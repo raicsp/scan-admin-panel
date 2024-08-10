@@ -1,7 +1,64 @@
 <?php
 include 'database/db_connect.php'; // Include the database connection
-include 'database/db-student-details.php';
+
+// Get student name from query parameter
 $studentName = $_GET['name'];
+
+// Fetch student details based on the student name
+$query = "SELECT studentID, name, grade_level, section FROM student 
+          JOIN classes ON student.class_id = classes.class_id 
+          WHERE name = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $studentName);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($row = $result->fetch_assoc()) {
+  $studentID = $row['studentID'];
+  $studentName = $row['name'];
+  $gradeLevel = $row['grade_level'];
+  $section = $row['section'];
+} else {
+  echo "Student not found";
+  exit();
+}
+
+// Fetching monthly attendance summary data for the student
+$monthlyAttendanceData = [];
+$attendanceByCategoryData = [];
+
+// Monthly Attendance Summary
+$query = "SELECT MONTH(date) as month, 
+                 SUM(status='Present') as days_present, 
+                 SUM(status='Absent') as days_absent 
+          FROM attendance 
+          WHERE studentID = ? 
+          GROUP BY MONTH(date)";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $studentID);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+  $monthlyAttendanceData[] = $row;
+}
+
+// Attendance by Category
+$query = "SELECT status, COUNT(*) as count 
+          FROM attendance 
+          WHERE studentID = ? 
+          GROUP BY status";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $studentID);
+$stmt->execute();
+$result = $stmt->get_result();
+
+while ($row = $result->fetch_assoc()) {
+  $attendanceByCategoryData[] = $row;
+}
+
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -29,6 +86,19 @@ $studentName = $_GET['name'];
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+  <style>
+    .student-info-container {
+      margin-bottom: 20px;
+    }
+    .equal-height {
+  display: flex;
+  flex-direction: column;
+}
+
+  </style>
+
+  
+
 </head>
 
 <body>
@@ -40,7 +110,7 @@ $studentName = $_GET['name'];
   <!-- End Sidebar-->
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Student Details: <span id="studentName"></span></h1>
+      <h1>Student Details</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -51,19 +121,32 @@ $studentName = $_GET['name'];
     </div><!-- End Page Title -->
 
     <section class="section">
+      <!-- Student Information Container -->
+      <div class="student-info-container">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+            <!-- Student Information -->
+            <div class="mb-3">
+              <h1> <?= htmlspecialchars($studentName) ?><br> </h1>
+              <h6> <?= htmlspecialchars($gradeLevel) ?> <?= htmlspecialchars($section) ?><br> </h6>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- End Student Information Container -->
+
+      <!-- Charts Container -->
       <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-6 equal-height">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Monthly Attendance Summary></span></h5>
+              <h5 class="card-title">Monthly Attendance Trends</h5>
               <!-- Monthly Attendance Summary Chart -->
               <div id="monthlyAttendanceChart1"></div>
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
-                  const urlParams = new URLSearchParams(window.location.search);
-                  const studentName = urlParams.get('name');
-                  document.getElementById('studentName').textContent = studentName;
-
                   const monthlyAttendanceData = <?php echo json_encode($monthlyAttendanceData); ?>;
                   const months = monthlyAttendanceData.map(item => item.month);
                   const daysPresent = monthlyAttendanceData.map(item => item.days_present);
@@ -79,7 +162,7 @@ $studentName = $_GET['name'];
                     }],
                     chart: {
                       type: 'line',
-                      height: 350
+                      height: 270
                     },
                     stroke: {
                       curve: 'smooth'
@@ -99,70 +182,15 @@ $studentName = $_GET['name'];
             </div>
           </div>
         </div>
-        <div class="col-lg-6">
+
+        <div class="col-lg-6  equal-height">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Monthly Attendance Summary ></span></h5>
-              <!-- Monthly Attendance Summary Chart -->
-              <div id="monthlyAttendanceChart2"></div>
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  const urlParams = new URLSearchParams(window.location.search);
-                  const studentName = urlParams.get('name');
-                  document.getElementById('studentName').textContent = studentName;
-
-                  const monthlyAttendanceData = <?php echo json_encode($monthlyAttendanceData); ?>;
-                  const months = monthlyAttendanceData.map(item => item.month);
-                  const daysPresent = monthlyAttendanceData.map(item => item.days_present);
-                  const daysAbsent = monthlyAttendanceData.map(item => item.days_absent);
-
-                  new ApexCharts(document.querySelector("#monthlyAttendanceChart2"), {
-                    series: [{
-                      name: 'Days Present',
-                      data: daysPresent
-                    }, {
-                      name: 'Days Absent',
-                      data: daysAbsent
-                    }],
-                    chart: {
-                      type: 'bar',
-                      height: 350
-                    },
-                    plotOptions: {
-                      bar: {
-                        borderRadius: 4,
-                        horizontal: false,
-                      }
-                    },
-                    dataLabels: {
-                      enabled: false
-                    },
-                    xaxis: {
-                      categories: months.map(month => new Date(0, month - 1).toLocaleString('default', {
-                        month: 'short'
-                      })),
-                    }
-                  }).render();
-                });
-              </script>
-              <!-- End Monthly Attendance Summary Chart -->
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Attendance by Category for <span id="studentName"></span></h5>
+              <h5 class="card-title">Attendance Distribution</h5>
               <!-- Attendance by Category Chart -->
               <div id="attendanceByCategoryChart"></div>
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
-                  const urlParams = new URLSearchParams(window.location.search);
-                  const studentName = urlParams.get('name');
-                  document.getElementById('studentName').textContent = studentName;
-
                   const attendanceByCategoryData = <?php echo json_encode($attendanceByCategoryData); ?>;
                   const categories = attendanceByCategoryData.map(item => item.status);
                   const counts = attendanceByCategoryData.map(item => item.count);
@@ -185,6 +213,8 @@ $studentName = $_GET['name'];
           </div>
         </div>
       </div>
+      <!-- End Charts Container -->
+
     </section>
   </main><!-- End #main -->
 

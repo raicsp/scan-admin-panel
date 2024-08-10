@@ -69,5 +69,23 @@
         </li>
       </ul>
     </li><!-- End Classes Nav -->
+
+        <!-- Reports Nav -->
+        <li class="nav-item">
+      <a class="nav-link <?php echo in_array($activePage, ['attendance-report', 'performance-report']) ? '' : 'collapsed'; ?>" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-file-earmark-text"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="reports-nav" class="nav-content collapse <?php echo in_array($activePage, ['attendance-report', 'performance-report']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="report.php" class="<?php echo $activePage === 'attendance-report' ? 'active' : ''; ?>">
+            <i class="bi bi-circle"></i><span>Attendance Report</span>
+          </a>
+        </li>
+
+      </ul>
+    </li><!-- End Reports Nav -->
+
   </ul>
+
+     
 </aside><!-- End Sidebar -->

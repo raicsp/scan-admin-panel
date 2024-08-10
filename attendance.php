@@ -66,7 +66,7 @@ $activePage = 'attendance';
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Student Attendance</h5>
+              <h5 class="card-title">Student Attendance <span>| <?= date("F j, Y") ?></span> </h5>
               <!-- Filter-->
               <div class="row mb-3">
                 <div class="col-md-6">
@@ -90,7 +90,7 @@ $activePage = 'attendance';
                   </select>
                 </div>
               </div>
-
+            
               <!-- Table with stripped rows -->
               <table class="table datatable" id="studentsTable">
                 <thead>
