@@ -85,7 +85,7 @@ include 'database/db-dashboard.php';
                     </div>
                     <div class="ps-3">
                       <h6 id="student"><?php echo $student; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">student</span>
+                      <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
                 </div>
@@ -102,7 +102,7 @@ include 'database/db-dashboard.php';
                     </div>
                     <div class="ps-3">
                       <h6 id="present-today"><?php echo $present_today; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">students</span>
+                      <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ include 'database/db-dashboard.php';
                     </div>
                     <div class="ps-3">
                       <h6 id="absent-today"><?php echo $absent_today; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">students</span>
+                      <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
                 </div>
@@ -134,14 +134,14 @@ include 'database/db-dashboard.php';
             <div class="col-md-6">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Total Late Students</h5>
+                  <h5 class="card-title">Total of Students Arriving Late</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-clock"></i>
                     </div>
                     <div class="ps-3">
                       <h6 id="late-today"><?php echo $late_today; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">students</span>
+                      <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
                 </div>
@@ -151,14 +151,14 @@ include 'database/db-dashboard.php';
             <div class="col-md-6">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Total Teachers</h5>
+                  <h5 class="card-title">Number of users</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-person-fill"></i>
                     </div>
                     <div class="ps-3">
                       <h6 id="teacher"><?php echo $teacher; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">teacher</span>
+                      <span class="text-muted small pt-2 ps-1">Teachers</span>
                     </div>
                   </div>
                 </div>
@@ -314,7 +314,7 @@ include 'database/db-dashboard.php';
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Most Absences </h5>
+                  <h5 class="card-title">Most Frequent Absences </h5>
                   <table class="table table-hover" id="absencesTable">
                     <thead>
                       <tr>
@@ -355,7 +355,7 @@ include 'database/db-dashboard.php';
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Most Late </h5>
+                  <h5 class="card-title">Students with the Highest Incidence of Tardiness </h5>
                   <table class="table table-hover" id="lateTable">
                     <thead>
                       <tr>
