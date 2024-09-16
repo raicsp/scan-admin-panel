@@ -254,14 +254,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             <!-- CSV Import Form -->
                             <form id="csvForm" class="row g-3 d-none" method="POST" action="" enctype="multipart/form-data">
+                                
+                                <!-- CSV format instruction -->
+                                <div class="col-md-12 mt-3">
+                                    <h5>CSV Format Instructions</h5>
+                                    <p>Ensure that your CSV file follows the exact format below:</p>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Gender</th>
+                                                <th>Teacher ID</th>
+                                                <th>Gmail</th>
+                                                <th>Class ID</th>
+                                                <th>Parent Contact</th>
+                                                <th>School Year</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>John Doe</td>
+                                                <td>Male</td>
+                                                <td>10</td>
+                                                <td>john.doe@gmail.com</td>
+                                                <td>4</td>
+                                                <td>09123456789</td>
+                                                <td>2024-2025</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jane Smith</td>
+                                                <td>Female</td>
+                                                <td>10</td>
+                                                <td>jane.smith@gmail.com</td>
+                                                <td>4</td>
+                                                <td>09123456789</td>
+                                                <td>2024-2025</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
                                 <div class="col-md-12">
                                     <label for="inputCSVFile" class="form-label">CSV File</label>
                                     <input type="file" name="csv_file" class="form-control" id="inputCSVFile" accept=".csv" required>
                                 </div>
+
                                 <div class="text-center">
                                     <button type="submit" name="import_csv" class="btn btn-primary">Import CSV</button>
                                 </div>
                             </form>
+
 
                         </div>
                     </div>
