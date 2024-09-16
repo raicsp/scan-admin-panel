@@ -1,6 +1,5 @@
 <?php
 include 'database/db_connect.php';
-
 include 'database/db-report.php';
 $activePage = 'attendance-report';
 ?>
@@ -25,12 +24,52 @@ $activePage = 'attendance-report';
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <style> 
+  <style>
     .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
-}
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
+    .form-control, .form-select {
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+    }
+
+    /* Custom form layout for spacing */
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .form-row .col-md-3 {
+      flex-grow: 1;
+    }
+
+    /* Align buttons */
+    .btn-container {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+    }
+
+    /* Styling improvements for buttons */
+    .btn-primary, .btn-success {
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* Improve table styling */
+    .table {
+      margin-top: 20px;
+    }
+
+    /* Responsive form layout */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
@@ -57,14 +96,10 @@ $activePage = 'attendance-report';
             <div class="card-body">
               <h5 class="card-title">Attendance Report</h5>
               <form method="GET">
-                <div class="row mb-3">
+                <!-- First row: Select Grade, Select Section, Select School Year -->
+                <div class="form-row mb-3">
                   <div class="col-md-3">
-                    <input type="date" class="form-control" name="startDate" value="<?= htmlspecialchars($startDate) ?>">
-                  </div>
-                  <div class="col-md-3">
-                    <input type="date" class="form-control" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
-                  </div>
-                  <div class="col-md-3">
+                    <label for="gradeFilter" class="form-label">Select Grade</label>
                     <select name="gradeFilter" id="gradeFilter" class="form-select" onchange="updateSections()">
                       <option value="">Select Grade</option>
                       <?php
@@ -75,6 +110,7 @@ $activePage = 'attendance-report';
                     </select>
                   </div>
                   <div class="col-md-3">
+                    <label for="sectionFilter" class="form-label">Select Section</label>
                     <select name="sectionFilter" id="sectionFilter" class="form-select">
                       <option value="">Select Section</option>
                       <?php
@@ -86,6 +122,7 @@ $activePage = 'attendance-report';
                     </select>
                   </div>
                   <div class="col-md-3">
+                    <label for="syFilter" class="form-label">Select School Year</label>
                     <select name="syFilter" id="syFilter" class="form-select">
                       <option value="">Select School Year</option>
                       <?php
@@ -96,35 +133,50 @@ $activePage = 'attendance-report';
                     </select>
                   </div>
                 </div>
-                <div class="row mb-3">
+
+                <!-- Second row: Initial Date, Ending Date -->
+                <div class="form-row mb-3">
                   <div class="col-md-3">
+                    <label for="startDate" class="form-label">Initial Date</label>
+                    <input type="date" id="startDate" class="form-control" name="startDate" value="<?= htmlspecialchars($startDate) ?>">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="endDate" class="form-label">Ending Date</label>
+                    <input type="date" id="endDate" class="form-control" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
+                  </div>
+                </div>
+
+                <!-- Buttons for Filtering and Exporting CSV -->
+                <div class="row mb-3">
+                  <div class="btn-container">
                     <button type="submit" class="btn btn-primary">Filter</button>
                     <button type="submit" name="export" value="csv" class="btn btn-success">Generate CSV</button>
                   </div>
                 </div>
               </form>
+
               <div class="table-responsive">
-    <table class="table datatable" id="studentsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <?php foreach ($dates as $date) : ?>
-                    <th><?= htmlspecialchars($date) ?></th>
-                <?php endforeach; ?>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($students as $student) : ?>
-                <tr>
-                    <td><?= htmlspecialchars($student['name']) ?></td>
-                    <?php foreach ($dates as $date) : ?>
-                        <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?></td>
+                <table class="table datatable" id="studentsTable">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <?php foreach ($dates as $date) : ?>
+                        <th><?= htmlspecialchars($date) ?></th>
+                      <?php endforeach; ?>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($students as $student) : ?>
+                      <tr>
+                        <td><?= htmlspecialchars($student['name']) ?></td>
+                        <?php foreach ($dates as $date) : ?>
+                          <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?></td>
+                        <?php endforeach; ?>
+                      </tr>
                     <?php endforeach; ?>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+                  </tbody>
+                </table>
+              </div>
 
             </div>
           </div>
@@ -132,6 +184,7 @@ $activePage = 'attendance-report';
       </div>
     </section>
   </main>
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -144,25 +197,23 @@ $activePage = 'attendance-report';
   <script src="assets/js/main.js"></script>
 
   <script>
-  function updateSections() {
+    function updateSections() {
       const gradeFilter = document.getElementById('gradeFilter').value;
       const sectionFilter = document.getElementById('sectionFilter');
       
-      // Clear existing options
       sectionFilter.innerHTML = '<option value="">Select Section</option>';
       
-      // Fetch sections for the selected grade
       const sectionsByGrade = <?php echo json_encode($uniqueSectionsByGrade); ?>;
       
       if (sectionsByGrade[gradeFilter]) {
-          sectionsByGrade[gradeFilter].forEach(section => {
-              const option = document.createElement('option');
-              option.value = section;
-              option.textContent = section;
-              sectionFilter.appendChild(option);
-          });
+        sectionsByGrade[gradeFilter].forEach(section => {
+          const option = document.createElement('option');
+          option.value = section;
+          option.textContent = section;
+          sectionFilter.appendChild(option);
+        });
       }
-  }
+    }
   </script>
 </body>
 
