@@ -78,4 +78,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alertType = 'warning';
     }
 }
+
+$alertMessage = '';
+$alertType = '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['import_csv'])) {
+        // CSV Import Logic
+        $fileName = $_FILES['csv_file']['tmp_name'];
+        if ($_FILES['csv_file']['size'] > 0) {
+            $file = fopen($fileName, 'r');
+            fgetcsv($file); // Skip header row if your CSV has one
+
+            while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
+                $name = mysqli_real_escape_string($conn, $column[0]);
+                $gender = mysqli_real_escape_string($conn, $column[1]);
+                $profile_pic = mysqli_real_escape_string($conn, $column[2]); // Assuming this is now included
+                $teacher_Id = mysqli_real_escape_string($conn, $column[3]); // Make sure teacher_Id is correct
+                $gmail = mysqli_real_escape_string($conn, $column[4]);
+                $class_id = mysqli_real_escape_string($conn, $column[5]);
+                $parent_contact = mysqli_real_escape_string($conn, $column[6]);
+                $school_year = mysqli_real_escape_string($conn, $column[7]);
+
+                // Check if the student already exists
+                $checkSql = "SELECT * FROM student WHERE name = '$name' AND class_id = '$class_id' AND school_year = '$school_year'";
+                $result = mysqli_query($conn, $checkSql);
+
+                if (mysqli_num_rows($result) == 0) {
+                    // Insert student into the database
+                    $sql = "INSERT INTO student (name, gender, profile_pic, teacher_Id, gmail, class_id, parent_contact, school_year) 
+                            VALUES ('$name', '$gender', '$profile_pic', '$teacher_Id', '$gmail', '$class_id', '$parent_contact', '$school_year')";
+                    if (!mysqli_query($conn, $sql)) {
+                        $_SESSION['alertMessage'] = "Error: " . mysqli_error($conn);
+                        $_SESSION['alertType'] = "danger";
+                    }
+                }
+            }
+            fclose($file);
+            $_SESSION['alertMessage'] = "CSV Import successful.";
+            $_SESSION['alertType'] = "success";
+        } else {
+            $_SESSION['alertMessage'] = "CSV file is empty.";
+            $_SESSION['alertType'] = "danger";
+        }
+    } elseif (isset($_POST['student_name'])) {
+        // Individual Encoding Logic
+        $name = $_POST['student_name'];
+        $gender = $_POST['gender'];
+        $class_id = $_POST['grade_level'] . '-' . $_POST['section'];
+        $parent_contact = $_POST['parent_contact'];
+        $gmail = $_POST['parent_email'];
+        $school_year = $_POST['school_year'];
+
+        // Check if the student already exists
+        $checkSql = "SELECT * FROM student WHERE name = '$name' AND class_id = '$class_id' AND school_year = '$school_year'";
+        $result = mysqli_query($conn, $checkSql);
+
+        if (mysqli_num_rows($result) == 0) {
+            // Insert student into the database
+            $sql = "INSERT INTO student (name, gender, class_id, parent_contact, gmail, school_year, teacher_Id) 
+                    VALUES ('$name', '$gender', '$class_id', '$parent_contact', '$gmail', '$school_year', NULL)";
+            if (mysqli_query($conn, $sql)) {
+                $_SESSION['alertMessage'] = "Student added successfully.";
+                $_SESSION['alertType'] = "success";
+            } else {
+                $_SESSION['alertMessage'] = "Error: " . mysqli_error($conn);
+                $_SESSION['alertType'] = "danger";
+            }
+        } else {
+            $_SESSION['alertMessage'] = "Student already exists!";
+            $_SESSION['alertType'] = "warning";
+        }
+    }
+
+    // Redirect to prevent form resubmission on reload
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
 ?>
