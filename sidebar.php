@@ -44,9 +44,9 @@
           </a>
         </li>
         <li>
-          <a href="add-teacher.php" class="<?php echo $activePage === 'add-teacher' ? 'active' : ''; ?>">
+          <!--<a href="add-teacher.php" class="<?php echo $activePage === 'add-teacher' ? 'active' : ''; ?>">
             <i class="bi bi-circle"></i><span>Register Teacher</span>
-          </a>
+          </a>-->
         </li>
       </ul>
     </li><!-- End Teachers Nav -->
