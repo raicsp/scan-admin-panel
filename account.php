@@ -1,70 +1,7 @@
 <?php
 $activePage = 'account'; // Set the active page
 include 'database/db_connect.php';
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Handle Add Teacher Form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
-  $first_name = $_POST['first_name'];
-  $last_name = $_POST['last_name'];
-  $email = $_POST['email'];
-  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-  $sql = "INSERT INTO users (firstname, lastname, email, password) VALUES ('$first_name', '$last_name', '$email', '$password')";
-
-  if ($conn->query($sql) === TRUE) {
-      $alert_message = "New teacher added successfully!";
-      $alert_type = "success";
-      header("Location: " . $_SERVER['PHP_SELF']);
-      exit();
-  } else {
-      $alert_message = "Error: " . $sql . "<br>" . $conn->error;
-      $alert_type = "danger";
-  }
-}
-
-// Handle Edit Teacher Form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
-  $teacher_id = $_POST['teacher_id'];
-  $first_name = $_POST['first_name'];
-  $last_name = $_POST['last_name'];
-  $email = $_POST['email'];
-
-  $sql = "UPDATE users SET firstname='$first_name', lastname='$last_name', email='$email' WHERE id='$teacher_id'";
-
-  if ($conn->query($sql) === TRUE) {
-      $alert_message = "Teacher updated successfully!";
-      $alert_type = "success";
-      header("Location: " . $_SERVER['PHP_SELF']);
-      exit();
-  } else {
-      $alert_message = "Error: " . $sql . "<br>" . $conn->error;
-      $alert_type = "danger";
-  }
-}
-
-// Handle Delete Teacher
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
-  $teacher_id = $_POST['teacher_id'];
-
-  $sql = "DELETE FROM users WHERE id='$teacher_id'";
-
-  if ($conn->query($sql) === TRUE) {
-      $alert_message = "Teacher deleted successfully!";
-      $alert_type = "success";
-      header("Location: " . $_SERVER['PHP_SELF']);
-      exit();
-  } else {
-      $alert_message = "Error: " . $sql . "<br>" . $conn->error;
-      $alert_type = "danger";
-  }
-}
+include 'database/db-add-teacher.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -158,8 +97,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
                   <?php
                   $result = $conn->query("SELECT * FROM users");
                   if ($result->num_rows > 0) {
-                      while ($row = $result->fetch_assoc()) {
-                          echo "<tr>
+                    while ($row = $result->fetch_assoc()) {
+                      echo "<tr>
                                   <td>{$row['id']}</td>
                                   <td>{$row['firstname']} {$row['lastname']}</td>
                                   <td>{$row['email']}</td>
@@ -168,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
                                       <button class='btn btn-danger btn-sm' onclick='deleteTeacher({$row['id']})'>Delete</button>
                                   </td>
                                 </tr>";
-                      }
+                    }
                   }
                   ?>
                 </tbody>
@@ -206,11 +145,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
             </div>
             <div class="col-md-6">
               <label for="inputEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com" required>
+              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com"
+                required>
             </div>
             <div class="col-md-6">
               <label for="inputPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Enter password" required>
+              <input type="password" class="form-control" id="inputPassword" name="password"
+                placeholder="Enter password" required>
             </div>
             <div class="col-12">
               <div class="form-check">
@@ -231,7 +172,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
   </div><!-- End Add Teacher Modal-->
 
   <!-- ======= Edit Teacher Modal ======= -->
-  <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+  <!-- Edit Teacher Modal -->
+  <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -240,7 +183,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
         </div>
         <div class="modal-body">
           <!-- Edit Teacher Form -->
-          <form class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+          <form id="editTeacherForm" class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+            method="post">
             <input type="hidden" id="editTeacherId" name="teacher_id">
             <input type="hidden" name="edit_teacher" value="1">
             <div class="col-md-6">
@@ -267,14 +211,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
               <button type="submit" class="btn btn-primary">Save Changes</button>
               <button type="reset" class="btn btn-secondary">Reset</button>
             </div>
-          </form><!-- End Edit Teacher Form -->
+          </form>
+          <!-- End Edit Teacher Form -->
         </div>
       </div>
     </div>
-  </div><!-- End Edit Teacher Modal-->
+  </div>
+
 
   <!-- Delete Teacher Form (hidden) -->
-  <form id="deleteTeacherForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" style="display:none;">
+  <form id="deleteTeacherForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
+    style="display:none;">
     <input type="hidden" name="delete_teacher" value="1">
     <input type="hidden" id="deleteTeacherId" name="teacher_id">
   </form>
@@ -283,10 +230,98 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
   <script>
+
+    <?php if (isset($_SESSION['message'])): ?>
+      Swal.fire({
+        title: 'Success!',
+        text: "<?php echo $_SESSION['message']; ?>",
+        icon: '<?php echo $_SESSION['message_type']; ?>',
+        confirmButtonText: 'OK'
+      });
+      <?php
+      // Clear the session message after displaying it
+      unset($_SESSION['message']);
+      unset($_SESSION['message_type']);
+      ?>
+    <?php endif; ?>
+
+    // Initialize a flag to track form submissions
+    let isSubmitting = false;
+
+    // Handle add teacher form submission and confirmation
+    document.querySelector('form[action*="add_teacher"]').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent default form submission
+
+      if (isSubmitting) return; // Prevent duplicate submissions
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You are about to add a new teacher.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, add it!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          isSubmitting = true; // Set the flag to prevent further submissions
+          this.submit(); // Submit the form
+        } else {
+          isSubmitting = false; // Reset the flag if canceled
+        }
+      });
+    });
+
+    // Handle edit teacher form submission and confirmation
+    document.querySelector('#editTeacherForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent default form submission
+
+      if (isSubmitting) return; // Prevent duplicate submissions
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You are about to save changes for this teacher.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, save changes!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          isSubmitting = true; // Set the flag to prevent further submissions
+          this.submit(); // Submit the form
+        } else {
+          isSubmitting = false; // Reset the flag if canceled
+        }
+      });
+    });
+
+    // Function to handle deleting a teacher with SweetAlert confirmation
+    function deleteTeacher(id) {
+      if (isSubmitting) return; // Prevent duplicate deletions
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          isSubmitting = true; // Set the flag to prevent further submissions
+          document.getElementById('deleteTeacherId').value = id;
+          document.getElementById('deleteTeacherForm').submit();
+        } else {
+          isSubmitting = false; // Reset the flag if canceled
+        }
+      });
+    }
+
     // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function() {
+    document.getElementById('searchInput').addEventListener('keyup', function () {
       let filter = this.value.toLowerCase();
       let rows = document.querySelectorAll('#accountsTable tbody tr');
       rows.forEach(row => {
@@ -295,20 +330,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
       });
     });
 
-    // Function to handle editing a teacher
+    // Function to populate the edit modal with teacher data
     function editTeacher(id, firstName, lastName, email) {
       document.getElementById('editTeacherId').value = id;
       document.getElementById('editFirstName').value = firstName;
       document.getElementById('editLastName').value = lastName;
       document.getElementById('editEmail').value = email;
-    }
-
-    // Function to handle deleting a teacher
-    function deleteTeacher(id) {
-      if (confirm('Are you sure you want to delete this teacher?')) {
-        document.getElementById('deleteTeacherId').value = id;
-        document.getElementById('deleteTeacherForm').submit();
-      }
     }
 
     // Function to toggle password visibility
