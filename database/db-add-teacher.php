@@ -1,4 +1,5 @@
 <?php
+session_start(); // Start the session
 
 include 'database/db_connect.php'; // Include the database connection file
 
@@ -32,39 +33,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $email = trim($_POST["email"]);
     }
-
-    // Check input errors before inserting in database
-    if (empty($firstNameErr) && empty($lastNameErr) && empty($emailErr)) {
-        // Prepare an insert statement
-        $sql = "INSERT INTO users (firstname, lastname, email) VALUES (?, ?, ?)";
-
-        if ($stmt = $conn->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("sss", $param_firstName, $param_lastName, $param_email);
-
-            // Set parameters
-            $param_firstName = $firstName;
-            $param_lastName = $lastName;
-            $param_email = $email;
-
-            // Attempt to execute the prepared statement
-            if ($stmt->execute()) {
-                $alertMessage = "Teacher added successfully!";
-                $alertType = "success";
-            } else {
-                $alertMessage = "Something went wrong. Please try again later.";
-                $alertType = "danger";
-            }
-
-            // Close statement
-            $stmt->close();
-        }
-    } else {
-        $alertMessage = "Please correct the errors and try again.";
-        $alertType = "danger";
-    }
-
-    // Close connection
-    $conn->close();
 }
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle Add Teacher Form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO users (firstname, lastname, email, password) VALUES ('$first_name', '$last_name', '$email', '$password')";
+
+    if ($conn->query($sql) === TRUE) {
+        $_SESSION['message'] = "Teacher added successfully!";
+        $_SESSION['message_type'] = "success";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
+        $_SESSION['message_type'] = "danger";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+
+// Handle Edit Teacher Form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
+    $teacher_id = $_POST['teacher_id'];
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+
+    $sql = "UPDATE users SET firstname='$first_name', lastname='$last_name', email='$email' WHERE id='$teacher_id'";
+
+    if ($conn->query($sql) === TRUE) {
+        $_SESSION['message'] = "Teacher updated successfully!";
+        $_SESSION['message_type'] = "success";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
+        $_SESSION['message_type'] = "danger";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+
+// Handle Delete Teacher
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
+    $teacher_id = $_POST['teacher_id'];
+
+    $sql = "DELETE FROM users WHERE id='$teacher_id'";
+
+    if ($conn->query($sql) === TRUE) {
+        $_SESSION['message'] = "Teacher removed successfully!";
+        $_SESSION['message_type'] = "success";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
+        $_SESSION['message_type'] = "danger";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
+
+// Close connection
+$conn->close();
 ?>
