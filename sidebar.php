@@ -32,24 +32,25 @@
       </ul>
     </li><!-- End Students Nav -->
 
-    <!-- Teachers Nav -->
-    <li class="nav-item">
-      <a class="nav-link <?php echo in_array($activePage, ['account', 'register-teacher']) ? '' : 'collapsed'; ?>" data-bs-target="#teachers-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-person"></i><span>Teachers</span><i class="bi bi-chevron-down ms-auto"></i>
+<!-- Teachers Nav -->
+<li class="nav-item">
+  <a class="nav-link <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? '' : 'collapsed'; ?>" data-bs-target="#teachers-nav" data-bs-toggle="collapse" href="#">
+    <i class="bi bi-person"></i><span>Accounts</span><i class="bi bi-chevron-down ms-auto"></i>
+  </a>
+  <ul id="teachers-nav" class="nav-content collapse <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
+    <li>
+      <a href="account.php" class="<?php echo $activePage === 'account' ? 'active' : ''; ?>">
+        <i class="bi bi-circle"></i><span>Teachers</span>
       </a>
-      <ul id="teachers-nav" class="nav-content collapse <?php echo in_array($activePage, ['account', 'add-teacher']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="account.php" class="<?php echo $activePage === 'account' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Accounts</span>
-          </a>
-        </li>
-        <li>
-          <!--<a href="add-teacher.php" class="<?php echo $activePage === 'add-teacher' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Register Teacher</span>
-          </a>-->
-        </li>
-      </ul>
-    </li><!-- End Teachers Nav -->
+    </li>
+
+    <li>
+      <a href="administrator.php" class="<?php echo $activePage === 'administrator' ? 'active' : ''; ?>">
+        <i class="bi bi-circle"></i><span>Administrators</span>
+      </a>
+    </li>
+  </ul>
+</li><!-- End Teachers Nav -->
 
     <!-- Classes Nav -->
     <li class="nav-item">
