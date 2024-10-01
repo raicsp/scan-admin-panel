@@ -1,7 +1,11 @@
 <?php
-session_start(); // Start the session
+//session_start(); // Start the session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'database/db_connect.php';
 include 'database/db-header.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -17,39 +21,39 @@ include 'database/db-header.php';
 
 <body>
 
-<!-- ======= Header ======= -->
-<header id="header" class="header fixed-top d-flex align-items-center">
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
 
-    <div class="d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center">
-            <!-- <img src="assets/img/logo.png" alt=""> -->
-            <span class="d-none d-lg-block">ATTENDANCE </span>
-        </a>
-        <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="index.html" class="logo d-flex align-items-center">
+                <!-- <img src="assets/img/logo.png" alt=""> -->
+                <span class="d-none d-lg-block">ATTENDANCE </span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo -->
 
-    <!-- <div class="search-bar">
+        <!-- <div class="search-bar">
         <form class="search-form d-flex align-items-center" method="POST" action="#">
             <input type="text" name="query" placeholder="Search" title="Enter search keyword">
             <button type="submit" title="Search"><i class="bi bi-search"></i></button>
         </form>
     </div> -->
-    <!-- End Search Bar -->
+        <!-- End Search Bar -->
 
-    <nav class="header-nav ms-auto">
-        <ul class="d-flex align-items-center">
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
 
-            <li class="nav-item d-block d-lg-none">
-                <a class="nav-link nav-icon search-bar-toggle" href="#">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li><!-- End Search Icon-->
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link nav-icon search-bar-toggle" href="#">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li><!-- End Search Icon-->
 
-            <!--<li class="nav-item dropdown">
+                <!--<li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-bell"></i>
                     <span class="badge bg-primary badge-number">4</span>
-                </a> End Notification Icon -->
+                </a> 
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                     <li class="dropdown-header">
@@ -114,17 +118,17 @@ include 'database/db-header.php';
                     <li class="dropdown-footer">
                         <a href="#">Show all notifications</a>
                     </li>
-                </ul><!-- End Notification Dropdown Items -->
+                </ul>End Notification Dropdown Items -->
 
-            </li><!-- End Notification Nav -->
+                </li><!-- End Notification Nav -->
 
-            <!--<li class="nav-item dropdown">
+                <!--<li class="nav-item dropdown">
                 <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-chat-left-text"></i>
                     <span class="badge bg-success badge-number">3</span>
                 </a> End Messages Icon -->
 
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+                <!--<ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
                     <li class="dropdown-header">
                         You have 3 new messages
                         <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
@@ -178,107 +182,97 @@ include 'database/db-header.php';
                     <li class="dropdown-footer">
                         <a href="#">Show all messages</a>
                     </li>
-                </ul><!-- End Messages Dropdown Items -->
+                </ul>End Messages Dropdown Items -->
 
-            </li><!-- End Messages Nav -->
+                </li><!-- End Messages Nav -->
 
-            <li class="nav-item dropdown pe-3">
-                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-                    <span class="d-none d-md-block dropdown-toggle ps-2">
-                        <?php 
-                        // Check if firstname and lastname are set in the session
-                        $fullname = isset($_SESSION['firstname']) && isset($_SESSION['lastname']) ? htmlspecialchars($_SESSION['firstname'] . ' ' . $_SESSION['lastname']) : 'Guest';
-                        echo $fullname; 
-                        ?>
-                    </span>
-                </a><!-- End Profile Image Icon -->
-
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                <li class="dropdown-header">
-                        <h6><?php echo $fullname; ?></h6>
-                        <span>
-                            <?php 
-                            $position = isset($_SESSION['position']) 
-                                ? htmlspecialchars($_SESSION['position']) 
-                                : 'Unknown Position';
-                            echo $position;
+                <li class="nav-item dropdown pe-3">
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="<?php echo $profile_pic; ?>" alt="Profile" class="rounded-circle">
+                        <!-- Use the session profile picture -->
+                        <span class="d-none d-md-block dropdown-toggle ps-2">
+                            <?php
+                            // Check if firstname and lastname are set in the session
+                            $fullname = isset($_SESSION['firstname']) && isset($_SESSION['lastname']) ? htmlspecialchars($_SESSION['firstname'] . ' ' . $_SESSION['lastname']) : 'Guest';
+                            echo $fullname;
                             ?>
                         </span>
-                </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                    </a><!-- End Profile Image Icon -->
 
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-person"></i>
-                            <span>My Profile</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header">
+                            <h6><?php echo $fullname; ?></h6>
+                            <span>
+                                <?php
+                                $position = isset($_SESSION['position']) ? htmlspecialchars($_SESSION['position']) : 'Unknown Position';
+                                echo $position;
+                                ?>
+                            </span>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="profile-settings.php">
+                                <i class="bi bi-person-gear"></i>
+                                <span>Profile Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
 
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                            <i class="bi bi-gear"></i>
-                            <span>Account Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
+                        <!--<li>
+                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Need Help?</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li> -->
 
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                            <i class="bi bi-question-circle"></i>
-                            <span>Need Help?</span>
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center" href="#" onclick="confirmLogout()">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span>Sign Out</span>
-                        </a>
-                    </li>
-
-                </ul><!-- End Profile Dropdown Items -->
-            </li><!-- End Profile Nav -->
-
-        </ul>
-    </nav><!-- End Icons Navigation -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="confirmLogout()">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sign Out</span>
+                            </a>
+                        </li>
 
 
-<!-- JavaScript for SweetAlert2 logout confirmation -->
-<script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You will be logged out of your account.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, log out!',
-                cancelButtonText: 'No, stay here'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect to logout
-                    window.location.href = "?action=logout";
-                }
-            });
-        }
-        
-        
-    </script>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
 
 
-</header><!-- End Header -->
+        <!-- JavaScript for SweetAlert2 logout confirmation -->
+        <script>
+            function confirmLogout() {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be logged out of your account.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log out!',
+                    cancelButtonText: 'No, stay here'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to logout
+                        window.location.href = "?action=logout";
+                    }
+                });
+            }
+
+
+        </script>
+
+
+    </header><!-- End Header -->
 
 </body>
+
 </html>

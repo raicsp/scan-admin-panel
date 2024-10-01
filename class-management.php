@@ -104,8 +104,9 @@ include 'database/db-class-management.php';
 
           <div class="card">
             <div class="card-header">
-              <h5 class="card-title">Manage Classes</h5>
+              <h5 class="card-title">MANAGE CLASSES</h5>
               <!-- Add Class Button -->
+        
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassModal">
                 Add Class
               </button>
@@ -113,61 +114,63 @@ include 'database/db-class-management.php';
 
             <div class="card-body">
               <!-- Add Class Modal -->
-              <div class="modal fade" id="addClassModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Add New Class</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form id="addClassForm" method="POST" action="">
-                        <div class="mb-3">
-                          <label for="inputGradeLevel" class="form-label">Grade Level</label>
-                          <input type="text" class="form-control" id="inputGradeLevel" name="gradeLevel" placeholder="e.g., 10th Grade" required>
-                        </div>
-                        <div class="mb-3">
-                          <label for="inputSection" class="form-label">Section</label>
-                          <input type="text" class="form-control" id="inputSection" name="section" placeholder="e.g., A" required>
-                        </div>
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary" onclick="submitClassForm()">Save changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div><!-- End Add Class Modal -->
+<!-- Add New Class Modal -->
+<div class="modal fade" id="addClassModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Class</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addClassForm" method="POST" action="">
+          <div class="mb-3">
+            <label for="inputGradeLevel" class="form-label">Grade Level</label>
+            <input type="text" class="form-control" id="inputGradeLevel" name="gradeLevel" placeholder="e.g., 10th Grade" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="mb-3">
+            <label for="inputSection" class="form-label">Section</label>
+            <input type="text" class="form-control" id="inputSection" name="section" placeholder="e.g., A" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitClassForm()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div><!-- End Add Class Modal -->
 
-              <!-- Update Class Modal -->
-              <div class="modal fade" id="updateClassModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Update Class</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form id="updateClassForm" method="POST" action="">
-                        <input type="hidden" name="class_id" id="updateClassId">
-                        <div class="mb-3">
-                          <label for="updateGradeLevel" class="form-label">Grade Level</label>
-                          <input type="text" class="form-control" id="updateGradeLevel" name="gradeLevel" placeholder="e.g., 10th Grade" required>
-                        </div>
-                        <div class="mb-3">
-                          <label for="updateSection" class="form-label">Section</label>
-                          <input type="text" class="form-control" id="updateSection" name="section" placeholder="e.g., A" required>
-                        </div>
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary" onclick="submitUpdateClassForm()">Save changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div><!-- End Update Class Modal -->
+<!-- Update Class Modal -->
+<div class="modal fade" id="updateClassModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Class</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateClassForm" method="POST" action="">
+          <input type="hidden" name="class_id" id="updateClassId">
+          <div class="mb-3">
+            <label for="updateGradeLevel" class="form-label">Grade Level</label>
+            <input type="text" class="form-control" id="updateGradeLevel" name="gradeLevel" placeholder="e.g., 10th Grade" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="mb-3">
+            <label for="updateSection" class="form-label">Section</label>
+            <input type="text" class="form-control" id="updateSection" name="section" placeholder="e.g., A" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitUpdateClassForm()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div><!-- End Update Class Modal -->
+
 
               <!-- Confirm Delete Modal -->
               <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
@@ -194,7 +197,7 @@ include 'database/db-class-management.php';
                 <table class="table table-hover" id="classTable">
                   <thead>
                     <tr>
-                      <th scope="col">Class ID</th>
+                     
                       <th scope="col">Grade Level</th>
                       <th scope="col">Section</th>
                       <th scope="col">Actions</th>
@@ -203,7 +206,7 @@ include 'database/db-class-management.php';
                   <tbody>
                     <?php foreach ($classes as $class) : ?>
                       <tr data-class-id="<?= htmlspecialchars($class['class_id']) ?>">
-                        <td><?= htmlspecialchars($class['class_id']) ?></td>
+                        
                         <td><?= htmlspecialchars($class['grade_level']) ?></td>
                         <td><?= htmlspecialchars($class['section']) ?></td>
                         <td>

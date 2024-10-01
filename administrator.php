@@ -51,7 +51,7 @@ include 'database/db-administrator.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Account Management</h1>
+      <h1>ADMINISTRATOR ACCOUNTS</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -68,7 +68,7 @@ include 'database/db-administrator.php';
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">Teacher Accounts</h5>
+                <h5 class="card-title">ADMINISTRATOR ACCOUNTS</h5>
 
                 <!-- Add Teacher Button -->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
@@ -84,7 +84,7 @@ include 'database/db-administrator.php';
               </div>
 
               <!-- Table with Data -->
-              <table id="accountsTable" class="table">
+              <table id="accountsTable" class="table  table-bordered ">
                 <thead>
                   <tr>
             
@@ -140,23 +140,59 @@ include 'database/db-administrator.php';
             <input type="hidden" name="add_teacher" value="1">
             <div class="col-md-6">
               <label for="inputFirstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required>
+              <input type="text" 
+                     class="form-control" 
+                     id="inputFirstName" 
+                     name="first_name" 
+                     placeholder="John" 
+                     required 
+                     maxlength="50"
+                     pattern="[A-Za-z\s]{1,50}" 
+                     title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
+
+            <!-- Last Name -->
             <div class="col-md-6">
               <label for="inputLastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="inputLastName" name="last_name" placeholder="Doe" required>
+              <input type="text" 
+                     class="form-control" 
+                     id="inputLastName" 
+                     name="last_name" 
+                     placeholder="Doe" 
+                     required 
+                     maxlength="50"
+                     pattern="[A-Za-z\s]{1,50}" 
+                     title="Last Name should contain only letters and spaces, max 50 characters.">
             </div>
+
+            <!-- Email -->
             <div class="col-md-6">
               <label for="inputEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com"
-                required>
+              <input type="email" 
+                     class="form-control" 
+                     id="inputEmail" 
+                     name="email" 
+                     placeholder="john.doe@example.com"
+                     required 
+                     maxlength="50" 
+                     title="Please enter a valid email address, max 50 characters.">
             </div>
+
+            <!-- Position -->
             <div class="col-md-6">
-                <label for="position">Position</label>
-                <input type="text" class="form-control" id="position" name="position" placeholder="Chairperson" required>
+                <label for="position" class="form-label">Position</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="position" 
+                       name="position" 
+                       placeholder="Chairperson" 
+                       required 
+                       maxlength="50"
+                       pattern="[A-Za-z\s]{1,50}" 
+                       title="Position should only contain letters and spaces, max 50 characters.">
             </div>
 
-
+            <!-- Confirmation Check -->
             <div class="col-12">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="gridCheck" required>
@@ -165,6 +201,8 @@ include 'database/db-administrator.php';
                 </label>
               </div>
             </div>
+
+            <!-- Submit and Reset Buttons -->
             <div class="text-center">
               <button type="submit" class="btn btn-primary">Submit</button>
               <button type="reset" class="btn btn-secondary">Reset</button>
@@ -173,7 +211,7 @@ include 'database/db-administrator.php';
         </div>
       </div>
     </div>
-  </div><!-- End Add Teacher Modal-->
+</div><!-- End Add Teacher Modal-->
 
   <!-- ======= Edit Teacher Modal ======= -->
   <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel"
@@ -190,22 +228,58 @@ include 'database/db-administrator.php';
             method="post">
             <input type="hidden" id="editTeacherId" name="id">
             <input type="hidden" name="edit_teacher" value="1">
-            <div class="col-md-6">
+             <!-- First Name -->
+             <div class="col-md-6">
               <label for="editFirstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="editFirstName" name="first_name" required>
+              <input type="text" 
+                     class="form-control" 
+                     id="editFirstName" 
+                     name="first_name" 
+                     required 
+                     maxlength="50"
+                     pattern="[A-Za-z\s]{1,50}" 
+                     title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
+
+            <!-- Last Name -->
             <div class="col-md-6">
               <label for="editLastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="editLastName" name="last_name" required>
+              <input type="text" 
+                     class="form-control" 
+                     id="editLastName" 
+                     name="last_name" 
+                     required 
+                     maxlength="50"
+                     pattern="[A-Za-z\s]{1,50}" 
+                     title="Last Name should contain only letters and spaces, max 50 characters.">
             </div>
+
+            <!-- Email -->
             <div class="col-md-6">
               <label for="editEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="editEmail" name="email" required>
+              <input type="email" 
+                     class="form-control" 
+                     id="editEmail" 
+                     name="email" 
+                     required 
+                     maxlength="50" 
+                     title="Please enter a valid email address, max 50 characters.">
             </div>
+
+            <!-- Position -->
             <div class="col-md-6">
               <label for="editPosition" class="form-label">Position</label>
-              <input type="text" class="form-control" id="editPosition" name="position" required>
+              <input type="text" 
+                     class="form-control" 
+                     id="editPosition" 
+                     name="position" 
+                     required 
+                     maxlength="50"
+                     pattern="[A-Za-z\s]{1,50}" 
+                     title="Position should only contain letters and spaces, max 50 characters.">
             </div>
+
+            <!-- Submit and Reset Buttons -->
             <div class="text-center">
               <button type="submit" class="btn btn-primary">Save Changes</button>
               <button type="reset" class="btn btn-secondary">Reset</button>
@@ -310,7 +384,22 @@ function deleteTeacher(id) {
       });
     });
   </script>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataTable = new simpleDatatables.DataTable("#accountsTable", {
+        searchable: false,
+        paging: true,
+        fixedHeight: true,
+        perPage: 10, // Set the number of rows per page
+        labels: {
+          placeholder: "Search...",
+          perPage: "entries per page",
+          noRows: "No results found",
+          info: "Showing {start} to {end} of {rows} results"
+        }
+      });
+    });
+</script>
 </body>
 
 </html>

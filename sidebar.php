@@ -1,5 +1,14 @@
+<?php
+// Get the user's position from the session
+$userPosition = $_SESSION['position'] ?? '';
+
+// Function to determine whether to show the Accounts section
+$showAccounts = !in_array($userPosition, ['Elementary Chairperson', 'High School Chairperson']);
+?>
+
 <aside id="sidebar" class="sidebar">
   <ul class="sidebar-nav" id="sidebar-nav">
+    
     <!-- Dashboard Nav -->
     <li class="nav-item">
       <a class="nav-link <?php echo $activePage === 'dashboard' ? '' : 'collapsed'; ?>" href="dashboard.php">
@@ -32,26 +41,6 @@
       </ul>
     </li><!-- End Students Nav -->
 
-<!-- Teachers Nav -->
-<li class="nav-item">
-  <a class="nav-link <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? '' : 'collapsed'; ?>" data-bs-target="#teachers-nav" data-bs-toggle="collapse" href="#">
-    <i class="bi bi-person"></i><span>Accounts</span><i class="bi bi-chevron-down ms-auto"></i>
-  </a>
-  <ul id="teachers-nav" class="nav-content collapse <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
-    <li>
-      <a href="account.php" class="<?php echo $activePage === 'account' ? 'active' : ''; ?>">
-        <i class="bi bi-circle"></i><span>Teachers</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="administrator.php" class="<?php echo $activePage === 'administrator' ? 'active' : ''; ?>">
-        <i class="bi bi-circle"></i><span>Administrators</span>
-      </a>
-    </li>
-  </ul>
-</li><!-- End Teachers Nav -->
-
     <!-- Classes Nav -->
     <li class="nav-item">
       <a class="nav-link <?php echo in_array($activePage, ['class', 'class-management']) ? '' : 'collapsed'; ?>" data-bs-target="#classes-nav" data-bs-toggle="collapse" href="#">
@@ -71,22 +60,42 @@
       </ul>
     </li><!-- End Classes Nav -->
 
-        <!-- Reports Nav -->
-        <li class="nav-item">
-      <a class="nav-link <?php echo in_array($activePage, ['attendance-report', 'performance-report']) ? '' : 'collapsed'; ?>" data-bs-target="#reports-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-file-earmark-text"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+    <!-- Reports Nav -->
+    <li class="nav-item">
+      <a class="nav-link <?php echo $activePage === 'attendance-report' ? '' : 'collapsed'; ?>" href="report.php">
+        <i class="bi bi-calendar"></i><span>Reports</span>
       </a>
-      <ul id="reports-nav" class="nav-content collapse <?php echo in_array($activePage, ['attendance-report', 'performance-report']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
+    </li>
+  <!-- End Reports Nav -->
+     
+
+    <!-- Academic Years Nav -->
+    <li class="nav-item">
+      <a class="nav-link <?php echo $activePage === 'manage-years' ? '' : 'collapsed'; ?>" href="manage-years.php">
+        <i class="bi bi-calendar"></i><span>Academic Years</span>
+      </a>
+    </li><!-- End Academic Years Nav -->
+
+    <!-- Accounts Nav (hidden for certain roles) -->
+    <?php if ($showAccounts): ?>
+    <li class="nav-item">
+      <a class="nav-link <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? '' : 'collapsed'; ?>" data-bs-target="#teachers-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-person"></i><span>Accounts</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="teachers-nav" class="nav-content collapse <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
         <li>
-          <a href="report.php" class="<?php echo $activePage === 'attendance-report' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Attendance Report</span>
+          <a href="account.php" class="<?php echo $activePage === 'account' ? 'active' : ''; ?>">
+            <i class="bi bi-circle"></i><span>Teachers</span>
           </a>
         </li>
-
+        <li>
+          <a href="administrator.php" class="<?php echo $activePage === 'administrator' ? 'active' : ''; ?>">
+            <i class="bi bi-circle"></i><span>Administrators</span>
+          </a>
+        </li>
       </ul>
-    </li><!-- End Reports Nav -->
-
+    </li><!-- End Teachers Nav -->
+    <?php endif; ?>
+    
   </ul>
-
-     
 </aside><!-- End Sidebar -->

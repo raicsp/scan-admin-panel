@@ -1,7 +1,7 @@
 <?php
 include 'database/db_connect.php';
 include 'database/db-report.php';
-$activePage = 'attendance-report';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -120,17 +120,7 @@ $activePage = 'attendance-report';
                       } ?>
                     </select>
                   </div>
-                  <div class="col-md-3">
-                    <label for="syFilter" class="form-label"><b>Select School Year</b></label>
-                    <select name="syFilter" id="syFilter" class="form-select">
-                      <option value="">Select School Year</option>
-                      <?php
-                      $schoolYears = array_unique(array_column($students, 'school_year'));
-                      foreach ($schoolYears as $schoolYear) : ?>
-                        <option value="<?= htmlspecialchars($schoolYear) ?>" <?= $schoolYear == $syFilter ? 'selected' : '' ?>><?= htmlspecialchars($schoolYear) ?></option>
-                      <?php endforeach; ?>
-                    </select>
-                  </div>
+
                 </div>
 
 

@@ -3,6 +3,20 @@ include 'database/db_connect.php';
 include 'database/db-attendance.php';
 
 $activePage = 'attendance';
+$gradeSections = [];
+foreach ($students as $student) {
+  $grade = $student['grade_level'];
+  $section = $student['section'];
+
+  // Add sections for each grade
+  if (!isset($gradeSections[$grade])) {
+    $gradeSections[$grade] = [];
+  }
+
+  if (!in_array($section, $gradeSections[$grade])) {
+    $gradeSections[$grade][] = $section;
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,7 +64,7 @@ $activePage = 'attendance';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Student Attendance</h1>
+      <h1>STUDENT ATTENDANCE</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -66,7 +80,9 @@ $activePage = 'attendance';
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Student Attendance <span>| <?= date("F j, Y") ?></span> </h5>
+              <h5 class="card-title">STUDENT ATTENDANCE <br><span> <?= date("F j, Y") ?></span> </h5>
+
+
               <!-- Filter-->
               <div class="row mb-3">
                 <div class="col-md-6">
@@ -82,17 +98,18 @@ $activePage = 'attendance';
                 <div class="col-md-6">
                   <select id="sectionFilter" class="form-select">
                     <option value="">Select Section</option>
-                    <?php
-                    $sections = array_unique(array_column($students, 'section'));
-                    foreach ($sections as $section) : ?>
-                      <option value="<?= htmlspecialchars($section) ?>"><?= htmlspecialchars($section) ?></option>
-                    <?php endforeach; ?>
+                    <!-- Sections will be dynamically added based on the selected grade -->
                   </select>
                 </div>
               </div>
-            
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Search by name">
+                </div>
+              </div>
+
               <!-- Table with stripped rows -->
-              <table class="table datatable" id="studentsTable">
+              <table class="table table-hover" id="studentsTable">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -144,30 +161,91 @@ $activePage = 'attendance';
     document.addEventListener('DOMContentLoaded', (event) => {
       const gradeFilter = document.getElementById('gradeFilter');
       const sectionFilter = document.getElementById('sectionFilter');
+      const searchInput = document.getElementById('searchInput');
       const table = document.getElementById('studentsTable');
       const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-      const filterTable = () => {
-        const gradeValue = gradeFilter.value;
-        const sectionValue = sectionFilter.value;
+      function filterTable() {
+        const searchFilter = searchInput.value.toUpperCase();
+        const gradeFilterValue = gradeFilter.value.toUpperCase();
+        const sectionFilterValue = sectionFilter.value.toUpperCase();
+        const rows = document.querySelectorAll('#studentsTable tbody tr');
 
-        for (let row of rows) {
-          const grade = row.cells[2].textContent;
-          const section = row.cells[3].textContent;
+        rows.forEach(row => {
+          const name = row.cells[0].textContent.toUpperCase();
+          const gradeCell = row.cells[2].textContent.toUpperCase();
+          const sectionCell = row.cells[3].textContent.toUpperCase();
 
-          if ((gradeValue === "" || grade === gradeValue) && (sectionValue === "" || section === sectionValue)) {
+          const matchesSearch = name.includes(searchFilter);
+          const matchesGrade = gradeFilterValue === '' || gradeCell === gradeFilterValue;
+          const matchesSection = sectionFilterValue === '' || sectionCell === sectionFilterValue;
+
+          if (matchesSearch && matchesGrade && matchesSection) {
             row.style.display = '';
           } else {
             row.style.display = 'none';
           }
-        }
-      };
+        });
+      }
 
       gradeFilter.addEventListener('change', filterTable);
       sectionFilter.addEventListener('change', filterTable);
+      searchInput.addEventListener('keyup', filterTable);
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // This is your grade-section mapping from PHP
+      const gradeSections = <?= json_encode($gradeSections) ?>;
 
+      const gradeFilter = document.getElementById('gradeFilter');
+      const sectionFilter = document.getElementById('sectionFilter');
+
+      // Function to update section options when a grade is selected
+      const updateSectionOptions = () => {
+        const selectedGrade = gradeFilter.value;
+
+        // Clear previous sections
+        sectionFilter.innerHTML = '<option value="">Select Section</option>';
+
+        if (selectedGrade && gradeSections[selectedGrade]) {
+          gradeSections[selectedGrade].forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            sectionFilter.appendChild(option);
+          });
+        }
+      };
+
+      gradeFilter.addEventListener('change', updateSectionOptions);
+    });
+  </script>
+  <script>
+    //page
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataTable = new simpleDatatables.DataTable("#studentsTable", {
+        searchable: false,
+        paging: true,
+        fixedHeight: true,
+        perPage: 10, // Set the number of rows per page
+        labels: {
+          placeholder: "Search...",
+          perPage: "entries per page",
+          noRows: "No results found",
+          info: "Showing {start} to {end} of {rows} results"
+        }
+      });
+    });
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const filter = this.value.toUpperCase();
+      const rows = document.querySelectorAll('#studentsTable tbody tr');
+      rows.forEach(row => {
+        const name = row.cells[0].textContent.toUpperCase();
+        row.style.display = name.includes(filter) ? '' : 'none';
+      });
+    });
+  </script>
 </body>
 
 </html>

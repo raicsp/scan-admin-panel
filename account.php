@@ -51,7 +51,7 @@ include 'database/db-add-teacher.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Account Management</h1>
+      <h1>TEACHER ACCOUNTS</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -68,7 +68,7 @@ include 'database/db-add-teacher.php';
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">Teacher Accounts</h5>
+                <h5 class="card-title">TEACHER ACCOUNTS</h5>
 
                 <!-- Add Teacher Button -->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
@@ -79,7 +79,8 @@ include 'database/db-add-teacher.php';
               <!-- Search and Filter -->
               <div class="row mb-3">
                 <div class="col-md-6">
-                  <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
+
                 </div>
               </div>
 
@@ -87,19 +88,19 @@ include 'database/db-add-teacher.php';
               <table id="accountsTable" class="table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+     
                     <th>Name</th>
                     <th>Email</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody >
                   <?php
                   $result = $conn->query("SELECT * FROM users");
                   if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                       echo "<tr>
-                                  <td>{$row['id']}</td>
+                               
                                   <td>{$row['firstname']} {$row['lastname']}</td>
                                   <td>{$row['email']}</td>
                                   <td>
@@ -123,101 +124,94 @@ include 'database/db-add-teacher.php';
 
   </main><!-- End #main -->
 
-  <!-- ======= Add Teacher Modal ======= -->
-  <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Add Teacher Form -->
-          <form class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <input type="hidden" name="add_teacher" value="1">
-            <div class="col-md-6">
-              <label for="inputFirstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required>
-            </div>
-            <div class="col-md-6">
-              <label for="inputLastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="inputLastName" name="last_name" placeholder="Doe" required>
-            </div>
-            <div class="col-md-6">
-              <label for="inputEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com"
-                required>
-            </div>
-            <div class="col-md-6">
-              <label for="inputPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="inputPassword" name="password"
-                placeholder="Enter password" required>
-            </div>
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck" required>
-                <label class="form-check-label" for="gridCheck">
-                  Confirm information is accurate
-                </label>
-              </div>
-            </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-secondary">Reset</button>
-            </div>
-          </form><!-- End Add Teacher Form -->
-        </div>
+ <!-- ======= Add Teacher Modal ======= -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTeacherModalLabel">Add Teacher</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-    </div>
-  </div><!-- End Add Teacher Modal-->
-
-  <!-- ======= Edit Teacher Modal ======= -->
-  <!-- Edit Teacher Modal -->
-  <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editTeacherModalLabel">Edit Teacher</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Edit Teacher Form -->
-          <form id="editTeacherForm" class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
-            method="post">
-            <input type="hidden" id="editTeacherId" name="teacher_id">
-            <input type="hidden" name="edit_teacher" value="1">
-            <div class="col-md-6">
-              <label for="editFirstName" class="form-label">First Name</label>
-              <input type="text" class="form-control" id="editFirstName" name="first_name" required>
+      <div class="modal-body">
+        <!-- Add Teacher Form -->
+        <form class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+          <input type="hidden" name="add_teacher" value="1">
+          <div class="col-md-6">
+            <label for="inputFirstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required 
+              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="col-md-6">
+            <label for="inputLastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="inputLastName" name="last_name" placeholder="Doe" required 
+              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="col-md-6">
+            <label for="inputEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com" 
+              required maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" 
+              title="Please enter a valid email address, up to 50 characters">
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gridCheck" required>
+              <label class="form-check-label" for="gridCheck">Confirm information is accurate</label>
             </div>
-            <div class="col-md-6">
-              <label for="editLastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="editLastName" name="last_name" required>
-            </div>
-            <div class="col-md-6">
-              <label for="editEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="editEmail" name="email" required>
-            </div>
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="editGridCheck" required>
-                <label class="form-check-label" for="editGridCheck">
-                  Confirm information is accurate
-                </label>
-              </div>
-            </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-              <button type="reset" class="btn btn-secondary">Reset</button>
-            </div>
-          </form>
-          <!-- End Edit Teacher Form -->
-        </div>
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+          </div>
+        </form><!-- End Add Teacher Form -->
       </div>
     </div>
   </div>
+</div><!-- End Add Teacher Modal -->
 
+<!-- ======= Edit Teacher Modal ======= -->
+<div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTeacherModalLabel">Edit Teacher</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Edit Teacher Form -->
+        <form id="editTeacherForm" class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+          <input type="hidden" id="editTeacherId" name="teacher_id">
+          <input type="hidden" name="edit_teacher" value="1">
+          <div class="col-md-6">
+            <label for="editFirstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="editFirstName" name="first_name" required 
+              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="col-md-6">
+            <label for="editLastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="editLastName" name="last_name" required 
+              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+          </div>
+          <div class="col-md-6">
+            <label for="editEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" name="email" required 
+              maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" 
+              title="Please enter a valid email address, up to 50 characters">
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="editGridCheck" required>
+              <label class="form-check-label" for="editGridCheck">Confirm information is accurate</label>
+            </div>
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+          </div>
+        </form><!-- End Edit Teacher Form -->
+      </div>
+    </div>
+  </div>
+</div><!-- End Edit Teacher Modal -->
 
   <!-- Delete Teacher Form (hidden) -->
   <form id="deleteTeacherForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
@@ -320,15 +314,6 @@ include 'database/db-add-teacher.php';
       });
     }
 
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function () {
-      let filter = this.value.toLowerCase();
-      let rows = document.querySelectorAll('#accountsTable tbody tr');
-      rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? '' : 'none';
-      });
-    });
 
     // Function to populate the edit modal with teacher data
     function editTeacher(id, firstName, lastName, email) {
@@ -345,6 +330,49 @@ include 'database/db-add-teacher.php';
       passwordField.setAttribute('type', type);
     }
   </script>
+  <script>
+  // Function to search the table
+  function searchTable() {
+    // Get the search input value and convert it to lowercase for case-insensitive search
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    
+    // Get all table rows from the tbody
+    const tableRows = document.querySelectorAll('#accountsTable tbody tr');
+    
+    // Loop through all table rows and hide those that don't match the search value
+    tableRows.forEach(row => {
+      const nameCell = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+      const emailCell = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+      
+      // Check if either name or email contains the search value
+      if (nameCell.includes(searchValue) || emailCell.includes(searchValue)) {
+        row.style.display = '';  // Show the row
+      } else {
+        row.style.display = 'none';  // Hide the row
+      }
+    });
+  }
+
+  // Attach the searchTable function to the search input
+  document.getElementById('searchInput').addEventListener('input', searchTable);
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataTable = new simpleDatatables.DataTable("#accountsTable", {
+        searchable: false,
+        paging: true,
+        fixedHeight: true,
+        perPage: 10, // Set the number of rows per page
+        labels: {
+          placeholder: "Search...",
+          perPage: "entries per page",
+          noRows: "No results found",
+          info: "Showing {start} to {end} of {rows} results"
+        }
+      });
+    });
+</script>
+
 
 </body>
 

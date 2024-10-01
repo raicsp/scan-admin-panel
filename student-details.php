@@ -5,7 +5,8 @@ include 'database/db_connect.php'; // Include the database connection
 $studentName = $_GET['name'];
 
 // Fetch student details based on the student name
-$query = "SELECT studentID, name, grade_level, section FROM student 
+$query = "SELECT studentID, name, gender, profile_pic, gmail, p_name, parent_contact, grade_level, section 
+          FROM student 
           JOIN classes ON student.class_id = classes.class_id 
           WHERE name = ?";
 $stmt = $conn->prepare($query);
@@ -16,14 +17,23 @@ $result = $stmt->get_result();
 if ($row = $result->fetch_assoc()) {
   $studentID = $row['studentID'];
   $studentName = $row['name'];
+  $gender = $row['gender'];
+  $profilePic = $row['profile_pic']; // BLOB data
+  $gmail = $row['gmail'];
+  $p_name = $row['p_name'];
+  $parentContact = $row['parent_contact'];
   $gradeLevel = $row['grade_level'];
   $section = $row['section'];
+
+  // Convert BLOB to base64 string
+  $profilePicBase64 = base64_encode($profilePic);
+
 } else {
   echo "Student not found";
   exit();
 }
 
-// Fetching monthly attendance summary data for the student
+// Fetching monthly attendance summary data for the student (same as before)
 $monthlyAttendanceData = [];
 $attendanceByCategoryData = [];
 
@@ -90,12 +100,45 @@ $conn->close();
     .student-info-container {
       margin-bottom: 20px;
     }
-    .equal-height {
-  display: flex;
-  flex-direction: column;
-}
 
-  </style>
+    .profile-pic {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 50%; /* Make the image round */
+      margin-right: auto;
+      margin-left: auto;
+      display: block; /* Center the image */
+    }
+
+    .row {
+      display: flex;
+      align-items: center; /* Align content vertically */
+      justify-content: space-between; /* Separate the student info and the image */
+    }
+
+    .card {
+      margin-bottom: 20px;
+    }
+
+    /* Ensure charts are of equal height */
+    .equal-height {
+      height: 350px; /* Fixed height to ensure charts are equal in size */
+    }
+
+    @media (max-width: 768px) {
+      .text-md-end {
+        text-align: center; /* Center the image on smaller screens */
+        margin-top: 15px;
+      }
+
+      .profile-pic {
+        margin-top: 15px;
+      }
+    }
+
+
+</style>
 
   
 
@@ -123,18 +166,28 @@ $conn->close();
     <section class="section">
       <!-- Student Information Container -->
       <div class="student-info-container">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title"></h5>
-            <!-- Student Information -->
-            <div class="mb-3">
-              <h1> <?= htmlspecialchars($studentName) ?><br> </h1>
-              <h6> <?= htmlspecialchars($gradeLevel) ?> <?= htmlspecialchars($section) ?><br> </h6>
-            </div>
-
-          </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title"></h5>
+      <!-- Student Information -->
+      <div class="row">
+        <div class="col-md-8">
+          <!-- Student Details -->
+          <h1><?= htmlspecialchars($studentName) ?><br></h1>
+          <p><strong>Grade-Section:</strong> <?= htmlspecialchars($gradeLevel) ?> <?= htmlspecialchars($section) ?><br></p>
+          <p><strong>Parent Email Address: </strong><?= htmlspecialchars($gmail) ?><br></p>
+          <p><strong>Parent Name: </strong><?= htmlspecialchars($p_name) ?><br></p>
+          <p><strong>Parent Contact Number:</strong> <?= htmlspecialchars($parentContact) ?><br></p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <!-- Profile Picture -->
+          <img src="data:image/jpeg;base64,<?= $profilePicBase64 ?>" alt="Profile Picture" class="rounded-circle profile-pic">
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
       <!-- End Student Information Container -->
 
       <!-- Charts Container -->

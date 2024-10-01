@@ -1,5 +1,19 @@
 <?php
 include 'database/db_connect.php';
+session_start();
+
+$userPosition = trim($_SESSION['position'] ?? '');
+
+
+// Define grade conditions based on user position
+$gradeCondition = '';
+if ($userPosition === 'Elementary Chairperson') {
+    // Allow access only to Kinder to Grade-6
+    $gradeCondition = "AND c.grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
+} elseif ($userPosition === 'High School Chairperson') {
+    // Allow access only to Grade-7 to Grade-12
+    $gradeCondition = "AND c.grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
+}
 // Get today's date
 $today = date("Y-m-d");
 $first_day_of_week = date("Y-m-d", strtotime('monday this week'));
@@ -41,7 +55,7 @@ $sql_present = "
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
-    WHERE $date_condition AND status = 'Present' $grade_condition";
+    WHERE $date_condition AND status = 'Present' $grade_condition $gradeCondition";
 $result_present = $conn->query($sql_present);
 $present_today = $result_present->fetch_assoc()['count'];
 
@@ -51,7 +65,7 @@ $sql_late = "
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
-    WHERE $date_condition AND status = 'Late' $grade_condition";
+    WHERE $date_condition AND status = 'Late' $grade_condition $gradeCondition";
 $result_late = $conn->query($sql_late);
 $late_today = $result_late->fetch_assoc()['count'];
 
@@ -61,7 +75,7 @@ $sql_absent = "
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id 
-    WHERE $date_condition AND status = 'Absent' $grade_condition";
+    WHERE $date_condition AND status = 'Absent' $gradeCondition";
 $result_absent = $conn->query($sql_absent);
 $absent_today = $result_absent->fetch_assoc()['count'];
 
@@ -69,21 +83,26 @@ $absent_today = $result_absent->fetch_assoc()['count'];
 $total_count = $present_today + $late_today + $absent_today;
 
 if ($total_count == 0) {
-    $present_today = $late_today = $absent_today = 1; // Set each count to 1 to show the circle
+    $present_today = $late_today = $absent_today = 0; // Set each count to 1 to show the circle
 }
 
 // Query to get the count of teachers
-$sql_teacher = "SELECT COUNT(*) AS total_teachers FROM `users`"; // Adjust condition as needed
+$sql_teacher = "SELECT COUNT(DISTINCT u.id) AS total_teachers
+    FROM users u
+    JOIN classes c ON u.class_id = c.class_id
+    WHERE 1=1 $gradeCondition"; // Adjust condition as needed
 $result_teacher = $conn->query($sql_teacher); // Make sure to use the correct query variable
 $row_teacher = $result_teacher->fetch_assoc();
 $teacher = $row_teacher['total_teachers']; // Use the alias 'total_teachers'
 
 // Query to get the count of students
-$sql_student = "SELECT COUNT(*) AS total_student FROM `student`"; // Adjust condition as needed
+$sql_student = "SELECT COUNT(DISTINCT s.studentID) AS total_student
+    FROM student s
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE 1=1 $gradeCondition"; // Adjust condition as needed
 $result_student = $conn->query($sql_student); // Make sure to use the correct query variable
 $row_student = $result_student->fetch_assoc();
 $student = $row_student['total_student']; // Use the alias 'total_teachers'
-
 
 
 
@@ -131,16 +150,20 @@ if (!$selectedSchoolYear) {
     }
 }
 
+
 // Query to get monthly attendance data
 $sql_monthly_attendance = "
-  SELECT 
+   SELECT 
     MONTHNAME(date) as month, 
     SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
     SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent,
     SUM(CASE WHEN status = 'Late' THEN 1 ELSE 0 END) as late
   FROM attendance a
   JOIN student s ON a.studentID = s.studentID
-  WHERE YEAR(date) = '$currentYear' AND s.school_year = '$selectedSchoolYear'
+  JOIN classes c ON s.class_id = c.class_id  -- Join with classes to access grade level
+  WHERE YEAR(date) = '$currentYear' 
+    AND s.school_year = '$selectedSchoolYear' 
+    $gradeCondition  -- Include grade condition here
   GROUP BY MONTH(date)
   ORDER BY MONTH(date) ASC";
 
@@ -213,19 +236,26 @@ foreach ($months as $month) {
 
 // Get the selected month from the URL
 $selectedMonth = isset($_GET['month']) ? $_GET['month'] : date("Y-m");
+$dateTime = DateTime::createFromFormat('Y-m', $selectedMonth);
+
+// Format the selected month as "Y-F" (e.g., "2024-July")
+$formattedMonth = $dateTime->format('F-Y');
 
 // Fetch data for the selected month
 $first_day_of_month = $selectedMonth . "-01";
 $last_day_of_month = date("Y-m-t", strtotime($selectedMonth));
 
 $query = "
-SELECT DATE_FORMAT(date, '%d') as day, 
-       SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present_count,
-       SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent_count
-FROM attendance
-WHERE date BETWEEN '$first_day_of_month' AND '$last_day_of_month'
-GROUP BY day
-ORDER BY date ASC";
+    SELECT DATE_FORMAT(a.date, '%d') as day, 
+           SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as present_count,
+           SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent_count
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE a.date BETWEEN '$first_day_of_month' AND '$last_day_of_month'
+    $gradeCondition  -- Include the grade condition here
+    GROUP BY day
+    ORDER BY a.date ASC;";
 
 $result = $conn->query($query);
 
@@ -245,17 +275,19 @@ $attendance_overview = [
     'absentCounts' => $absentCounts
 ];
 
+
 // Fetch top students with most absences
-$absences_sql = "SELECT s.studentID, CONCAT(s.name) AS student_name, 
-                 c.grade_level, c.section, COUNT(a.status) AS absence_count, 
-                 ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
-                 FROM attendance a
-                 JOIN student s ON a.studentID = s.studentID
-                 JOIN classes c ON s.class_id = c.class_id
-                 WHERE a.status = 'Absent' 
-                 GROUP BY s.studentID
-                 ORDER BY absence_count DESC
-                 LIMIT 5";
+$absences_sql = "  SELECT s.studentID, CONCAT(s.name) AS student_name, 
+           c.grade_level, c.section, COUNT(a.status) AS absence_count, 
+           ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE a.status = 'Absent' 
+    $gradeCondition  -- Include the grade condition here
+    GROUP BY s.studentID
+    ORDER BY absence_count DESC
+    LIMIT 5";
 
 $absences_result = $conn->query($absences_sql);
 
@@ -267,6 +299,7 @@ $late_sql = "SELECT s.studentID, CONCAT(s.name) AS student_name,
              JOIN student s ON a.studentID = s.studentID
              JOIN classes c ON s.class_id = c.class_id
              WHERE a.status = 'Late'
+             $gradeCondition
              GROUP BY s.studentID
              ORDER BY late_count DESC
              LIMIT 5";
@@ -275,19 +308,25 @@ $late_result = $conn->query($late_sql);
 
 // Fetch students with perfect attendance
 $perfect_attendance_sql = "
-    SELECT s.studentID, CONCAT(s.name) AS student_name, c.grade_level, c.section
-    FROM student s
-    JOIN classes c ON s.class_id = c.class_id
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM (SELECT DISTINCT date FROM attendance) d
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM attendance a
-            WHERE a.studentID = s.studentID
-            AND a.date = d.date
-        )
-    )
+  SELECT 
+    s.studentID, 
+    CONCAT(s.name) AS student_name, 
+    c.grade_level, 
+    c.section
+FROM 
+    student s
+JOIN 
+    classes c ON s.class_id = c.class_id
+JOIN 
+    attendance a ON s.studentID = a.studentID
+WHERE 
+    1=1
+    $gradeCondition
+GROUP BY 
+    s.studentID, s.name, c.grade_level, c.section
+HAVING 
+    COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
+LIMIT 5;
 ";
 
 $perfect_attendance_result = $conn->query($perfect_attendance_sql);
@@ -304,7 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Query to get attendance data by grade
     $query = "
-    SELECT c.grade_level, 
+ SELECT c.grade_level, 
            SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) AS present_count,
            SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) AS late_count,
            SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) AS absent_count
@@ -312,7 +351,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
     WHERE a.date = '$date'
-    " . (!empty($schoolYear) ? "AND s.school_year = '$schoolYear'" : "") . "
+    " . (!empty($schoolYear) ? "AND s.school_year = '$schoolYear' " : "") . "
+    $gradeCondition  -- Include grade condition here
     GROUP BY c.grade_level
     ORDER BY c.grade_level ASC;
     ";

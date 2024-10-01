@@ -78,13 +78,13 @@ include 'database/db-dashboard.php';
             <div class="col-md-4">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Total Students</h5>
+                  <h5 class="card-title">Total of Students Arriving Late</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
+                      <i class="bi bi-clock"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="student"><?php echo $student; ?></h6>
+                      <h6 id="late-today"><?php echo $late_today; ?></h6>
                       <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
@@ -133,14 +133,14 @@ include 'database/db-dashboard.php';
           <div class="row">
             <div class="col-md-6">
               <div class="card info-card sales-card">
-                <div class="card-body">
-                  <h5 class="card-title">Total of Students Arriving Late</h5>
+              <div class="card-body">
+                  <h5 class="card-title">Total Number of Students</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-clock"></i>
+                      <i class="bi bi-people"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="late-today"><?php echo $late_today; ?></h6>
+                      <h6 id="student"><?php echo $student; ?></h6>
                       <span class="text-muted small pt-2 ps-1">Students</span>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ include 'database/db-dashboard.php';
             <div class="col-md-6">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Number of users</h5>
+                  <h5 class="card-title">Number of Users</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-person-fill"></i>
@@ -192,7 +192,7 @@ include 'database/db-dashboard.php';
                       </li>
                     </ul>
                   </div>
-                  <h5 class="card-title"> Monthly Attendance Overview <span>| <?= htmlspecialchars($selectedMonth) ?></span></h5>
+                  <h5 class="card-title"> Monthly Attendance Overview <span>| <?= htmlspecialchars($formattedMonth) ?></span></h5>
                   <div id="attendance-line-chart"></div>
                 </div>
               </div>
@@ -322,7 +322,7 @@ include 'database/db-dashboard.php';
                         <th scope="col">Grade</th>
                         <th scope="col">Section</th>
                         <th scope="col">Absences</th>
-                        <th scope="col">Percentage</th>
+                        
                       </tr>
                     </thead>
                     <tbody>
@@ -332,7 +332,7 @@ include 'database/db-dashboard.php';
                           <td><?php echo $row['grade_level']; ?></td>
                           <td><?php echo $row['section']; ?></td>
                           <td class="fw-bold"><?php echo $row['absence_count']; ?></td>
-                          <td><?php echo $row['percentage']; ?>%</td>
+                         
                         </tr>
                       <?php endwhile; ?>
                     </tbody>
@@ -363,7 +363,7 @@ include 'database/db-dashboard.php';
                         <th scope="col">Grade</th>
                         <th scope="col">Section</th>
                         <th scope="col">Lates</th>
-                        <th scope="col">Percentage</th>
+                    
                       </tr>
                     </thead>
                     <tbody>
@@ -373,7 +373,7 @@ include 'database/db-dashboard.php';
                           <td><?php echo $row['grade_level']; ?></td>
                           <td><?php echo $row['section']; ?></td>
                           <td class="fw-bold"><?php echo $row['late_count']; ?></td>
-                          <td><?php echo $row['percentage']; ?>%</td>
+                         
                         </tr>
                       <?php endwhile; ?>
                     </tbody>
@@ -575,6 +575,7 @@ include 'database/db-dashboard.php';
         window.location.href = `?filter=${filter}&grade=${grade}`;
       });
     });
+    
   </script>
 
   <script>

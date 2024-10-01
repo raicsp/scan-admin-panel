@@ -9,6 +9,9 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+/* color #4154f1 */
+
+
 :root {
   scroll-behavior: smooth;
 }
@@ -20,7 +23,7 @@ body {
 }
 
 a {
-  color: #4154f1;
+  color:#A32926;
   text-decoration: none;
 }
 
@@ -64,7 +67,8 @@ h6 {
   font-size: 24px;
   margin-bottom: 0;
   font-weight: 600;
-  color: #012970;
+  /* color: #012970; */
+  color:#000;
 }
 
 /*--------------------------------------------------------------
@@ -77,7 +81,7 @@ h6 {
   right: 15px;
   bottom: 15px;
   z-index: 99999;
-  background: #4154f1;
+  background: #A32926;
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -236,10 +240,12 @@ h6 {
 
 .card-title {
   padding: 20px 0 15px 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 500;
-  color: #012970;
+  /* color: #012970; */
+  color: #000;
   font-family: "Poppins", sans-serif;
+  text-align: center;
 }
 
 .card-title span {
@@ -296,7 +302,7 @@ h6 {
 
 .accordion-flush .accordion-button:not(.collapsed) {
   box-shadow: none;
-  color: #4154f1;
+  color: #A32926;
 }
 
 .accordion-flush .accordion-body {
@@ -344,13 +350,13 @@ h6 {
 
 .nav-tabs-bordered .nav-link:hover,
 .nav-tabs-bordered .nav-link:focus {
-  color: #4154f1;
+  color: #A32926;
 }
 
 .nav-tabs-bordered .nav-link.active {
   background-color: #fff;
-  color: #4154f1;
-  border-bottom: 2px solid #4154f1;
+  color: #A32926;
+  border-bottom: 2px solid #A32926;
 }
 
 /*--------------------------------------------------------------
@@ -374,7 +380,7 @@ h6 {
 .logo span {
   font-size: 26px;
   font-weight: 700;
-  color: #012970;
+  color: #fff;
   font-family: "Nunito", sans-serif;
 }
 
@@ -383,7 +389,7 @@ h6 {
   z-index: 997;
   height: 60px;
   box-shadow: 0px 2px 20px rgba(1, 41, 112, 0.1);
-  background-color: #fff;
+  background-color: #A32926; 
   padding-left: 20px;
   /* Toggle Sidebar Button */
   /* Search Bar */
@@ -393,7 +399,7 @@ h6 {
   font-size: 32px;
   padding-left: 10px;
   cursor: pointer;
-  color: #012970;
+  color: #fff;
 }
 
 .header .search-bar {
@@ -470,13 +476,13 @@ h6 {
 
 .header-nav .nav-icon {
   font-size: 22px;
-  color: #012970;
+  color: #fff;
   margin-right: 25px;
   position: relative;
 }
 
 .header-nav .nav-profile {
-  color: #012970;
+  color: #fff;
 }
 
 .header-nav .nav-profile img {
@@ -686,7 +692,7 @@ h6 {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #4154f1;
+  color: #A32926;
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px 15px;
@@ -696,11 +702,12 @@ h6 {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
-  color: #4154f1;
+  color: #A32926;
 }
 
 .sidebar-nav .nav-link.collapsed {
-  color: #012970;
+  /* color: #012970; */
+  color:#000;
   background: #fff;
 }
 
@@ -709,12 +716,12 @@ h6 {
 }
 
 .sidebar-nav .nav-link:hover {
-  color: #4154f1;
+  color: #A32926;
   background: #f6f9ff;
 }
 
 .sidebar-nav .nav-link:hover i {
-  color: #4154f1;
+  color: #A32926;
 }
 
 .sidebar-nav .nav-link .bi-chevron-down {
@@ -737,7 +744,8 @@ h6 {
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: #012970;
+  /* color: #012970; */
+  color: #000;
   transition: 0.3;
   padding: 10px 0 10px 40px;
   transition: 0.3s;
@@ -752,11 +760,11 @@ h6 {
 
 .sidebar-nav .nav-content a:hover,
 .sidebar-nav .nav-content a.active {
-  color: #4154f1;
+  color: #A32926;
 }
 
 .sidebar-nav .nav-content a.active i {
-  background-color: #4154f1;
+  background-color: #A32926;
 }
 
 /*--------------------------------------------------------------
@@ -779,7 +787,7 @@ h6 {
 
 .dashboard .filter .icon:hover,
 .dashboard .filter .icon:focus {
-  color: #4154f1;
+  color: #A32926;
 }
 
 .dashboard .filter .dropdown-header {
@@ -823,7 +831,7 @@ h6 {
 }
 
 .dashboard .sales-card .card-icon {
-  color: #4154f1;
+  color: #A32926;
   background: #f6f6fe;
 }
 
@@ -908,7 +916,7 @@ h6 {
 }
 
 .dashboard .news h4 a:hover {
-  color: #4154f1;
+  color: #A32926;
 }
 
 .dashboard .news p {
@@ -1056,7 +1064,7 @@ h6 {
 .faq .basic h6 {
   font-size: 18px;
   font-weight: 600;
-  color: #4154f1;
+  color: #A32926;
 }
 
 .faq .basic p {
@@ -1073,7 +1081,7 @@ h6 {
 .contact .info-box i {
   font-size: 38px;
   line-height: 0;
-  color: #4154f1;
+  color: #A32926;
 }
 
 .contact .info-box h3 {
@@ -1140,7 +1148,7 @@ h6 {
 
 .contact .php-email-form input:focus,
 .contact .php-email-form textarea:focus {
-  border-color: #4154f1;
+  border-color: #A32926;
 }
 
 .contact .php-email-form input {
@@ -1152,7 +1160,7 @@ h6 {
 }
 
 .contact .php-email-form button[type=submit] {
-  background: #4154f1;
+  background: #A32926;
   border: 0;
   padding: 10px 30px;
   color: #fff;
@@ -1184,7 +1192,7 @@ h6 {
 .error-404 h1 {
   font-size: 180px;
   font-weight: 700;
-  color: #4154f1;
+  color: #A32926;
   margin-bottom: 0;
   line-height: 150px;
 }

@@ -101,23 +101,22 @@ include 'database/db-class.php';
 
               <!-- Filter-->
               <div class="row mb-3">
-                <div class="col-md-6">
-                  <select id="gradeFilter" class="form-select">
-                    <option value="">Select Grade</option>
-                    <?php foreach ($grades as $grade) : ?>
-                      <option value="<?php echo htmlspecialchars($grade); ?>"><?php echo htmlspecialchars($grade); ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <select id="sectionFilter" class="form-select">
-                    <option value="">Select Section</option>
-                    <?php foreach ($sections as $section) : ?>
-                      <option value="<?php echo htmlspecialchars($section); ?>"><?php echo htmlspecialchars($section); ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-              </div>
+    <div class="col-md-6">
+        <select id="gradeFilter" class="form-select">
+            <option value="">Select Grade</option>
+            <?php foreach ($grades as $grade) : ?>
+                <option value="<?php echo htmlspecialchars($grade); ?>"><?php echo htmlspecialchars($grade); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <select id="sectionFilter" class="form-select">
+            <option value="">Select Section</option>
+            <!-- Section options will be dynamically populated based on selected grade -->
+        </select>
+    </div>
+</div>
+
 
               <!-- Table with stripped rows -->
               <table id="classTable" class="table">
@@ -201,32 +200,56 @@ include 'database/db-class.php';
       });
     });
 
-    document.addEventListener('DOMContentLoaded', (event) => {
-      const gradeFilter = document.getElementById('gradeFilter');
-      const sectionFilter = document.getElementById('sectionFilter');
-      const table = document.getElementById('classTable');
-      const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    document.addEventListener('DOMContentLoaded', function() {
+        const gradeFilter = document.getElementById('gradeFilter');
+        const sectionFilter = document.getElementById('sectionFilter');
+        const table = document.getElementById('classTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-      const filterTable = () => {
-        const gradeValue = gradeFilter.value;
-        const sectionValue = sectionFilter.value;
+        // Get sections by grade from PHP
+        const sectionsByGrade = <?php echo json_encode($sectionsByGrade); ?>;
 
-        for (let row of rows) {
-          const grade = row.cells[0].textContent;
-          const section = row.cells[1].textContent;
+        // Function to filter the table
+        const filterTable = () => {
+            const gradeValue = gradeFilter.value;
+            const sectionValue = sectionFilter.value;
 
-          if ((gradeValue === "" || grade === gradeValue) && (sectionValue === "" || section === sectionValue)) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        }
-      };
+            for (let row of rows) {
+                const grade = row.cells[0].textContent;
+                const section = row.cells[1].textContent;
 
-      gradeFilter.addEventListener('change', filterTable);
-      sectionFilter.addEventListener('change', filterTable);
+                if ((gradeValue === "" || grade === gradeValue) && (sectionValue === "" || section === sectionValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        };
+
+        // Populate sections based on the selected grade
+        gradeFilter.addEventListener('change', function() {
+            const selectedGrade = this.value;
+
+            // Clear current section options
+            sectionFilter.innerHTML = '<option value="">Select Section</option>';
+
+            // Populate section options if a grade is selected
+            if (selectedGrade && sectionsByGrade[selectedGrade]) {
+                sectionsByGrade[selectedGrade].forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionFilter.appendChild(option);
+                });
+            }
+
+            // Apply filtering after grade change
+            filterTable();
+        });
+
+        // Apply table filtering when the section is changed
+        sectionFilter.addEventListener('change', filterTable);
     });
-
     function updateTeacher(selectElement) {
       const classId = selectElement.getAttribute('data-class-id');
       const teacherId = selectElement.value;
@@ -241,31 +264,36 @@ include 'database/db-class.php';
 
       // Handle confirm button click
       document.getElementById('confirmButton').onclick = function() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'database/db-class.php', true); // Adjust path to match the location of db-class.php
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-            console.log('Request completed with status:', xhr.status);
-            if (xhr.status === 200) {
-              console.log('Response:', xhr.responseText);
-              if (xhr.responseText.includes('successfully')) {
-                location.href = 'class.php?status=success'; // Redirect to show alert
-              } else {
-                console.error('Error in response:', xhr.responseText);
-                location.href = 'class.php?status=error'; // Redirect to show error alert
-              }
-            } else {
-              console.error('Error updating teacher:', xhr.status, xhr.statusText);
-              location.href = 'class.php?status=error'; // Redirect to show error alert
-            }
-          }
-        };
-        xhr.send('class_id=' + encodeURIComponent(classId) + '&teacher_id=' + encodeURIComponent(teacherId));
-        myModal.hide();
-      };
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', 'database/db-class.php', true); // Adjust path to match the location of db-class.php
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      console.log('Request completed with status:', xhr.status);
+      console.log('Response Text:', xhr.responseText);  // Add this line to log the actual response
+
+      if (xhr.status === 200) {
+        if (xhr.responseText.trim() === 'success') {
+          location.href = 'class.php?status=success'; // Redirect to show success alert
+        } else {
+          console.error('Error in response:', xhr.responseText);
+          console.error('Error in response:', xhr.responseText);
+          location.href = 'class.php?status=error'; // Redirect to show error alert
+        }
+      } else {
+        console.error('Error updating teacher:', xhr.status, xhr.statusText);
+        location.href = 'class.php?status=error'; // Redirect to show error alert
+      }
+    }
+  };
+  xhr.send('class_id=' + encodeURIComponent(classId) + '&teacher_id=' + encodeURIComponent(teacherId));
+  myModal.hide();
+};
+
     }
   </script>
+  
 </body>
 
 </html>

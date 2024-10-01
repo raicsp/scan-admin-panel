@@ -45,10 +45,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $passwordPlain = $first_name . $last_name;
-    $password = password_hash($passwordPlain, PASSWORD_BCRYPT);
+    $password = isset($_POST['password']) && !empty($_POST['password']) 
+           ? password_hash($_POST['password'], PASSWORD_BCRYPT) 
+           : password_hash($first_name . $last_name, PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO users (firstname, lastname, email, password) VALUES ('$first_name', '$last_name', '$email', '$password')";
+    $position = $_POST['position']; // Get the position value
+
+    $sql = "INSERT INTO admin (firstname, lastname, email, password, position) VALUES ('$first_name', '$last_name', '$email', '$password', '$position')";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['message'] = "Teacher added successfully!";
@@ -63,14 +66,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     }
 }
 
+
 // Handle Edit Teacher Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
-    $teacher_id = $_POST['teacher_id'];
+    $id = $_POST['id'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
+    $position = $_POST['position']; // Get the position value
 
-    $sql = "UPDATE users SET firstname='$first_name', lastname='$last_name', email='$email' WHERE id='$teacher_id'";
+    $sql = "UPDATE admin SET firstname='$first_name', lastname='$last_name', email='$email', position='$position' WHERE id='$id'";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['message'] = "Teacher updated successfully!";
@@ -86,10 +91,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
 }
 
 // Handle Delete Teacher
+// Handle Delete Teacher
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
-    $teacher_id = $_POST['teacher_id'];
+    $id = $_POST['id'];
 
-    $sql = "DELETE FROM users WHERE id='$teacher_id'";
+    $sql = "DELETE FROM admin WHERE id='$id'";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['message'] = "Teacher removed successfully!";
@@ -104,6 +110,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
     }
 }
 
-// Close connection
-$conn->close();
+
 ?>

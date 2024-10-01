@@ -10,7 +10,7 @@ include 'database/db-class-students.php';
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Class Students</title>
+  <title>CLASS STUDENTS</title>
   <!-- Include your CSS and JS files here -->
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
@@ -41,7 +41,7 @@ include 'database/db-class-students.php';
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Students in Class</h1>
+      <h1>STUDENTS IN CLASS</h1>
     </div><!-- End Page Title -->
 
     <section class="section">
@@ -51,10 +51,11 @@ include 'database/db-class-students.php';
           <div class="card">
             <div class="card-header">
               <h5 class="card-title">
-                Students List
+                STUDENT LIST
+                <br>
                 <?php if ($classDetails) : ?>
                   <small class="text-muted">
-                    (<?= htmlspecialchars($classDetails['grade_level']) ?> - <?= htmlspecialchars($classDetails['section']) ?>)
+                    <?= htmlspecialchars($classDetails['grade_level']) ?> - <?= htmlspecialchars($classDetails['section']) ?>
                   </small>
                 <?php endif; ?>
               </h5>
@@ -65,7 +66,7 @@ include 'database/db-class-students.php';
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th scope="col">Student ID</th>
+                    <!-- <th scope="col">Student ID</th> -->
                     <th scope="col">Name</th>
                   </tr>
                 </thead>
@@ -73,7 +74,7 @@ include 'database/db-class-students.php';
                   <?php if (!empty($students)) : ?>
                     <?php foreach ($students as $student) : ?>
                       <tr onclick="window.location.href='student-details.php?name=<?= urlencode($student['name']) ?>';" style="cursor: pointer;">
-                        <td><?= htmlspecialchars($student['studentID']) ?></td>
+                        <!-- <td><?= htmlspecialchars($student['studentID']) ?></td> -->
                         <td><?= htmlspecialchars($student['name']) ?></td>
                       </tr>
                     <?php endforeach; ?>

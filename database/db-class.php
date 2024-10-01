@@ -17,18 +17,25 @@ if (isset($_GET['status'])) {
 // Fetch data for classes
 $classes = [];
 $grades = [];
-$sections = [];
+$sectionsByGrade = []; // Array to store sections by grade
 
 // Fetch classes
 $result = $conn->query("SELECT class_id, grade_level, section, assigned_teacher_id FROM classes");
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $classes[] = $row;
+
+        // Add unique grades
         if (!in_array($row['grade_level'], $grades)) {
             $grades[] = $row['grade_level'];
         }
-        if (!in_array($row['section'], $sections)) {
-            $sections[] = $row['section'];
+
+        // Group sections by grade
+        if (!isset($sectionsByGrade[$row['grade_level']])) {
+            $sectionsByGrade[$row['grade_level']] = [];
+        }
+        if (!in_array($row['section'], $sectionsByGrade[$row['grade_level']])) {
+            $sectionsByGrade[$row['grade_level']][] = $row['section'];
         }
     }
 }
@@ -74,8 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bind_param('ii', $teacher_id, $class_id);
                     if ($stmt->execute()) {
                         echo 'success';
+                        exit;
                     } else {
                         echo 'Error updating teacher in student table: ' . $conn->error;
+                        exit;
                     }
                 } else {
                     echo 'Error updating teacher in users table: ' . $conn->error;
