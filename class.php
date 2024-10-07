@@ -11,12 +11,12 @@ include 'database/db-class.php';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -31,6 +31,8 @@ include 'database/db-class.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -69,24 +71,16 @@ include 'database/db-class.php';
   <!-- End Sidebar-->
 
   <!-- Alert Container -->
-  <div id="alertContainer" class="container mt-3">
-    <?php if (!empty($alertMessage)) : ?>
-      <div class="alert alert-<?= $alertType ?> alert-dismissible fade show" role="alert">
-        <?= $alertMessage ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <?php endif; ?>
-  </div>
+ 
 
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Class Management</h1>
+      <h1>Class Allocation</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Management</li>
-          <li class="breadcrumb-item active">Class</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Class Allocation</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -251,47 +245,68 @@ include 'database/db-class.php';
         sectionFilter.addEventListener('change', filterTable);
     });
     function updateTeacher(selectElement) {
-      const classId = selectElement.getAttribute('data-class-id');
-      const teacherId = selectElement.value;
-
-      // Prepare confirmation message
-      const selectedTeacher = selectElement.options[selectElement.selectedIndex].text;
-      document.getElementById('confirmMessage').textContent = `Are you sure you want to assign ${selectedTeacher} to this class?`;
-
-      // Show confirmation modal
-      var myModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-      myModal.show();
-
-      // Handle confirm button click
-      document.getElementById('confirmButton').onclick = function() {
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', 'database/db-class.php', true); // Adjust path to match the location of db-class.php
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  const classId = selectElement.getAttribute('data-class-id');
+  const teacherId = selectElement.value;
   
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      console.log('Request completed with status:', xhr.status);
-      console.log('Response Text:', xhr.responseText);  // Add this line to log the actual response
-
-      if (xhr.status === 200) {
-        if (xhr.responseText.trim() === 'success') {
-          location.href = 'class.php?status=success'; // Redirect to show success alert
-        } else {
-          console.error('Error in response:', xhr.responseText);
-          console.error('Error in response:', xhr.responseText);
-          location.href = 'class.php?status=error'; // Redirect to show error alert
+  // Prepare confirmation message
+  const selectedTeacher = selectElement.options[selectElement.selectedIndex].text;
+  
+  // Show SweetAlert confirmation dialog
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you want to assign ${selectedTeacher} to this class?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, assign it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Send the AJAX request if confirmed
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'database/db-class.php', true); // Adjust path to match the location of db-class.php
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            if (xhr.responseText.trim() === 'success') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Assigned!',
+                text: 'The teacher has been successfully assigned.',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                location.href = 'class.php?status=success'; // Redirect to show success alert
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'There was an error assigning the teacher.',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                location.href = 'class.php?status=error'; // Redirect to show error alert
+              });
+            }
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: `Request failed with status ${xhr.status}: ${xhr.statusText}`,
+            });
+          }
         }
-      } else {
-        console.error('Error updating teacher:', xhr.status, xhr.statusText);
-        location.href = 'class.php?status=error'; // Redirect to show error alert
-      }
-    }
-  };
-  xhr.send('class_id=' + encodeURIComponent(classId) + '&teacher_id=' + encodeURIComponent(teacherId));
-  myModal.hide();
-};
+      };
 
+      xhr.send('class_id=' + encodeURIComponent(classId) + '&teacher_id=' + encodeURIComponent(teacherId));
     }
+  });
+}
+
+
+    
   </script>
   
 </body>

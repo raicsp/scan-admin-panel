@@ -26,8 +26,10 @@ include 'database/db-header.php';
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
-                <!-- <img src="assets/img/logo.png" alt=""> -->
-                <span class="d-none d-lg-block">ATTENDANCE </span>
+            <img src="assets/img/spartan.png" alt="" style="max-height: 40px; width: auto;">
+
+
+                <span class="d-none d-lg-block">ADMINISTRATOR</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div><!-- End Logo -->

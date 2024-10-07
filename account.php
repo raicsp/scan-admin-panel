@@ -10,12 +10,12 @@ include 'database/db-add-teacher.php';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -51,12 +51,11 @@ include 'database/db-add-teacher.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>TEACHER ACCOUNTS</h1>
+      <h1>Faculty Account Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Management</li>
-          <li class="breadcrumb-item active">Account</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Faculty Account Management</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -68,7 +67,7 @@ include 'database/db-add-teacher.php';
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">TEACHER ACCOUNTS</h5>
+                <h5 class="card-title">Faculty Account</h5>
 
                 <!-- Add Teacher Button -->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
@@ -167,7 +166,7 @@ include 'database/db-add-teacher.php';
     </div>
   </div>
 </div><!-- End Add Teacher Modal -->
-
+ 
 <!-- ======= Edit Teacher Modal ======= -->
 <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -226,21 +225,20 @@ include 'database/db-add-teacher.php';
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-  <script>
-
+<script>
+    // Show success or error messages using SweetAlert if present in the session
     <?php if (isset($_SESSION['message'])): ?>
-      Swal.fire({
-        title: 'Success!',
-        text: "<?php echo $_SESSION['message']; ?>",
-        icon: '<?php echo $_SESSION['message_type']; ?>',
-        confirmButtonText: 'OK'
-      });
-      <?php
-      // Clear the session message after displaying it
-      unset($_SESSION['message']);
-      unset($_SESSION['message_type']);
-      ?>
+        Swal.fire({
+            title: 'Notification',
+            text: "<?php echo $_SESSION['message']; ?>",
+            icon: '<?php echo $_SESSION['message_type']; ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php
+        // Clear the session message after displaying it
+        unset($_SESSION['message']);
+        unset($_SESSION['message_type']);
+        ?>
     <?php endif; ?>
 
     // Initialize a flag to track form submissions

@@ -10,12 +10,12 @@ include 'database/db-administrator.php';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -32,6 +32,10 @@ include 'database/db-administrator.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -51,12 +55,11 @@ include 'database/db-administrator.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>ADMINISTRATOR ACCOUNTS</h1>
+      <h1>Administrators Account</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Management</li>
-          <li class="breadcrumb-item active">Account</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Administrators Account</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -68,9 +71,9 @@ include 'database/db-administrator.php';
           <div class="card">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title">ADMINISTRATOR ACCOUNTS</h5>
+                <h5 class="card-title">Administrators Account</h5>
 
-                <!-- Add Teacher Button -->
+                <!-- Add Admin Button -->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
                   Add Administrator
                 </button>
@@ -87,7 +90,7 @@ include 'database/db-administrator.php';
               <table id="accountsTable" class="table  table-bordered ">
                 <thead>
                   <tr>
-            
+
                     <th>Name</th>
                     <th>Email</th>
                     <th>Position</th>
@@ -126,7 +129,7 @@ include 'database/db-administrator.php';
 
   </main><!-- End #main -->
 
-  <!-- ======= Add Teacher Modal ======= -->
+  <!-- ======= Add Admin Modal ======= -->
   <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -135,61 +138,37 @@ include 'database/db-administrator.php';
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <!-- Add Teacher Form -->
+          <!-- Add Admin Form -->
           <form class="row g-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <input type="hidden" name="add_teacher" value="1">
             <div class="col-md-6">
               <label for="inputFirstName" class="form-label">First Name</label>
-              <input type="text" 
-                     class="form-control" 
-                     id="inputFirstName" 
-                     name="first_name" 
-                     placeholder="John" 
-                     required 
-                     maxlength="50"
-                     pattern="[A-Za-z\s]{1,50}" 
-                     title="First Name should contain only letters and spaces, max 50 characters.">
+              <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required
+                maxlength="50" pattern="[A-Za-z\s]{1,50}"
+                title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
 
             <!-- Last Name -->
             <div class="col-md-6">
               <label for="inputLastName" class="form-label">Last Name</label>
-              <input type="text" 
-                     class="form-control" 
-                     id="inputLastName" 
-                     name="last_name" 
-                     placeholder="Doe" 
-                     required 
-                     maxlength="50"
-                     pattern="[A-Za-z\s]{1,50}" 
-                     title="Last Name should contain only letters and spaces, max 50 characters.">
+              <input type="text" class="form-control" id="inputLastName" name="last_name" placeholder="Doe" required
+                maxlength="50" pattern="[A-Za-z\s]{1,50}"
+                title="Last Name should contain only letters and spaces, max 50 characters.">
             </div>
 
             <!-- Email -->
             <div class="col-md-6">
               <label for="inputEmail" class="form-label">Email</label>
-              <input type="email" 
-                     class="form-control" 
-                     id="inputEmail" 
-                     name="email" 
-                     placeholder="john.doe@example.com"
-                     required 
-                     maxlength="50" 
-                     title="Please enter a valid email address, max 50 characters.">
+              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="john.doe@example.com"
+                required maxlength="50" title="Please enter a valid email address, max 50 characters.">
             </div>
 
             <!-- Position -->
             <div class="col-md-6">
-                <label for="position" class="form-label">Position</label>
-                <input type="text" 
-                       class="form-control" 
-                       id="position" 
-                       name="position" 
-                       placeholder="Chairperson" 
-                       required 
-                       maxlength="50"
-                       pattern="[A-Za-z\s]{1,50}" 
-                       title="Position should only contain letters and spaces, max 50 characters.">
+              <label for="position" class="form-label">Position</label>
+              <input type="text" class="form-control" id="position" name="position" placeholder="Chairperson" required
+                maxlength="50" pattern="[A-Za-z\s]{1,50}"
+                title="Position should only contain letters and spaces, max 50 characters.">
             </div>
 
             <!-- Confirmation Check -->
@@ -204,14 +183,15 @@ include 'database/db-administrator.php';
 
             <!-- Submit and Reset Buttons -->
             <div class="text-center">
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary"
+                onclick="confirmSubmit(event, 'add_teacher')">Submit</button>
               <button type="reset" class="btn btn-secondary">Reset</button>
             </div>
           </form><!-- End Add Teacher Form -->
         </div>
       </div>
     </div>
-</div><!-- End Add Teacher Modal-->
+  </div><!-- End Add Teacher Modal-->
 
   <!-- ======= Edit Teacher Modal ======= -->
   <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel"
@@ -228,55 +208,33 @@ include 'database/db-administrator.php';
             method="post">
             <input type="hidden" id="editTeacherId" name="id">
             <input type="hidden" name="edit_teacher" value="1">
-             <!-- First Name -->
-             <div class="col-md-6">
+            <!-- First Name -->
+            <div class="col-md-6">
               <label for="editFirstName" class="form-label">First Name</label>
-              <input type="text" 
-                     class="form-control" 
-                     id="editFirstName" 
-                     name="first_name" 
-                     required 
-                     maxlength="50"
-                     pattern="[A-Za-z\s]{1,50}" 
-                     title="First Name should contain only letters and spaces, max 50 characters.">
+              <input type="text" class="form-control" id="editFirstName" name="first_name" required maxlength="50"
+                pattern="[A-Za-z\s]{1,50}"
+                title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
 
             <!-- Last Name -->
             <div class="col-md-6">
               <label for="editLastName" class="form-label">Last Name</label>
-              <input type="text" 
-                     class="form-control" 
-                     id="editLastName" 
-                     name="last_name" 
-                     required 
-                     maxlength="50"
-                     pattern="[A-Za-z\s]{1,50}" 
-                     title="Last Name should contain only letters and spaces, max 50 characters.">
+              <input type="text" class="form-control" id="editLastName" name="last_name" required maxlength="50"
+                pattern="[A-Za-z\s]{1,50}" title="Last Name should contain only letters and spaces, max 50 characters.">
             </div>
 
             <!-- Email -->
             <div class="col-md-6">
               <label for="editEmail" class="form-label">Email</label>
-              <input type="email" 
-                     class="form-control" 
-                     id="editEmail" 
-                     name="email" 
-                     required 
-                     maxlength="50" 
-                     title="Please enter a valid email address, max 50 characters.">
+              <input type="email" class="form-control" id="editEmail" name="email" required maxlength="50"
+                title="Please enter a valid email address, max 50 characters.">
             </div>
 
             <!-- Position -->
             <div class="col-md-6">
               <label for="editPosition" class="form-label">Position</label>
-              <input type="text" 
-                     class="form-control" 
-                     id="editPosition" 
-                     name="position" 
-                     required 
-                     maxlength="50"
-                     pattern="[A-Za-z\s]{1,50}" 
-                     title="Position should only contain letters and spaces, max 50 characters.">
+              <input type="text" class="form-control" id="editPosition" name="position" required maxlength="50"
+                pattern="[A-Za-z\s]{1,50}" title="Position should only contain letters and spaces, max 50 characters.">
             </div>
 
             <!-- Submit and Reset Buttons -->
@@ -286,10 +244,10 @@ include 'database/db-administrator.php';
             </div>
           </form><!-- End Edit Teacher Form -->
           <!-- Hidden Delete Form -->
-<form id="deleteTeacherForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-  <input type="hidden" name="delete_teacher" value="1">
-  <input type="hidden" id="deleteTeacherId" name="id">
-</form>
+          <form id="deleteTeacherForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="delete_teacher" value="1">
+            <input type="hidden" id="deleteTeacherId" name="id">
+          </form>
 
         </div>
       </div>
@@ -297,26 +255,26 @@ include 'database/db-administrator.php';
   </div><!-- End Edit Teacher Modal-->
 
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteTeacherModal" tabindex="-1" aria-labelledby="deleteTeacherModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteTeacherModalLabel">Confirm Delete</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete this teacher?
-        <input type="hidden" id="deleteTeacherId" name="delete_teacher_id"> <!-- Hidden ID -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteTeacherModal" tabindex="-1" aria-labelledby="deleteTeacherModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteTeacherModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this teacher?
+          <input type="hidden" id="deleteTeacherId" name="delete_teacher_id"> <!-- Hidden ID -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 
 
 
@@ -339,67 +297,101 @@ include 'database/db-administrator.php';
   <script>
     // Edit teacher function
     function editTeacher(id, firstName, lastName, email, position) {
-      document.getElementById('editTeacherId').value = id;
-      document.getElementById('editFirstName').value = firstName;
-      document.getElementById('editLastName').value = lastName;
-      document.getElementById('editEmail').value = email;
-      document.getElementById('editPosition').value = position;
+        document.getElementById('editTeacherId').value = id;
+        document.getElementById('editFirstName').value = firstName;
+        document.getElementById('editLastName').value = lastName;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPosition').value = position;
     }
 
     // Delete teacher function
+    function deleteTeacher(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteTeacherId').value = id; // Set the id in hidden input
+                document.getElementById('deleteTeacherForm').submit(); // Submit the form
+            }
+        });
+    }
 
-// Delete teacher function
-// Delete teacher function
-function deleteTeacher(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('deleteTeacherId').value = id; // Set the id in hidden input
-            document.getElementById('deleteTeacherForm').submit(); // Submit the form
-        }
-    });
-}
+    // Confirmation for form submission
+    function confirmSubmit(event, actionType) {
+        event.preventDefault(); // Prevent the default form submission
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Please confirm your action.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, proceed!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                event.target.form.submit(); // Submit the form after confirmation
+            }
+        });
+    }
 
     // Search function
     document.getElementById('searchInput').addEventListener('input', function () {
-      const searchQuery = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#accountsTable tbody tr');
+        const searchQuery = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#accountsTable tbody tr');
 
-      rows.forEach(row => {
-        const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-        const email = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        rows.forEach(row => {
+            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const email = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
 
-        if (name.includes(searchQuery) || email.includes(searchQuery)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
+            if (name.includes(searchQuery) || email.includes(searchQuery)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     });
-  </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-        searchable: false,
-        paging: true,
-        fixedHeight: true,
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
-        }
-      });
+
+    // DataTables initialization
+    document.addEventListener('DOMContentLoaded', function () {
+        const dataTable = new simpleDatatables.DataTable("#accountsTable", {
+            searchable: false,
+            paging: true,
+            fixedHeight: true,
+            perPage: 10,
+            labels: {
+                placeholder: "Search...",
+                perPage: "entries per page",
+                noRows: "No results found",
+                info: "Showing {start} to {end} of {rows} results"
+            }
+        });
     });
+
+    <?php if (isset($_SESSION['message'])): ?>
+        Swal.fire({
+            icon: '<?php echo $_SESSION['message_type']; ?>',
+            title: '<?php echo $_SESSION['message']; ?>',
+            showConfirmButton: true, // Show OK button
+            confirmButtonText: 'OK', // Text for the OK butto
+            timer: 1500
+        }).then(() => {
+            // Optionally redirect after showing the SweetAlert message
+            window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>';
+        });
+    <?php endif; ?>
+
 </script>
+
+<?php
+// Clear session message after displaying it
+unset($_SESSION['message']);
+unset($_SESSION['message_type']);
+?>
 </body>
 
 </html>

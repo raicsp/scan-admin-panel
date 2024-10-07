@@ -11,22 +11,27 @@ include 'database/db-add-student.php';
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>SCAN</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito|Poppins" rel="stylesheet">
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <title>Administrator | Laboratory School | Batangas State University TNEU</title>
+    <link href="assets/img/bsu.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -43,7 +48,7 @@ include 'database/db-add-student.php';
             });
 
             // Populate sections based on selected grade
-            gradeSelect.addEventListener('change', function() {
+            gradeSelect.addEventListener('change', function () {
                 const selectedGrade = this.value;
                 const sections = <?php echo json_encode($sections); ?>;
 
@@ -96,22 +101,34 @@ include 'database/db-add-student.php';
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>STUDENT INFORMATION</h1>
-        </div>
+        <h1>Student Registration</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Student Registration</li>
+                </ol>
+            </nav>        </div>
 
         <div id="alertContainer" class="container mt-3">
-            <?php if (isset($_SESSION['alertMessage']) && !empty($_SESSION['alertMessage'])): ?>
-                <div class="alert alert-<?= $_SESSION['alertType'] ?> alert-dismissible fade show" role="alert">
-                    <?= $_SESSION['alertMessage'] ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php
-                // Clear the session alert after displaying it
-                unset($_SESSION['alertMessage']);
-                unset($_SESSION['alertType']);
-                ?>
-            <?php endif; ?>
-        </div>
+    <?php if (isset($_SESSION['alertMessage']) && !empty($_SESSION['alertMessage'])): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    icon: '<?= $_SESSION['alertType'] ?>', // 'success', 'error', 'warning', 'info'
+                    title: 'Success!',
+                    text: '<?= $_SESSION['alertMessage'] ?>',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+        <?php
+        // Clear the session alert after displaying it
+        unset($_SESSION['alertMessage']);
+        unset($_SESSION['alertType']);
+        ?>
+    <?php endif; ?>
+</div>
+
 
 
         <section class="section">
@@ -274,6 +291,18 @@ include 'database/db-add-student.php';
                 individualForm.classList.add('d-none');
                 csvForm.classList.remove('d-none');
             });
+
+            // Display alert message if set
+            const alertMessage = <?= json_encode($alertMessage) ?>;
+            const alertType = <?= json_encode($alertType) ?>;
+            if (alertMessage) {
+                Swal.fire({
+                    icon: alertType,
+                    title: alertType.charAt(0).toUpperCase() + alertType.slice(1), // Capitalize first letter
+                    text: alertMessage,
+                    confirmButtonText: 'OK'
+                });
+            }
         });
 
         document.addEventListener('DOMContentLoaded', () => {

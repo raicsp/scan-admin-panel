@@ -25,17 +25,17 @@ $showAccounts = !in_array($userPosition, ['Elementary Chairperson', 'High School
       <ul id="students-nav" class="nav-content collapse <?php echo in_array($activePage, ['add-student', 'attendance', 'student-list']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
         <li>
           <a href="add-student.php" class="<?php echo $activePage === 'add-student' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Register Student</span>
+            <i class="bi bi-circle"></i><span>Student Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="student-list.php" class="<?php echo $activePage === 'student-list' ? 'active' : ''; ?>">
+            <i class="bi bi-circle"></i><span>Student Management</span>
           </a>
         </li>
         <li>
           <a href="attendance.php" class="<?php echo $activePage === 'attendance' ? 'active' : ''; ?>">
             <i class="bi bi-circle"></i><span>Student Attendance</span>
-          </a>
-        </li>
-        <li>
-          <a href="student-list.php" class="<?php echo $activePage === 'student-list' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Student List</span>
           </a>
         </li>
       </ul>
@@ -54,7 +54,7 @@ $showAccounts = !in_array($userPosition, ['Elementary Chairperson', 'High School
         </li>
         <li>
           <a href="class-management.php" class="<?php echo $activePage === 'class-management' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Manage Classes</span>
+            <i class="bi bi-circle"></i><span>Class Management</span>
           </a>
         </li>
       </ul>
@@ -85,7 +85,7 @@ $showAccounts = !in_array($userPosition, ['Elementary Chairperson', 'High School
       <ul id="teachers-nav" class="nav-content collapse <?php echo in_array($activePage, ['account', 'add-teacher', 'administrator']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
         <li>
           <a href="account.php" class="<?php echo $activePage === 'account' ? 'active' : ''; ?>">
-            <i class="bi bi-circle"></i><span>Teachers</span>
+            <i class="bi bi-circle"></i><span>Faculty</span>
           </a>
         </li>
         <li>

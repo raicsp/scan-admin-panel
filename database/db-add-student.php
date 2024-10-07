@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'db_connect.php';
 
 // Initialize arrays for grades and sections
@@ -84,18 +85,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     fclose($handle);
                     $_SESSION['alertMessage'] = "CSV Import successful.";
                     $_SESSION['alertType'] = "success";
+                    header("Location: " . $_SERVER['PHP_SELF']);
                 } else {
                     $_SESSION['alertMessage'] = "Error opening the CSV file.";
                     $_SESSION['alertType'] = "danger";
+                    header("Location: " . $_SERVER['PHP_SELF']);
                 }
             }
         } else {
             $_SESSION['alertMessage'] = 'No class found for the selected grade level and section.';
             $_SESSION['alertType'] = 'danger';
+            header("Location: " . $_SERVER['PHP_SELF']);
         }
-        
-    }
-else if (isset($_POST['submit_individual'])) {
+
+    } else if (isset($_POST['submit_individual'])) {
         // Handle individual form submission
         $gradeLevel = isset($_POST['grade_level']) ? $_POST['grade_level'] : null;
         $section = isset($_POST['section']) ? $_POST['section'] : null;
@@ -119,8 +122,8 @@ else if (isset($_POST['submit_individual'])) {
                 $studentName = isset($_POST['student_name']) ? $_POST['student_name'] : null;
                 $p_name =  isset($_POST['parent_name']) ? $_POST['parent_name'] : null;
                 $parentContact = isset($_POST['parent_contact']) ? $_POST['parent_contact'] : null;
-                $parentEmail = isset($_POST['parent_email']) ? $_POST['parent_email'] : null;
-                $notif=NULL;
+                $parentEmail = isset($_POST['parent_email']) ? $_POST['parent_email'] : null; // Parent email is now optional
+                $notif = NULL;
                 $currentYear = date("Y");
                 $currentMonth = date("n"); // Numeric representation of the current month (1 to 12)
                 
@@ -132,33 +135,38 @@ else if (isset($_POST['submit_individual'])) {
                     $schoolYear = ($currentYear - 1) . "-{$currentYear}";
                 }
                 // Validate student information
-                if ($studentName && $parentContact && $parentEmail && $schoolYear) {
+                if ($studentName && $parentContact && $schoolYear) {
                     // Insert student record into class_list
-                    $insertQuery = "INSERT INTO student (gender, name, p_name, parent_contact, gmail, school_year, class_id, teacher_id,notif) VALUES (?, ?,?, ?, ?, ?, ?, ?,?)";
+                    $insertQuery = "INSERT INTO student (gender, name, p_name, parent_contact, gmail, school_year, class_id, teacher_id, notif) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $insertStmt = $conn->prepare($insertQuery);
-                    $insertStmt->bind_param('sssssssii', $gender, $studentName, $p_name, $parentContact, $parentEmail, $schoolYear, $classId, $teacherId, $notif);
+                    $insertStmt->bind_param('ssssssssi', $gender, $studentName, $p_name, $parentContact, $parentEmail, $schoolYear, $classId, $teacherId, $notif);
                     $insertStmt->execute();
 
                     // Check if the insertion was successful
                     if ($insertStmt->affected_rows > 0) {
                         $_SESSION['alertMessage'] = 'Student added successfully!';
                         $_SESSION['alertType'] = 'success';
+                        header("Location: " . $_SERVER['PHP_SELF']);
                     } else {
                         $_SESSION['alertMessage'] = 'Error adding student.';
                         $_SESSION['alertType'] = 'error';
+                        header("Location: " . $_SERVER['PHP_SELF']);
                     }
                     $insertStmt->close();
                 } else {
                     $_SESSION['alertMessage'] = 'Please fill in all required student information.';
                     $_SESSION['alertType'] = 'warning';
+                    header("Location: " . $_SERVER['PHP_SELF']);
                 }
             } else {
                 $_SESSION['alertMessage'] = 'Class not found for the selected grade and section.';
                 $_SESSION['alertType'] = 'error';
+                header("Location: " . $_SERVER['PHP_SELF']);
             }
         } else {
             $_SESSION['alertMessage'] = 'Please select a grade level and section.';
             $_SESSION['alertType'] = 'warning';
+            header("Location: " . $_SERVER['PHP_SELF']);
         }
     }
 

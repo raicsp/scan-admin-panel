@@ -10,10 +10,10 @@ include 'database/db-class-students.php';
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>CLASS STUDENTS</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <!-- Include your CSS and JS files here -->
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -41,7 +41,14 @@ include 'database/db-class-students.php';
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>STUDENTS IN CLASS</h1>
+      <h1>Student List</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="class-management.php">Class Management</a></li>
+          <li class="breadcrumb-item active">Student List</li>
+        </ol>
+      </nav>
     </div><!-- End Page Title -->
 
     <section class="section">
@@ -51,7 +58,7 @@ include 'database/db-class-students.php';
           <div class="card">
             <div class="card-header">
               <h5 class="card-title">
-                STUDENT LIST
+                Student List
                 <br>
                 <?php if ($classDetails) : ?>
                   <small class="text-muted">
@@ -59,22 +66,30 @@ include 'database/db-class-students.php';
                   </small>
                 <?php endif; ?>
               </h5>
+              <div class="d-flex justify-content-start">
+              <span class="text-muted" style="padding-right: 30px;">
+                <?= count($students); ?> Students
+              </span>
             </div>
 
+            </div>
+    
             <div class="card-body">
+              <!-- Table with student list -->
               <!-- Table with student list -->
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <!-- <th scope="col">Student ID</th> -->
-                    <th scope="col">Name</th>
+                    <th scope="col">#</th> <!-- Add a column header for the numbering -->
+                    <th scope="col">Student Name</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php if (!empty($students)) : ?>
+                    <?php $counter = 1; ?> <!-- Initialize a counter -->
                     <?php foreach ($students as $student) : ?>
                       <tr onclick="window.location.href='student-details.php?name=<?= urlencode($student['name']) ?>';" style="cursor: pointer;">
-                        <!-- <td><?= htmlspecialchars($student['studentID']) ?></td> -->
+                        <td><?= $counter++; ?></td> <!-- Display the counter and increment it -->
                         <td><?= htmlspecialchars($student['name']) ?></td>
                       </tr>
                     <?php endforeach; ?>
@@ -84,9 +99,8 @@ include 'database/db-class-students.php';
                     </tr>
                   <?php endif; ?>
                 </tbody>
-
-
               </table>
+
             </div>
           </div>
 

@@ -25,12 +25,12 @@ foreach ($grades as $grade) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>SCAN</title>
+    <title>Administrator | Laboratory School | Batangas State University TNEU</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/bsu.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
@@ -65,7 +65,8 @@ foreach ($grades as $grade) {
             <h1>VIEW ARCHIVED STUDENTS</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="manage-years.php">Manage Academic Years</a></li>
                     <li class="breadcrumb-item active">View Archived Students</li>
                 </ol>
             </nav>

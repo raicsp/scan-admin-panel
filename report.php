@@ -9,19 +9,27 @@ $activePage = 'attendance-report';
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>SCAN</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-  <link href="assets/img/favicon.png" rel="icon">
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
+ <!-- Favicons -->
+ <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Nunito" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
   <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
   <style>
@@ -81,12 +89,11 @@ $activePage = 'attendance-report';
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>ATTENDANCE REPORT</h1>
+      <h1>Attendance Report</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Tables</li>
-          <li class="breadcrumb-item active">Data</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Attendance Report</li>
         </ol>
       </nav>
     </div>
@@ -96,7 +103,7 @@ $activePage = 'attendance-report';
         <div class="col-lg-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">ATTENDANCE REPORT</h5>
+              <h5 class="card-title">Attendance Report</h5>
               <form method="GET">
                 <div class="form-row mb-3">
                   <div class="col-md-3">

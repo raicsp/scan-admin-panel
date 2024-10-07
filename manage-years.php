@@ -26,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -63,10 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>SCAN</h1>
+      <h1>Manage Academic Years</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
           <li class="breadcrumb-item active">Manage Academic Years</li>
         </ol>
       </nav>
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">MANAGE ACADEMIC YEARS <br> <span> <?= date("F j, Y") ?></span> </h5>
+              <h5 class="card-title">Manage Academic Years<br> <span> <?= date("F j, Y") ?></span> </h5>
 
               <!-- Archive Data Section -->
               <h6><b>Archive Current Year Data</b></h6>

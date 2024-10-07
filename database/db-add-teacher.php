@@ -1,6 +1,5 @@
 <?php
-
-
+session_start();
 include 'database/db_connect.php'; // Include the database connection file
 
 // Define variables and initialize with empty values

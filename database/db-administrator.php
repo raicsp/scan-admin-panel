@@ -1,7 +1,9 @@
 <?php
+// Start session to handle messages
+session_start(); 
 
-
-include 'database/db_connect.php'; // Include the database connection file
+// Include database connection file
+include 'database/db_connect.php'; 
 
 // Define variables and initialize with empty values
 $firstName = $lastName = $email = "";
@@ -35,11 +37,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
 // Handle Add Teacher Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     $first_name = $_POST['first_name'];
@@ -54,18 +51,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     $sql = "INSERT INTO admin (firstname, lastname, email, password, position) VALUES ('$first_name', '$last_name', '$email', '$password', '$position')";
 
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['message'] = "Teacher added successfully!";
+        $_SESSION['message'] = "Admin added successfully!";
         $_SESSION['message_type'] = "success";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } else {
         $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
+        $_SESSION['message_type'] = "error";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 }
-
 
 // Handle Edit Teacher Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
@@ -78,19 +74,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
     $sql = "UPDATE admin SET firstname='$first_name', lastname='$last_name', email='$email', position='$position' WHERE id='$id'";
 
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['message'] = "Teacher updated successfully!";
+        $_SESSION['message'] = "Admin updated successfully!";
         $_SESSION['message_type'] = "success";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } else {
         $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
+        $_SESSION['message_type'] = "error";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 }
 
-// Handle Delete Teacher
 // Handle Delete Teacher
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
     $id = $_POST['id'];
@@ -98,17 +93,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
     $sql = "DELETE FROM admin WHERE id='$id'";
 
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['message'] = "Teacher removed successfully!";
+        $_SESSION['message'] = "Admin removed successfully!";
         $_SESSION['message_type'] = "success";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } else {
         $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
+        $_SESSION['message_type'] = "error";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 }
 
+// Display SweetAlert message
+if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: '" . $_SESSION['message_type'] . "',
+                title: '" . $_SESSION['message'] . "',
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '" . $_SERVER['PHP_SELF'] . "';
+            });
+        });
+    </script>";
 
+    // Clear session after message is displayed
+    unset($_SESSION['message']);
+    unset($_SESSION['message_type']);
+}
 ?>

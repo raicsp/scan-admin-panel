@@ -136,4 +136,3 @@ echo "<script>var gradeSections = " . json_encode($gradeSections) . ";</script>"
 ?>
 
 
-?>

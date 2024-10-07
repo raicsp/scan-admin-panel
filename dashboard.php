@@ -10,12 +10,12 @@ include 'database/db-dashboard.php';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN - Dashboard</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -305,16 +305,11 @@ include 'database/db-dashboard.php';
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="most-frequent-absences.php">View All</a></li>
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Most Frequent Absences </h5>
+                  <h5 class="card-title">Students with Most Frequent Absences </h5>
                   <table class="table table-hover" id="absencesTable">
                     <thead>
                       <tr>
@@ -349,13 +344,11 @@ include 'database/db-dashboard.php';
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="most-frequent-tardiness.php">View All</a></li>
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with the Highest Incidence of Tardiness </h5>
+                  <h5 class="card-title">Students with the Most Frequent Tardiness </h5>
                   <table class="table table-hover" id="lateTable">
                     <thead>
                       <tr>
@@ -389,9 +382,7 @@ include 'database/db-dashboard.php';
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
+                    <li><a class="dropdown-item" href="perfect-attendance.php">View All</a></li>
                   </ul>
                 </div>
                 <div class="card-body pb-0">

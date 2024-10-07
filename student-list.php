@@ -25,12 +25,12 @@ if ($userPosition === 'Elementary Chairperson') {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN - Student List</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -79,12 +79,11 @@ if ($userPosition === 'Elementary Chairperson') {
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>STUDENT LIST</h1>
+      <h1>Student Information Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Management</li>
-          <li class="breadcrumb-item active">Student List</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Student Information Management</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -96,7 +95,7 @@ if ($userPosition === 'Elementary Chairperson') {
           <div class="card">
             <div class="card-body">
 
-              <h5 class="card-title">STUDENT LIST</h5>
+              <h5 class="card-title">Student Information Management</h5>
 
 
               <!-- Filter by Grade Level and Section -->
@@ -223,7 +222,7 @@ if ($userPosition === 'Elementary Chairperson') {
   </main><!-- End #main -->
 
   <!-- ======= Edit Student Modal ======= -->
-  <!-- ======= Edit Student Modal ======= -->
+
   <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -290,8 +289,8 @@ if ($userPosition === 'Elementary Chairperson') {
               <button type="submit" class="btn btn-primary">Save changes</button>
             </div>
           </form><!-- End Edit Student Form -->
-                    <!-- Hidden Delete Form -->
-                    <form id="deleteStudentForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+          <!-- Hidden Delete Form -->
+          <form id="deleteStudentForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
             <input type="hidden" name="delete_student" value="1">
             <input type="hidden" id="deleteStudent" name="id">
           </form>
@@ -363,16 +362,6 @@ if ($userPosition === 'Elementary Chairperson') {
 
   <!-- Custom JS to Populate Edit Modal with Data -->
   <script>
-    function editStudent(id, name, schoolYear, gender, gradeLevel, section, parentContact, parentEmail) {
-      document.getElementById('editStudentId').value = id;
-      document.getElementById('editFullName').value = name;
-      document.getElementById('editSchoolYear').value = schoolYear;
-      document.getElementById('editGender').value = gender;
-      document.getElementById('editGradeLevel').value = gradeLevel;
-      document.getElementById('editSection').value = section;
-      document.getElementById('editParentContact').value = parentContact;
-      document.getElementById('editParentEmail').value = parentEmail;
-    }
 
     function deleteStudent(id) {
       Swal.fire({
@@ -565,7 +554,7 @@ if ($userPosition === 'Elementary Chairperson') {
       });
     }
   </script>
-  
+
 </body>
 
 </html>

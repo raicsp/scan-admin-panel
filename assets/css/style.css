@@ -18,7 +18,7 @@
 
 body {
   font-family: "Open Sans", sans-serif;
-  background: #f6f9ff;
+  background: #f7f7fa;
   color: #444444;
 }
 
@@ -465,6 +465,7 @@ h6 {
 /*--------------------------------------------------------------
 # Header Nav
 --------------------------------------------------------------*/
+
 .header-nav ul {
   list-style: none;
 }

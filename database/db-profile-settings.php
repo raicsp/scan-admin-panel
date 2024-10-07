@@ -11,12 +11,19 @@ if (!isset($_SESSION['firstname'], $_SESSION['lastname'], $_SESSION['email'], $_
 // Get the admin ID from the session
 $admin_id = $_SESSION['user_id'];
 
+// Define the upload directory for profile pictures
+$upload_dir = $_SERVER['DOCUMENT_ROOT'] . "/scan-admin/adminimages/";
+
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0777, true); // Create the directory if it doesn't exist
+}
+ 
 // Fetch user data from session
 $firstname = htmlspecialchars($_SESSION['firstname']);
 $lastname = htmlspecialchars($_SESSION['lastname']);
 $email = htmlspecialchars($_SESSION['email']);
 $position = htmlspecialchars($_SESSION['position']);
-$profile_pic = htmlspecialchars($_SESSION['profile_pic'] ?? 'assets/img/default-profile.png');
+$profile_pic = htmlspecialchars($_SESSION['profile_pic'] ?? 'adminimages/default-profile.png');
 
 // Update profile logic for name, email, and picture
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
@@ -26,24 +33,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
 
     // Check if a new profile picture is uploaded
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
-        $profile_pic = $_FILES['profile_pic']['name'];
+        $profile_pic = basename($_FILES['profile_pic']['name']);
         $profile_pic_tmp = $_FILES['profile_pic']['tmp_name'];
-        $upload_dir = "uploads/";
+        
+        // Check for valid image file types (optional)
+        $allowed_file_types = ['jpg', 'jpeg', 'png', 'gif'];
+        $file_extension = pathinfo($profile_pic, PATHINFO_EXTENSION);
+        
+        if (!in_array(strtolower($file_extension), $allowed_file_types)) {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid File Type!',
+                    text: 'Please upload a valid image (jpg, jpeg, png, gif).',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+            exit;
+        }
+
+        // Move the uploaded file to the adminimages directory
         if (move_uploaded_file($profile_pic_tmp, $upload_dir . $profile_pic)) {
-            $_SESSION['profile_pic'] = $upload_dir . $profile_pic;
+            $_SESSION['profile_pic'] = 'adminimages/' . $profile_pic; // Update session with new path
+        } else {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Failed!',
+                    text: 'There was an error uploading the image. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+            exit;
         }
     }
 
     // Update user information (excluding password)
     $sql_update = "UPDATE admin SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("ssssi", $firstname, $lastname, $email, $profile_pic, $admin_id);
+    $stmt_update->bind_param("ssssi", $firstname, $lastname, $email, $_SESSION['profile_pic'], $admin_id);
 
     if ($stmt_update->execute()) {
         $_SESSION['firstname'] = $firstname;
         $_SESSION['lastname'] = $lastname;
         $_SESSION['email'] = $email;
-        $_SESSION['profile_pic'] = $profile_pic;
 
         echo "<script>
             Swal.fire({
@@ -63,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
             });
         </script>";
     }
-
 }
 
 // Separate password update logic
@@ -108,7 +140,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['previous_password']))
                     });
                 </script>";
             }
+        } else {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Mismatch!',
+                    text: 'The new passwords do not match. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
         }
+    } else {
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Incorrect Password!',
+                text: 'The previous password is incorrect. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        </script>";
     }
 }
 ?>

@@ -1,4 +1,16 @@
 <?php
+if (isset($_SESSION['profile_update_success'])) {
+    echo "<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Profile Updated!',
+            text: 'Your profile has been updated successfully.',
+            confirmButtonText: 'OK'
+        });
+    </script>";
+    unset($_SESSION['profile_update_success']); // Remove the session flag after showing the message
+}
+
 include 'database/db_connect.php'; // Connect to the database
 include 'database/db-header.php';
 include 'database/db-profile-settings.php';
@@ -14,7 +26,6 @@ include 'database/db-profile-settings.php';
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .profile-wrapper {
             display: flex;
@@ -78,9 +89,8 @@ include 'database/db-profile-settings.php';
 </head>
 
 <body>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <?php include 'header.php'; ?>
-    
 
     <div class="container-fluid">
         <div class="container profile-wrapper">
@@ -91,7 +101,7 @@ include 'database/db-profile-settings.php';
 
                 <!-- Left Side (Profile Picture Form) -->
                 <div class="profile-left">
-                    <img src="<?php echo htmlspecialchars($_SESSION['profile_pic']) ?? 'assets/img/default-profile.png'; ?>"
+                    <img src="<?php echo htmlspecialchars($_SESSION['profile_pic']) ?: 'adminimages/default-profile.png'; ?>"
                         alt="Profile Picture" class="profile-pic" id="profile-pic">
                     <h2><?php echo htmlspecialchars($_SESSION['firstname']) . ' ' . htmlspecialchars($_SESSION['lastname']); ?>
                     </h2>
@@ -99,8 +109,8 @@ include 'database/db-profile-settings.php';
                     <p><?php echo htmlspecialchars($_SESSION['email']); ?></p>
 
                     <label class="upload-btn" for="profile-pic-input">Select Profile Picture</label>
-                    <input type="file" id="profile-pic-input" name="profile_pic" style="display: none;"
-                        accept="image/*">
+                    <input type="file" id="profile-pic-input" name="profile_pic" form="profile-settings-form"
+                        style="display: none;" accept="image/*">
 
                     <button type="button" class="btn btn-primary save-pic-btn" id="save-pic-btn">Save Profile
                         Picture</button>
@@ -140,7 +150,8 @@ include 'database/db-profile-settings.php';
                                         value="<?php echo htmlspecialchars($_SESSION['email']); ?>" required>
                                 </div>
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">Update Profile Info</button>
+                                    <button type="button" class="btn btn-primary" id="confirm-update-profile">Update
+                                        Profile Info</button>
                                 </div>
                             </form>
                         </div>
@@ -155,15 +166,16 @@ include 'database/db-profile-settings.php';
                                 <div class="mb-3">
                                     <label for="newPassword" class="form-label">New Password</label>
                                     <input type="password" class="form-control" id="newPassword" name="new_password"
-                                        placeholder="Enter new password">
+                                        placeholder="Enter new password" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="retypePassword" class="form-label">Confirm New Password</label>
                                     <input type="password" class="form-control" id="retypePassword"
-                                        name="retype_password" placeholder="Confirm new password">
+                                        name="retype_password" placeholder="Confirm new password" required>
                                 </div>
                                 <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                    <button type="button" class="btn btn-primary" id="confirm-change-password">Change
+                                        Password</button>
                                 </div>
                             </form>
                         </div>
@@ -175,7 +187,7 @@ include 'database/db-profile-settings.php';
 
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('profile-pic-input').addEventListener('change', function (event) {
+        document.getElementById('profile-pic-input').addEventListener('change', function () {
             const savePicBtn = document.getElementById('save-pic-btn');
             const profilePic = document.getElementById('profile-pic');
 
@@ -190,7 +202,9 @@ include 'database/db-profile-settings.php';
             }
         });
 
-        document.getElementById('save-pic-btn').addEventListener('click', function () {
+        document.getElementById('save-pic-btn').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you want to save this profile picture?",
@@ -204,6 +218,41 @@ include 'database/db-profile-settings.php';
                 }
             });
         });
+
+        document.getElementById('confirm-update-profile').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update your profile information?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('profile-settings-form').submit();
+                }
+            });
+        });
+
+        document.getElementById('confirm-change-password').addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to change your password?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, change it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('password-change-form').submit();
+                }
+            });
+        });
+
 
 
     </script>

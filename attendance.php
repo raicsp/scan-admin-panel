@@ -25,12 +25,12 @@ foreach ($students as $student) {
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -64,12 +64,11 @@ foreach ($students as $student) {
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>STUDENT ATTENDANCE</h1>
+      <h1>Student Attendance</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Tables</li>
-          <li class="breadcrumb-item active">Data</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Student Attendance</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -80,7 +79,7 @@ foreach ($students as $student) {
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">STUDENT ATTENDANCE <br><span> <?= date("F j, Y") ?></span> </h5>
+              <h5 class="card-title">Student Attendance<br><span> <?= date("F j, Y") ?></span> </h5>
 
 
               <!-- Filter-->

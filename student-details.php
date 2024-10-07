@@ -26,13 +26,14 @@ if ($row = $result->fetch_assoc()) {
   $section = $row['section'];
 
   // Convert BLOB to base64 string
-  $profilePicBase64 = base64_encode($profilePic);
 
+  $profilePicBase64 = base64_encode($profilePic);
 } else {
   echo "Student not found";
   exit();
 }
-
+$defaultProfilePic = 'assets/img/default.png';
+$profilePicSrc = $profilePicBase64 ? "data:image/jpeg;base64,$profilePicBase64" : $defaultProfilePic;
 // Fetching monthly attendance summary data for the student (same as before)
 $monthlyAttendanceData = [];
 $attendanceByCategoryData = [];
@@ -77,11 +78,11 @@ $conn->close();
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>SCAN</title>
+  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -105,16 +106,20 @@ $conn->close();
       width: 200px;
       height: 200px;
       object-fit: cover;
-      border-radius: 50%; /* Make the image round */
+      border-radius: 50%;
+      /* Make the image round */
       margin-right: auto;
       margin-left: auto;
-      display: block; /* Center the image */
+      display: block;
+      /* Center the image */
     }
 
     .row {
       display: flex;
-      align-items: center; /* Align content vertically */
-      justify-content: space-between; /* Separate the student info and the image */
+      align-items: center;
+      /* Align content vertically */
+      justify-content: space-between;
+      /* Separate the student info and the image */
     }
 
     .card {
@@ -123,12 +128,14 @@ $conn->close();
 
     /* Ensure charts are of equal height */
     .equal-height {
-      height: 350px; /* Fixed height to ensure charts are equal in size */
+      height: 350px;
+      /* Fixed height to ensure charts are equal in size */
     }
 
     @media (max-width: 768px) {
       .text-md-end {
-        text-align: center; /* Center the image on smaller screens */
+        text-align: center;
+        /* Center the image on smaller screens */
         margin-top: 15px;
       }
 
@@ -136,11 +143,9 @@ $conn->close();
         margin-top: 15px;
       }
     }
+  </style>
 
 
-</style>
-
-  
 
 </head>
 
@@ -153,12 +158,11 @@ $conn->close();
   <!-- End Sidebar-->
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Student Details</h1>
+      <h1>Student Information</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Student</li>
-          <li class="breadcrumb-item active">Details</li>
+          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Student Information</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -166,27 +170,41 @@ $conn->close();
     <section class="section">
       <!-- Student Information Container -->
       <div class="student-info-container">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title"></h5>
-      <!-- Student Information -->
-      <div class="row">
-        <div class="col-md-8">
-          <!-- Student Details -->
-          <h1><?= htmlspecialchars($studentName) ?><br></h1>
-          <p><strong>Grade-Section:</strong> <?= htmlspecialchars($gradeLevel) ?> <?= htmlspecialchars($section) ?><br></p>
-          <p><strong>Parent Email Address: </strong><?= htmlspecialchars($gmail) ?><br></p>
-          <p><strong>Parent Name: </strong><?= htmlspecialchars($p_name) ?><br></p>
-          <p><strong>Parent Contact Number:</strong> <?= htmlspecialchars($parentContact) ?><br></p>
-        </div>
-        <div class="col-md-4 text-md-end">
-          <!-- Profile Picture -->
-          <img src="data:image/jpeg;base64,<?= $profilePicBase64 ?>" alt="Profile Picture" class="rounded-circle profile-pic">
+        <div class="card">
+          <div class="card-body text-center" style="padding:50px;">
+            <!-- Profile Picture at the top, centered -->
+            <img src="<?= htmlspecialchars($profilePicSrc) ?>" alt="Profile Picture" class="rounded-circle profile-pic">
+            <!-- Student Name below the profile picture -->
+            <h1><?= htmlspecialchars($studentName) ?></h1>
+
+            <!-- Student Details -->
+            <div class="row"  style="margin-top: 20px;">
+              <!-- First row: Grade-Section and Parent Name -->
+              <div class="col-md-6 text-start">
+                <label>Grade-Section:</label>
+                <input type="text" class="form-control" value="<?= htmlspecialchars($gradeLevel) ?> <?= htmlspecialchars($section) ?>" readonly>
+              </div>
+              <div class="col-md-6 text-start">
+                <label>Parent Name:</label>
+                <input type="text" class="form-control" value="<?= htmlspecialchars($p_name) ?>" readonly>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+              <!-- Second row: Parent Email and Parent Contact -->
+              <div class="col-md-6 text-start">
+                <label>Parent Contact Number:</label>
+                <input type="text" class="form-control" value="<?= htmlspecialchars($parentContact) ?>" readonly>
+              </div>
+              <div class="col-md-6 text-start">
+                <label>Parent Email:</label>
+                <input type="email" class="form-control" value="<?= htmlspecialchars($gmail) ?>" readonly>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+
 
       <!-- End Student Information Container -->
 
