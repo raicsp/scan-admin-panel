@@ -127,7 +127,7 @@ $activePage = 'attendance-report';
                       } ?>
                     </select>
                   </div>
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     <label for="syFilter" class="form-label"><b>Select School Year</b></label>
                     <select name="syFilter" id="syFilter" class="form-select">
                       <option value="">Select School Year</option>
@@ -137,7 +137,7 @@ $activePage = 'attendance-report';
                         <option value="<?= htmlspecialchars($schoolYear) ?>" <?= $schoolYear == $syFilter ? 'selected' : '' ?>><?= htmlspecialchars($schoolYear) ?></option>
                       <?php endforeach; ?>
                     </select>
-                  </div>
+                  </div> -->
                 </div>
 
 

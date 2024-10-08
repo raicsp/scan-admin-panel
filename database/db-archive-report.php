@@ -8,7 +8,7 @@ $academicYear = preg_replace('/[^0-9\-]/', '', $academicYear); // Sanitize input
 
 // Capture user position from the session
 $userPosition = trim($_SESSION['position'] ?? '');
-echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</script>";
+
 
 // Define grade conditions based on user position
 $gradeCondition = '';

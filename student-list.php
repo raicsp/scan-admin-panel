@@ -129,10 +129,10 @@ if ($userPosition === 'Elementary Chairperson') {
 
 
 
-              <div class="col-md-4">
+              <!-- <div class="col-md-4">
                 <input type="text" id="searchInput" class="form-control" placeholder="Search by name">
               </div>
-
+ -->
 
               <!-- Table with Data -->
               <table id="studentsTable" class="table">
@@ -299,11 +299,8 @@ if ($userPosition === 'Elementary Chairperson') {
     </div>
   </div><!-- End Edit Student Modal-->
 
-
-
   <script>
-    // Populate the section dropdown based on selected grade level
-    document.getElementById('editGradeLevel').addEventListener('change', function() {
+       document.getElementById('editGradeLevel').addEventListener('change', function() {
       const selectedGrade = this.value;
       const sectionDropdown = document.getElementById('editSection');
 
@@ -320,7 +317,7 @@ if ($userPosition === 'Elementary Chairperson') {
         });
       }
     });
-
+   
     // This function populates the fields when the modal opens
     function editStudent(id, name, schoolYear, gender, gradeLevel, section, parentContact, parentEmail) {
       document.getElementById('editStudentId').value = id;
@@ -402,96 +399,90 @@ if ($userPosition === 'Elementary Chairperson') {
     <?php endif; ?>
 
     // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const filter = this.value.toUpperCase();
-      const rows = document.querySelectorAll('#studentsTable tbody tr');
-      rows.forEach(row => {
-        const name = row.cells[0].textContent.toUpperCase();
-        row.style.display = name.includes(filter) ? '' : 'none';
-      });
-    });
+    // document.getElementById('searchInput').addEventListener('input', function() {
+    //   const filter = this.value.toUpperCase();
+    //   const rows = document.querySelectorAll('#studentsTable tbody tr');
+    //   rows.forEach(row => {
+    //     const name = row.cells[0].textContent.toUpperCase();
+    //     row.style.display = name.includes(filter) ? '' : 'none';
+    //   });
+    // });
 
-    // Filter functionality
-    document.getElementById('filterGrade').addEventListener('change', function() {
-      filterTable();
-    });
+  
+  </script>
+  <script>
+// Ensure that these variables are properly defined
+const gradeFilter = document.getElementById('filterGrade');
+const sectionFilter = document.getElementById('filterSection');
+const searchInput = document.getElementById('searchInput');
 
-    document.getElementById('filterSection').addEventListener('change', function() {
-      filterTable();
-    });
+// Initialize DataTable
+const dataTable = new simpleDatatables.DataTable("#studentsTable", {
+    searchable: true, // Enable default search input
+    paging: true,
+    fixedHeight: true,
+    perPage: 10,
+    labels: {
+        placeholder: "Search...",
+        perPage: "entries per page",
+        noRows: "No results found",
+        info: "Showing {start} to {end} of {rows} results"
+    }
+});
 
-    function filterTable() {
-      const grade = document.getElementById('filterGrade').value.toUpperCase();
-      const section = document.getElementById('filterSection').value.toUpperCase();
-      const rows = document.querySelectorAll('#studentsTable tbody tr');
+// When the grade dropdown changes, update the section options
+gradeFilter.addEventListener('change', () => {
+    const selectedGrade = gradeFilter.value;
+    sectionFilter.innerHTML = '<option value="">Filter by Section</option>'; // Clear previous sections
 
-      rows.forEach(row => {
-        const gradeCell = row.cells[1].textContent.toUpperCase();
-        const sectionCell = row.cells[2].textContent.toUpperCase();
-
-        if ((grade === '' || gradeCell === grade) && (section === '' || sectionCell === section)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    } // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-      filterTable(); // Call filterTable to ensure filtering is applied with search
-    });
-
-    // Filter functionality
-    document.getElementById('filterGrade').addEventListener('change', function() {
-      filterTable();
-    });
-
-    document.getElementById('filterSection').addEventListener('change', function() {
-      filterTable();
-    });
-
-    function filterTable() {
-      const searchFilter = document.getElementById('searchInput').value.toUpperCase();
-      const gradeFilter = document.getElementById('filterGrade').value.toUpperCase();
-      const sectionFilter = document.getElementById('filterSection').value.toUpperCase();
-      const rows = document.querySelectorAll('#studentsTable tbody tr');
-
-      rows.forEach(row => {
-        const name = row.cells[0].textContent.toUpperCase();
-        const gradeCell = row.cells[1].textContent.toUpperCase();
-        const sectionCell = row.cells[2].textContent.toUpperCase();
-
-        const matchesSearch = name.includes(searchFilter);
-        const matchesGrade = gradeFilter === '' || gradeCell === gradeFilter;
-        const matchesSection = sectionFilter === '' || sectionCell === sectionFilter;
-
-        // Show row if it matches all conditions
-        if (matchesSearch && matchesGrade && matchesSection) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
+    if (selectedGrade && gradeSections[selectedGrade]) {
+        gradeSections[selectedGrade].forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            sectionFilter.appendChild(option);
+        });
     }
 
-    //page
-    document.addEventListener('DOMContentLoaded', function() {
-      const dataTable = new simpleDatatables.DataTable("#studentsTable", {
-        searchable: false,
-        paging: true,
-        fixedHeight: true,
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
-        }
-      });
-    });
+    filterTable(); // Apply filter after changing grade
+});
 
+// Filter table based on search and selection
+function filterTable() {
+    const gradeFilterValue = gradeFilter.value.toUpperCase();
+    const sectionFilterValue = sectionFilter.value.toUpperCase();
+ //   const searchQuery = searchInput.value.toUpperCase();
 
-    //clicable row
-    document.addEventListener('DOMContentLoaded', (event) => {
+    // Build filter query based on selected values
+    let filterQuery = '';
+
+    // Append grade filter
+    if (gradeFilterValue) {
+        filterQuery += gradeFilterValue;
+    }
+
+    // Append section filter
+    if (sectionFilterValue) {
+        filterQuery += ' ' + sectionFilterValue; // Add space to separate terms
+    }
+
+    // // Append search query for name
+    // if (searchQuery) {
+    //     filterQuery += ' ' + searchQuery; // Add space to separate terms
+    // }
+
+    // Apply the search/filter on the datatable
+    dataTable.search(filterQuery.trim()); // Use search method to filter the table
+}
+
+// Event listeners for filtering
+gradeFilter.addEventListener('change', filterTable);
+//sectionFilter.addEventListener('change', filterTable);
+searchInput.addEventListener('input', filterTable);
+
+// Clickable row functionality
+ //clicable row
+ document.addEventListener('DOMContentLoaded', (event) => {
       const table = document.getElementById('studentsTable');
       const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
@@ -505,54 +496,8 @@ if ($userPosition === 'Elementary Chairperson') {
         });
       }
     });
-  </script>
-  <script>
-    // When the grade dropdown changes, update the section options
-    document.getElementById('filterGrade').addEventListener('change', function() {
-      const selectedGrade = this.value;
-      const sectionDropdown = document.getElementById('filterSection');
+  
 
-      // Clear current sections
-      sectionDropdown.innerHTML = '<option value="">Filter by Section</option>';
-
-      // Get the sections for the selected grade level
-      if (gradeSections[selectedGrade]) {
-        gradeSections[selectedGrade].forEach(function(section) {
-          const option = document.createElement('option');
-          option.value = section;
-          option.textContent = section;
-          sectionDropdown.appendChild(option);
-        });
-      }
-
-      // Call the filterTable function to filter the table when the grade changes
-      filterTable();
-    });
-
-    // Function to filter the table
-    function filterTable() {
-      const searchFilter = document.getElementById('searchInput').value.toUpperCase();
-      const gradeFilter = document.getElementById('filterGrade').value.toUpperCase();
-      const sectionFilter = document.getElementById('filterSection').value.toUpperCase();
-      const rows = document.querySelectorAll('#studentsTable tbody tr');
-
-      rows.forEach(row => {
-        const name = row.cells[0].textContent.toUpperCase();
-        const gradeCell = row.cells[1].textContent.toUpperCase();
-        const sectionCell = row.cells[2].textContent.toUpperCase();
-
-        const matchesSearch = name.includes(searchFilter);
-        const matchesGrade = gradeFilter === '' || gradeCell === gradeFilter;
-        const matchesSection = sectionFilter === '' || sectionCell === sectionFilter;
-
-        // Show row if it matches all conditions
-        if (matchesSearch && matchesGrade && matchesSection) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    }
   </script>
 
 </body>

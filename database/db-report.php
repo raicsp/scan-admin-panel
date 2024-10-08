@@ -2,7 +2,7 @@
 include 'database/db_connect.php';
 session_start();
 $userPosition = trim($_SESSION['position'] ?? '');
-echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</script>";
+
 
 $gradeCondition = '';
 $availableGrades = [];
