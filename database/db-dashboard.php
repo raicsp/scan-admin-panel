@@ -85,6 +85,20 @@ $total_count = $present_today + $late_today + $absent_today;
 if ($total_count == 0) {
     $present_today = $late_today = $absent_today = 0; // Set each count to 1 to show the circle
 }
+// Query to get gender
+$query = "SELECT gender, COUNT(*) as count FROM student GROUP BY gender";
+$result = $conn->query($query);
+
+$male_count = $female_count = 0;
+if ($result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+    if ($row['gender'] == 'Male') {
+      $male_count = $row['count'];
+    } elseif ($row['gender'] == 'Female') {
+      $female_count = $row['count'];
+    }
+  }
+}
 
 // Query to get the count of teachers
 $sql_teacher = "SELECT COUNT(DISTINCT u.id) AS total_teachers
@@ -277,7 +291,7 @@ $attendance_overview = [
 
 
 // Fetch top students with most absences
-$absences_sql = "  SELECT s.studentID, CONCAT(s.name) AS student_name, 
+$absences_sql = "  SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
            c.grade_level, c.section, COUNT(a.status) AS absence_count, 
            ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
     FROM attendance a
@@ -292,7 +306,7 @@ $absences_sql = "  SELECT s.studentID, CONCAT(s.name) AS student_name,
 $absences_result = $conn->query($absences_sql);
 
 // Fetch top students with most late
-$late_sql = "SELECT s.studentID, CONCAT(s.name) AS student_name, 
+$late_sql = "SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
              c.grade_level, c.section, COUNT(a.status) AS late_count, 
              ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
              FROM attendance a
@@ -309,6 +323,7 @@ $late_result = $conn->query($late_sql);
 // Fetch students with perfect attendance
 $perfect_attendance_sql = "
   SELECT 
+    s.srcode,
     s.studentID, 
     CONCAT(s.name) AS student_name, 
     c.grade_level, 

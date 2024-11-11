@@ -82,7 +82,6 @@ $attendanceResult = $conn->query($attendanceQuery);
 $students = [];
 $dates = [];
 $sectionsByGrade = [];
-
 // Process query results for attendance
 if ($attendanceResult->num_rows > 0) {
     while ($row = $attendanceResult->fetch_assoc()) {
@@ -91,6 +90,25 @@ if ($attendanceResult->num_rows > 0) {
         $students[$row['studentID']]['grade_level'] = $row['grade_level'];
         $students[$row['studentID']]['section'] = $row['section'];
         $students[$row['studentID']]['school_year'] = $row['school_year'];
+
+        // Count statuses
+        if (!isset($students[$row['studentID']]['lateCount'])) {
+            $students[$row['studentID']]['lateCount'] = 0;
+            $students[$row['studentID']]['absentCount'] = 0;
+            $students[$row['studentID']]['presentCount'] = 0;
+        }
+        
+        switch ($row['status']) {
+            case 'Late':
+                $students[$row['studentID']]['lateCount']++;
+                break;
+            case 'Absent':
+                $students[$row['studentID']]['absentCount']++;
+                break;
+            case 'Present':
+                $students[$row['studentID']]['presentCount']++;
+                break;
+        }
 
         // Populate sections by grade
         $sectionsByGrade[$row['grade_level']][] = $row['section'];
@@ -101,28 +119,57 @@ if ($attendanceResult->num_rows > 0) {
     }
 }
 
-// Get unique sections for each grade level
-$uniqueSectionsByGrade = [];
-foreach ($sectionsByGrade as $grade => $sections) {
-    $uniqueSectionsByGrade[$grade] = array_unique($sections);
-}
+// Initialize totals
+$totalPresent = 0;
+$totalAbsent = 0;
+$totalLate = 0;
 
-// Export to CSV if requested
+// (Export to CSV if requested)
 if (isset($_GET['export']) && $_GET['export'] == 'csv') {
+    $filename = '';
+
+    if ($gradeFilter) {
+        $filename .= "{$gradeFilter}";
+    }
+    
+    if ($sectionFilter) {
+        $filename .= "_{$sectionFilter}";
+    }
+    
+    $filename .= "_attendance_report.csv";
+    
     header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="attendance_report.csv"');
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+    
+    
 
     $output = fopen('php://output', 'w');
-    $header = array_merge(['Name'], $dates);
+    $header = array_merge(['Name', 'Total Number of Present', 'Total Number of Absent', 'Total Number of Late'], $dates);
     fputcsv($output, $header);
 
     foreach ($students as $student) {
-        $row = [$student['name']];
+        // Create the row with totals first
+        $row = [
+            $student['name'],
+            $student['presentCount'],
+            $student['absentCount'],
+            $student['lateCount']
+        ];
+
+        // Append the attendance data
         foreach ($dates as $date) {
             $row[] = isset($student['data'][$date]) ? $student['data'][$date] : 'Absent';
         }
+
+        // Accumulate totals
+        $totalPresent += $student['presentCount'];
+        $totalAbsent += $student['absentCount'];
+        $totalLate += $student['lateCount'];
+
         fputcsv($output, $row);
     }
+
+  
 
     fclose($output);
     exit();

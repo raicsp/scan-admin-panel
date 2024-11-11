@@ -1,11 +1,16 @@
 <?php
-//session_start(); // Start the session
+// Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include 'database/db_connect.php';
 include 'database/db-header.php';
 
+// Check and log the position and profile pic for debugging purposes
+if (isset($_SESSION['position'])) {
+    echo '<script>console.log("Position: ' . $_SESSION['position'] . '");</script>';
+    echo '<script>console.log("Profile Pic: ' . $_SESSION['profile_pic'] . '");</script>';
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,10 +31,19 @@ include 'database/db-header.php';
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
-            <img src="assets/img/spartan.png" alt="" style="max-height: 40px; width: auto;">
+                <img src="assets/img/spartan.png" alt="" style="max-height: 40px; width: auto;">
 
-
-                <span class="d-none d-lg-block">ADMINISTRATOR</span>
+                <!-- Conditionally display 'Administrator' or 'Faculty' based on the session's position -->
+                <span class="d-none d-lg-block">
+                    <?php 
+                        // Check if the position is 'Teacher' and display 'Faculty', else 'Administrator'
+                        if ($_SESSION['position'] === 'Teacher') {
+                            echo 'FACULTY';
+                        } else {
+                            echo 'ADMINISTRATOR';
+                        }
+                    ?>
+                </span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div><!-- End Logo -->
@@ -187,8 +201,9 @@ include 'database/db-header.php';
                 </ul>End Messages Dropdown Items -->
 
                 </li><!-- End Messages Nav -->
-
+                <span id="datetime" style="color: white; opacity: 0.6; margin-right: 20px;"></span>
                 <li class="nav-item dropdown pe-3">
+                  
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                         <img src="<?php echo $profile_pic; ?>" alt="Profile" class="rounded-circle">
                         <!-- Use the session profile picture -->
@@ -264,7 +279,7 @@ include 'database/db-header.php';
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Redirect to logout
-                        window.location.href = "?action=logout";
+                        window.location.href = "login.php";
                     }
                 });
             }
@@ -276,5 +291,23 @@ include 'database/db-header.php';
     </header><!-- End Header -->
 
 </body>
+<script>
+function updateDateTime() {
+    var now = new Date();
+    var formattedDate = now.getFullYear() + '-' + 
+        ('0' + (now.getMonth() + 1)).slice(-2) + '-' + 
+        ('0' + now.getDate()).slice(-2) + ' ' + 
+        ('0' + now.getHours()).slice(-2) + ':' + 
+        ('0' + now.getMinutes()).slice(-2) + ':' + 
+        ('0' + now.getSeconds()).slice(-2);
+    document.getElementById('datetime').textContent = formattedDate;
+}
+
+// Update the time every second
+setInterval(updateDateTime, 1000);
+
+// Initialize the datetime on page load
+updateDateTime();
+</script>
 
 </html>

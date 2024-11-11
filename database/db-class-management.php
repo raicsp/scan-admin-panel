@@ -68,7 +68,7 @@ if ($result->num_rows > 0) {
 
 function getStudentsByClassId($class_id) {
     global $conn; // Assuming $conn is your MySQLi connection
-    $stmt = $conn->prepare('SELECT studentID, name FROM student WHERE class_id = ? ORDER BY name ASC');
+    $stmt = $conn->prepare('SELECT studentID, srcode, name FROM student WHERE class_id = ? ORDER BY name ASC');
     $stmt->bind_param('i', $class_id);
     $stmt->execute();
     $result = $stmt->get_result();

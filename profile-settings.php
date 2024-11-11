@@ -22,6 +22,7 @@ include 'database/db-profile-settings.php';
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Profile Settings</title>
+    <link href="assets/img/bsu.png" rel="icon">
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
@@ -95,9 +96,17 @@ include 'database/db-profile-settings.php';
     <div class="container-fluid">
         <div class="container profile-wrapper">
             <div class="profile-card">
-                <div class="back-btn">
-                    <a href="dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>
-                </div>
+            <div class="back-btn">
+    <?php
+    // Redirect based on user position
+    if (isset($_SESSION['position']) && $_SESSION['position'] === 'Teacher') {
+        echo '<a href="teacher-dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
+    } else {
+        echo '<a href="dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
+    }
+    ?>
+</div>
+
 
                 <!-- Left Side (Profile Picture Form) -->
                 <div class="profile-left">

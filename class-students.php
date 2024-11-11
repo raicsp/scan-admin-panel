@@ -81,6 +81,7 @@ include 'database/db-class-students.php';
                 <thead>
                   <tr>
                     <th scope="col">#</th> <!-- Add a column header for the numbering -->
+                    <th scope="col">Sr-Code</th>
                     <th scope="col">Student Name</th>
                   </tr>
                 </thead>
@@ -88,8 +89,9 @@ include 'database/db-class-students.php';
                   <?php if (!empty($students)) : ?>
                     <?php $counter = 1; ?> <!-- Initialize a counter -->
                     <?php foreach ($students as $student) : ?>
-                      <tr onclick="window.location.href='student-details.php?name=<?= urlencode($student['name']) ?>';" style="cursor: pointer;">
+                      <tr onclick="window.location.href='student-details.php?srcode=<?= urlencode($student['srcode']) ?>';" style="cursor: pointer;">
                         <td><?= $counter++; ?></td> <!-- Display the counter and increment it -->
+                        <td><?= htmlspecialchars($student['srcode']) ?></td>
                         <td><?= htmlspecialchars($student['name']) ?></td>
                       </tr>
                     <?php endforeach; ?>

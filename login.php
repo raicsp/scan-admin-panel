@@ -104,6 +104,9 @@ include 'database/db-login.php';
                                             <button class="btn btn-success w-50 custom-width" type="submit">Sign in</button>
                                         </div>
                                     </form>
+                                          <p class="text-center">
+                                            <a href="forgotpassword.php">Forgot Password?</a>
+                                        </p>
 
 
                                 </div>

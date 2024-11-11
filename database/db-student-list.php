@@ -8,6 +8,7 @@ $response = ['success' => false, 'error' => ''];
 if (isset($_POST['edit_student'])) {
     // Use null coalescing operator to avoid undefined array key errors
     $studentID = $_POST['id'] ?? null;
+    $srcode = $_POST['srcode'] ?? '';
     $fullName = $_POST['full_name'] ?? '';
     $schoolYear = $_POST['school_year'] ?? '';
     $gender = $_POST['gender'] ?? '';
@@ -31,6 +32,7 @@ if (isset($_POST['edit_student'])) {
             $updateQuery = "
             UPDATE student 
             SET 
+                srcode = ?,
                 name = ?, 
                 gender = ?, 
                 school_year = ?, 
@@ -42,7 +44,7 @@ if (isset($_POST['edit_student'])) {
             
             $stmt = $conn->prepare($updateQuery);
             if ($stmt) {
-                $stmt->bind_param('ssssssi', $fullName, $gender, $schoolYear, $parentContact, $parentEmail, $classID, $studentID);
+                $stmt->bind_param('sssssssi',$srcode,$fullName, $gender, $schoolYear, $parentContact, $parentEmail, $classID, $studentID);
                 if ($stmt->execute()) {
                     $response['success'] = true;
                     $response['message'] = "Student details updated successfully!";
@@ -84,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_student'])) {
 $query = "
     SELECT 
         s.studentID,
+        s.srcode,
         s.name AS student_name,
         s.gender,
         c.grade_level,
@@ -134,5 +137,4 @@ while ($row = $sectionResult->fetch_assoc()) {
 // Pass the sections data to JavaScript
 echo "<script>var gradeSections = " . json_encode($gradeSections) . ";</script>";
 ?>
-
 

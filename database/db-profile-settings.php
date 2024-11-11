@@ -68,65 +68,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
         }
     }
 
-    // Update user information (excluding password)
-    $sql_update = "UPDATE admin SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
-    $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("ssssi", $firstname, $lastname, $email, $_SESSION['profile_pic'], $admin_id);
+    // Check if email exists in the admin table
+    $sql_check_admin = "SELECT id FROM admin WHERE email = ?";
+    $stmt_check_admin = $conn->prepare($sql_check_admin);
+    $stmt_check_admin->bind_param("s", $email);
+    $stmt_check_admin->execute();
+    $result_admin = $stmt_check_admin->get_result();
 
-    if ($stmt_update->execute()) {
-        $_SESSION['firstname'] = $firstname;
-        $_SESSION['lastname'] = $lastname;
-        $_SESSION['email'] = $email;
+    // If email is not found in admin, check in users table
+    if ($result_admin->num_rows == 0) {
+        $sql_check_user = "SELECT id FROM users WHERE email = ?";
+        $stmt_check_user = $conn->prepare($sql_check_user);
+        $stmt_check_user->bind_param("s", $email);
+        $stmt_check_user->execute();
+        $result_user = $stmt_check_user->get_result();
 
-        echo "<script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated!',
-                text: 'Your profile information has been updated successfully.',
-                confirmButtonText: 'OK'
-            });
-        </script>";
-    } else {
-        echo "<script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Update Failed!',
-                text: 'Failed to update profile. Please try again.',
-                confirmButtonText: 'OK'
-            });
-        </script>";
-    }
-}
+        // If email is found in users, update the user
+        if ($result_user->num_rows > 0) {
+            $sql_update_user = "UPDATE users SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE email = ?";
+            $stmt_update_user = $conn->prepare($sql_update_user);
+            $stmt_update_user->bind_param("sssss", $firstname, $lastname, $email, $_SESSION['profile_pic'], $email);
 
-// Separate password update logic
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['previous_password'])) {
-    $previous_password = $_POST['previous_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
-    $retype_password = $_POST['retype_password'] ?? '';
-
-    // Fetch current admin data for verification
-    $sql_fetch = "SELECT password FROM admin WHERE id = ?";
-    $stmt_fetch = $conn->prepare($sql_fetch);
-    $stmt_fetch->bind_param("i", $admin_id);
-    $stmt_fetch->execute();
-    $result = $stmt_fetch->get_result();
-    $admin = $result->fetch_assoc();
-
-    // Verify previous password
-    if (!empty($previous_password) && password_verify($previous_password, $admin['password'])) {
-        if (!empty($new_password) && $new_password === $retype_password) {
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-
-            // Update password
-            $sql_update_password = "UPDATE admin SET password = ? WHERE id = ?";
-            $stmt_update_password = $conn->prepare($sql_update_password);
-            $stmt_update_password->bind_param("si", $hashed_password, $admin_id);
-            if ($stmt_update_password->execute()) {
+            if ($stmt_update_user->execute()) {
+                $_SESSION['firstname'] = $firstname;
+                $_SESSION['lastname'] = $lastname;
+                $_SESSION['email'] = $email;
                 echo "<script>
                     Swal.fire({
                         icon: 'success',
-                        title: 'Password Updated!',
-                        text: 'Your password has been updated successfully.',
+                        title: 'Profile Updated!',
+                        text: 'Your profile information has been updated successfully.',
                         confirmButtonText: 'OK'
                     });
                 </script>";
@@ -135,30 +106,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['previous_password']))
                     Swal.fire({
                         icon: 'error',
                         title: 'Update Failed!',
-                        text: 'Failed to update password. Please try again.',
+                        text: 'Failed to update profile. Please try again.',
                         confirmButtonText: 'OK'
                     });
                 </script>";
             }
         } else {
+            // Email not found in users, show error
             echo "<script>
                 Swal.fire({
                     icon: 'error',
-                    title: 'Password Mismatch!',
-                    text: 'The new passwords do not match. Please try again.',
+                    title: 'Email Not Found!',
+                    text: 'The email address is not found in both admin and users.',
                     confirmButtonText: 'OK'
                 });
             </script>";
         }
     } else {
-        echo "<script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Incorrect Password!',
-                text: 'The previous password is incorrect. Please try again.',
-                confirmButtonText: 'OK'
-            });
-        </script>";
+        // Update profile in admin table
+        $sql_update_admin = "UPDATE admin SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
+        $stmt_update_admin = $conn->prepare($sql_update_admin);
+        $stmt_update_admin->bind_param("ssssi", $firstname, $lastname, $email, $_SESSION['profile_pic'], $admin_id);
+
+        if ($stmt_update_admin->execute()) {
+            $_SESSION['firstname'] = $firstname;
+            $_SESSION['lastname'] = $lastname;
+            $_SESSION['email'] = $email;
+
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated!',
+                    text: 'Your profile information has been updated successfully.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+        } else {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed!',
+                    text: 'Failed to update profile. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+        }
     }
 }
 ?>

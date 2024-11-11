@@ -14,6 +14,10 @@ if ($userPosition === 'Elementary Chairperson') {
     $allowedGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6','Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
 }
 
+// Retrieve date range from request, if provided
+$startDate = $_GET['start_date'] ?? '';
+$endDate = $_GET['end_date'] ?? '';
+
 // Construct grade condition for the SQL query
 $gradeCondition = '';
 if (!empty($allowedGrades)) {
@@ -21,9 +25,16 @@ if (!empty($allowedGrades)) {
     $gradeCondition = "AND c.grade_level IN ($gradeList)";
 }
 
+// Construct date range condition for the SQL query
+$dateCondition = '';
+if ($startDate && $endDate) {
+    $dateCondition = "AND a.date BETWEEN '$startDate' AND '$endDate'";
+}
+
 // Query to get students with perfect attendance
 $perfectAttendance_sql = "
- SELECT 
+   SELECT 
+    s.srcode,
     s.studentID, 
     CONCAT(s.name) AS student_name, 
     c.grade_level, 
@@ -37,11 +48,12 @@ JOIN
 WHERE 
     1=1
     $gradeCondition
+    $dateCondition
 GROUP BY 
     s.studentID, s.name, c.grade_level, c.section
 HAVING 
-    COUNT(CASE WHEN a.status = 'Absent' THEN 1 END) = 0
-    ;
+    COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
+
 ";
 
 $result = $conn->query($perfectAttendance_sql);
@@ -128,7 +140,7 @@ $conn->close();
                                 <span><?= date("F j, Y") ?></span>
                             </h5>
                             <div class="row mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <select id="gradeFilter" class="form-select">
                                         <option value="">Select Grade</option>
                                         <?php foreach ($allowedGrades as $grade): ?>
@@ -136,20 +148,32 @@ $conn->close();
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <select id="sectionFilter" class="form-select">
                                         <option value="">All Sections</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
-                                    <input type="text" id="searchBar" class="form-control" placeholder="Search by Name">
-                                </div>
+                        
                             </div>
+                            <div class="row mb-3">
+                                    <div class="col-md-5">
+                                        <label for="startDate">Start Date:</label>
+                                        <input type="date" id="startDate" class="form-control" name="start_date">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="endDate">End Date:</label>
+                                        <input type="date" id="endDate" class="form-control" name="end_date">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button id="filterButton" class="btn btn-primary mt-4" onclick="filterByDate()">Filter</button>
+                                    </div>
+                                </div>
 
                             <!-- Table for displaying the students with perfect attendance -->
                             <table class="table table-bordered" id="attendanceTable">
                                 <thead>
                                     <tr>
+                                        <th>Sr-Code</th>
                                         <th>Name</th>
                                         <th>Grade Level</th>
                                         <th>Section</th>
@@ -157,7 +181,8 @@ $conn->close();
                                 </thead>
                                 <tbody>
                                     <?php foreach ($perfectAttendanceStudents as $student) : ?>
-                                        <tr>
+                                        <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">                                
+                                        <td><?= htmlspecialchars($student['srcode']) ?></td>
                                             <td><?= htmlspecialchars($student['student_name']) ?></td>
                                             <td><?= htmlspecialchars($student['grade_level']) ?></td>
                                             <td><?= htmlspecialchars($student['section']) ?></td>
@@ -189,70 +214,89 @@ $conn->close();
     <script src="assets/js/main.js"></script>
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dataTable = new simpleDatatables.DataTable("#attendanceTable", {
-        searchable: false, // Disable the default search input
-        paging: true,
-        fixedHeight: true,
-        perPage: 10,
-        labels: {
-            placeholder: "Search...",
-            perPage: "entries per page",
-            noRows: "No results found",
-            info: "Showing {start} to {end} of {rows} results"
-        }
-    });
+ document.addEventListener('DOMContentLoaded', function() {
+            const dataTable = new simpleDatatables.DataTable("#attendanceTable", {
+                searchable: true,
+                paging: true,
+                perPage: 10,
+            });
+            function filterTable() {
+                const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
+                const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
 
-    function filterTable() {
-        const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
-        const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
-        const searchQuery = document.getElementById('searchBar').value.toUpperCase();
+                // Build filter query based on selected values
+                let filterQuery = '';
 
-        // Build filter query based on selected values
-        let filterQuery = '';
+                // Append grade filter
+                if (gradeFilter) {
+                    filterQuery += gradeFilter;
+                }
 
-        // Append grade filter
-        if (gradeFilter) {
-            filterQuery += gradeFilter;
-        }
+                // Append section filter
+                if (sectionFilter) {
+                    filterQuery += ' ' + sectionFilter; // Add space to separate terms
+                }
 
-        // Append section filter
-        if (sectionFilter) {
-            filterQuery += ' ' + sectionFilter; // Add space to separate terms
-        }
 
-        // Append search query for name
-        if (searchQuery) {
-            filterQuery += ' ' + searchQuery; // Add space to separate terms
-        }
+                // Apply the search/filter on the datatable
+                dataTable.search(filterQuery.trim()); // Use search method to filter the table
+            }
 
-        // Apply the search/filter on the datatable
-        dataTable.search(filterQuery.trim()); // Use search method to filter the table
-    }
+            document.getElementById('gradeFilter').addEventListener('change', function() {
+                const selectedGrade = this.value;
 
-    document.getElementById('gradeFilter').addEventListener('change', function() {
-        const selectedGrade = this.value;
+                // Filter sections based on selected grade
+                const sections = gradeSections[selectedGrade] || [];
+                const sectionDropdown = document.getElementById('sectionFilter');
+                sectionDropdown.innerHTML = '<option value="">All Sections</option>';
 
-        // Filter sections based on selected grade
-        const sections = gradeSections[selectedGrade] || [];
-        const sectionDropdown = document.getElementById('sectionFilter');
-        sectionDropdown.innerHTML = '<option value="">All Sections</option>';
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionDropdown.appendChild(option);
+                });
 
-        sections.forEach(section => {
-            const option = document.createElement('option');
-            option.value = section;
-            option.textContent = section;
-            sectionDropdown.appendChild(option);
+                // Trigger table filtering after updating the section dropdown
+                filterTable();
+            });
+
         });
-
-        // Trigger table filtering after updating the section dropdown
-        filterTable();
-    });
-
-  //  document.getElementById('sectionFilter').addEventListener('change', filterTables);
-    document.getElementById('searchBar').addEventListener('input', filterTable);
-});
 </script>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+        
+            function filterByDate() {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
 
+                if (startDate && endDate) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('start_date', startDate);
+                    url.searchParams.set('end_date', endDate);
+                    window.location.href = url.toString();
+                } else {
+                    alert("Please select both a start date and an end date.");
+                }
+            }
+
+            document.getElementById('filterButton').addEventListener('click', filterByDate);
+        });
+           // Add click functionality to table rows
+           document.addEventListener('DOMContentLoaded', (event) => {
+            const table = document.getElementById('attendanceTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let row of rows) {
+                row.classList.add('clickable-row');
+                row.addEventListener('click', function(event) {
+                    if (!event.target.closest('.action-buttons')) {
+                        const studentName = row.getAttribute('data-name');
+                        window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
+                    }
+                });
+            }
+        });
+</script>
 </body>
 </html>

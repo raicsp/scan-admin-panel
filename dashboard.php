@@ -75,22 +75,7 @@ include 'database/db-dashboard.php';
         <!-- 1st Layer: 3 Cards -->
         <div class="col-12">
           <div class="row">
-            <div class="col-md-4">
-              <div class="card info-card sales-card">
-                <div class="card-body">
-                  <h5 class="card-title">Total of Students Arriving Late</h5>
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-clock"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6 id="late-today"><?php echo $late_today; ?></h6>
-                      <span class="text-muted small pt-2 ps-1">Students</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div><!-- End Total Students Card -->
+            
 
             <div class="col-md-4">
               <div class="card info-card sales-card">
@@ -125,6 +110,22 @@ include 'database/db-dashboard.php';
                 </div>
               </div>
             </div><!-- End Absent Today Card -->
+            <div class="col-md-4">
+              <div class="card info-card sales-card">
+                <div class="card-body">
+                  <h5 class="card-title">Late Arrivals Today</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="late-today"><?php echo $late_today; ?></h6>
+                      <span class="text-muted small pt-2 ps-1">Students</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- End Total Students Card -->
           </div>
         </div><!-- End 1st Layer -->
 
@@ -151,7 +152,7 @@ include 'database/db-dashboard.php';
             <div class="col-md-6">
               <div class="card info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">Number of Users</h5>
+                  <h5 class="card-title">Total Number of Users</h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                       <i class="bi bi-person-fill"></i>
@@ -167,8 +168,57 @@ include 'database/db-dashboard.php';
           </div>
         </div><!-- End 2nd Layer -->
 
-        <!-- 3rd Layer: Attendance Overview and Attendance by Grade -->
-        <div class="col-12">
+       
+
+            
+
+        <div class="col-md-6 equal-height">
+          <div class="card">
+            <div class="filter">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Gender Distribution</h5>
+              <div id="genderDistributionChart"></div>
+            </div>
+          </div>
+        </div><!-- End Gender Distribution Chart -->
+        
+        <div class="col-md-6 equal-height">
+              <div class="card">
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filter</h6>
+                    </li>
+                    <li>
+                      <select id="gradeFilter" class="form-select">
+                        <option value="">Select Grade</option>
+                        <?php foreach ($grades as $grade_level) : ?>
+                          <option value="<?= htmlspecialchars($grade_level) ?>" <?= ($grade_level == $grade) ? 'selected' : '' ?>><?= htmlspecialchars($grade_level) ?></option>
+                        <?php endforeach; ?>
+                      </select>
+                    </li>
+                    <li>
+                      <select id="timeFilter" class="form-select">
+                        <option value="today" <?= ($filter == 'today') ? 'selected' : '' ?>>Today</option>
+                        <option value="week" <?= ($filter == 'week') ? 'selected' : '' ?>>This Week</option>
+                        <option value="month" <?= ($filter == 'month') ? 'selected' : '' ?>>This Month</option>
+                      </select>
+                    </li>
+                  </ul>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Attendance Distribution<span> | <?= ucfirst($filter) ?> <?= $grade ? "$grade" : "" ?></span></h5>
+                  <div id="attendanceSummaryChart"></div>
+                </div>
+              </div>
+            </div><!-- End Attendance Summary Chart -->
+          </div><!-- End Attendance Distribution Pie Chart -->
+        </div><!-- End 3rd Layer -->
+
+         <!-- 3rd Layer: Attendance Overview and Attendance by Grade -->
+         <div class="col-12">
           <div class="row">
             <div class="col-md-6 equal-height">
               <div class="card">
@@ -196,46 +246,11 @@ include 'database/db-dashboard.php';
                   <div id="attendance-line-chart"></div>
                 </div>
               </div>
-            </div><!-- End Attendance Overview Line Chart -->
-
-            <div class="col-sm-6 equal-height">
-              <div class="card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-                    <li>
-                      <select id="gradeFilter" class="form-select">
-                        <option value="">Select Grade</option>
-                        <?php foreach ($grades as $grade_level) : ?>
-                          <option value="<?= htmlspecialchars($grade_level) ?>" <?= ($grade_level == $grade) ? 'selected' : '' ?>><?= htmlspecialchars($grade_level) ?></option>
-                        <?php endforeach; ?>
-                      </select>
-                    </li>
-                    <li>
-                      <select id="timeFilter" class="form-select">
-                        <option value="today" <?= ($filter == 'today') ? 'selected' : '' ?>>Today</option>
-                        <option value="week" <?= ($filter == 'week') ? 'selected' : '' ?>>This Week</option>
-                        <option value="month" <?= ($filter == 'month') ? 'selected' : '' ?>>This Month</option>
-                      </select>
-                    </li>
-                  </ul>
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title">Attendance Distribution<span> | <?= ucfirst($filter) ?> <?= $grade ? " - Grade $grade" : "" ?></span></h5>
-                  <div id="attendanceSummaryChart"></div>
-                </div>
-              </div>
-            </div><!-- End Attendance Summary Chart -->
-          </div><!-- End Attendance Distribution Pie Chart -->
-        </div><!-- End 3rd Layer -->
+            </div> <!--End Attendance Overview Line Chart -->
 
         <!-- 4th Layer: Attendance Distribution and Monthly Attendance -->
-        <div class="col-12">
-          <div class="row">
-            <div class="col-md-6">
+        
+          <div class="col-md-6 equal-height">
               <div class="card">
                 <div class="card-body">
                   <div class="filter">
@@ -247,14 +262,14 @@ include 'database/db-dashboard.php';
                       <li><a class="dropdown-item" href="#" data-filter="today">Today</a></li>
                       <li><a class="dropdown-item" href="#" data-filter="week">This Week</a></li>
                       <li><a class="dropdown-item" href="#" data-filter="month">This Month</a></li>
-                      <li>
+                      <!-- <li>
                         <select id="schoolYearFilter" class="form-select">
                           <option value="">Select School Year</option>
                           <?php foreach ($school_years as $year) : ?>
                             <option value="<?= htmlspecialchars($year) ?>" <?= ($year == $schoolYear) ? 'selected' : '' ?>><?= htmlspecialchars($year) ?></option>
                           <?php endforeach; ?>
                         </select>
-                      </li>
+                      </li> -->
                     </ul>
                   </div>
 
@@ -263,118 +278,12 @@ include 'database/db-dashboard.php';
                 </div>
               </div>
             </div><!-- End Attendance By Grade -->
-            <!-- Start Monthly Attendance Stacked Bar Chart -->
-            <div class="col-md-6 equal-height">
-              <div class="card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">School Year</a>
-                      <select id="stackedChartFilter" class="form-select">
-                        <option value="">Select School Year</option>
-                        <?php foreach ($school_years as $year) : ?>
-                          <option value="<?= htmlspecialchars($year) ?>" <?= ($year == $selectedSchoolYear) ? 'selected' : '' ?>><?= htmlspecialchars($year) ?></option>
-                        <?php endforeach; ?>
-                      </select>
-                    </li>
 
-
-
-                  </ul>
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title">
-                    Monthly Attendance Breakdown <span id="selectedYear"><?= htmlspecialchars($selectedSchoolYear) ? htmlspecialchars($selectedSchoolYear) : 'N/A' ?></span>
-                  </h5>
-                  <canvas id="attendance-stacked-bar-chart"></canvas>
-                </div>
-              </div>
-            </div><!-- End Monthly Attendance Stacked Bar Chart -->
-          </div>
-        </div><!-- End 4th Layer -->
+           
 
         <!-- 5th Layer: Top Students with Most Absences and Top Students with Most Late -->
-        <div class="col-12">
-          <div class="row">
-            <div class="col-md-6 equal-height">
-              <div class="card top-students overflow-auto">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li><a class="dropdown-item" href="most-frequent-absences.php">View All</a></li>
-                  </ul>
-                </div>
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Most Frequent Absences </h5>
-                  <table class="table table-hover" id="absencesTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">Student Name</th>
-                        <th scope="col">Grade</th>
-                        <th scope="col">Section</th>
-                        <th scope="col">Absences</th>
-                        
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <?php while ($row = $absences_result->fetch_assoc()) : ?>
-                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['student_name']) ?>">
-                          <td><?php echo $row['student_name']; ?></td>
-                          <td><?php echo $row['grade_level']; ?></td>
-                          <td><?php echo $row['section']; ?></td>
-                          <td class="fw-bold"><?php echo $row['absence_count']; ?></td>
-                         
-                        </tr>
-                      <?php endwhile; ?>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div><!-- End Top Students with Most Absences -->
-
-            <div class="col-md-6 equal-height">
-              <div class="card top-students overflow-auto">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-                    <li><a class="dropdown-item" href="most-frequent-tardiness.php">View All</a></li>
-                  </ul>
-                </div>
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Students with the Most Frequent Tardiness </h5>
-                  <table class="table table-hover" id="lateTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">Student Name</th>
-                        <th scope="col">Grade</th>
-                        <th scope="col">Section</th>
-                        <th scope="col">Lates</th>
-                    
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <?php while ($row = $late_result->fetch_assoc()) : ?>
-                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['student_name']) ?>">
-                          <td><?php echo $row['student_name']; ?></td>
-                          <td><?php echo $row['grade_level']; ?></td>
-                          <td><?php echo $row['section']; ?></td>
-                          <td class="fw-bold"><?php echo $row['late_count']; ?></td>
-                         
-                        </tr>
-                      <?php endwhile; ?>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div><!-- End Top Students with Most Late -->
-            <div class="col-md-12 equal-height">
+        
+          <div class="col-md-6 equal-height">
               <div class="card top-students overflow-auto">
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -390,6 +299,7 @@ include 'database/db-dashboard.php';
                   <table class="table table-hover" id="perfectAttendanceTable">
                     <thead>
                       <tr>
+                      <th scope="col">Sr-Code</th>
                         <th scope="col">Student Name</th>
                         <th scope="col">Grade</th>
                         <th scope="col">Section</th>
@@ -397,7 +307,8 @@ include 'database/db-dashboard.php';
                     </thead>
                     <tbody>
                       <?php while ($row = $perfect_attendance_result->fetch_assoc()) : ?>
-                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['student_name']) ?>">
+                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['srcode']) ?>">
+                        <td><?php echo $row['srcode']; ?></td>
                           <td><?php echo $row['student_name']; ?></td>
                           <td><?php echo $row['grade_level']; ?></td>
                           <td><?php echo $row['section']; ?></td>
@@ -409,6 +320,85 @@ include 'database/db-dashboard.php';
 
               </div>
             </div><!-- End Top Students with Most Late -->
+            <div class="col-md-6 equal-height">
+              <div class="card top-students overflow-auto">
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li><a class="dropdown-item" href="most-frequent-absences.php">View All</a></li>
+                  </ul>
+                </div>
+                <div class="card-body pb-0">
+                  <h5 class="card-title">Students with Most Frequent Absences </h5>
+                  <table class="table table-hover" id="absencesTable">
+                    <thead>
+                      <tr>
+                      <th scope="col">Sr-Code</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Grade</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Absences</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php while ($row = $absences_result->fetch_assoc()) : ?>
+                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['srcode']) ?>">
+                        <td><?php echo $row['srcode']; ?></td>
+                          <td><?php echo $row['student_name']; ?></td>
+                          <td><?php echo $row['grade_level']; ?></td>
+                          <td><?php echo $row['section']; ?></td>
+                          <td class="fw-bold"><?php echo $row['absence_count']; ?></td>
+                         
+                        </tr>
+                      <?php endwhile; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div><!-- End Top Students with Most Absences -->
+
+            <div class="col-md-12 equal-height">
+              <div class="card top-students overflow-auto">
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filter</h6>
+                    </li>
+                    <li><a class="dropdown-item" href="most-frequent-tardiness.php">View All</a></li>
+                  </ul>
+                </div>
+                <div class="card-body pb-0">
+                  <h5 class="card-title">Students with Most Frequent Late Arrivals </h5>
+                  <table class="table table-hover" id="lateTable">
+                    <thead>
+                      <tr>
+                      <th scope="col">Sr-Code</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Grade</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Lates</th>
+                    
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php while ($row = $late_result->fetch_assoc()) : ?>
+                        <tr class="clickable-row" data-name="<?= htmlspecialchars($row['srcode']) ?>">
+                        <td><?php echo $row['srcode']; ?></td>
+                          <td><?php echo $row['student_name']; ?></td>
+                          <td><?php echo $row['grade_level']; ?></td>
+                          <td><?php echo $row['section']; ?></td>
+                          <td class="fw-bold"><?php echo $row['late_count']; ?></td>
+                         
+                        </tr>
+                      <?php endwhile; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div><!-- End Top Students with Most Late -->
+            
           </div>
         </div><!-- End 5th Layer -->
 
@@ -503,7 +493,7 @@ include 'database/db-dashboard.php';
         row.classList.add('clickable-row');
         row.addEventListener('click', function() {
           const studentName = row.getAttribute('data-name');
-          window.location.href = `student-details.php?name=${encodeURIComponent(studentName)}`;
+          window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
         });
       }
     });
@@ -515,7 +505,7 @@ include 'database/db-dashboard.php';
         row.classList.add('clickable-row');
         row.addEventListener('click', function() {
           const studentName = row.getAttribute('data-name');
-          window.location.href = `student-details.php?name=${encodeURIComponent(studentName)}`;
+          window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
         });
       }
     });
@@ -527,7 +517,7 @@ include 'database/db-dashboard.php';
         row.classList.add('clickable-row');
         row.addEventListener('click', function() {
           const studentName = row.getAttribute('data-name');
-          window.location.href = `student-details.php?name=${encodeURIComponent(studentName)}`;
+          window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
         });
       }
     });
@@ -568,7 +558,41 @@ include 'database/db-dashboard.php';
     });
     
   </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+      var options = {
+        series: [<?php echo $male_count; ?>, <?php echo $female_count; ?>],
+        chart: {
+          type: 'pie',
+          height: 350
+        },
+        labels: ['Male', 'Female'],
+        colors: ['#008FFB', '#FF4560'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      };
+      
+      var chart = new ApexCharts(document.querySelector("#genderDistributionChart"), options);
+      chart.render();
+    });
+    // Handle filter changes
+    $('#gradeFilter, #timeFilter').change(function() {
+        const grade = $('#gradeFilter').val();
+        const filter = $('#timeFilter').val();
 
+        window.location.href = `?filter=${filter}&grade=${grade}`;
+      });
+  </script>
+  
   <script>
     // bar chart 
     // Initial chart setup
