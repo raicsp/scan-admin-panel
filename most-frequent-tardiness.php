@@ -14,9 +14,10 @@ if ($userPosition === 'Elementary Chairperson') {
     $allowedGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6', 'Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
 }
 
-// Retrieve date range from request, if provided
+// Retrieve date range or month from request, if provided
 $startDate = $_GET['start_date'] ?? '';
 $endDate = $_GET['end_date'] ?? '';
+$month = $_GET['month'] ?? '';
 
 // Construct grade condition for the SQL query
 $gradeCondition = '';
@@ -25,17 +26,27 @@ if (!empty($allowedGrades)) {
     $gradeCondition = "AND c.grade_level IN ($gradeList)";
 }
 
-// Construct date range condition for the SQL query
-$dateCondition = '';
-if ($startDate && $endDate) {
+// Set default values for date range if month or specific date range is not provided
+if ($month) {
+    $startOfMonth = $month . "-01";
+    $endOfMonth = date("Y-m-t", strtotime($startOfMonth)); // Last day of the month
+    $dateCondition = "AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'";
+} elseif ($startDate && $endDate) {
     $dateCondition = "AND a.date BETWEEN '$startDate' AND '$endDate'";
+    $startOfMonth = $startDate; // For use in percentage calculation
+    $endOfMonth = $endDate;
+} else {
+    // Fallback to the current month if no date or month provided
+    $startOfMonth = date("Y-m-01");
+    $endOfMonth = date("Y-m-t");
+    $dateCondition = "AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'";
 }
 
 // Query to get students with most absences within the date range
 $absences_sql = "
     SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
            c.grade_level, c.section, COUNT(a.status) AS late_count, 
-           ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID AND date BETWEEN '$startDate' AND '$endDate')) * 100, 2) AS percentage
+           ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID AND date BETWEEN '$startOfMonth' AND '$endOfMonth')) * 100, 2) AS percentage
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
@@ -131,7 +142,8 @@ $conn->close();
                             
                             </h5>
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
+                                    <label for="gradeFilter">Select Grade:</label>
                                     <select id="gradeFilter" class="form-select">
                                         <option value="">Select Grade</option>
                                         <?php foreach ($allowedGrades as $grade): ?>
@@ -139,28 +151,20 @@ $conn->close();
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
+                                    <label for="sectionFilter">Select Section:</label>
                                     <select id="sectionFilter" class="form-select">
                                         <option value="">All Sections</option>
                                     </select>
                                 </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-5">
-                                        <label for="startDate">Start Date:</label>
-                                        <input type="date" id="startDate" class="form-control" name="start_date">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label for="endDate">End Date:</label>
-                                        <input type="date" id="endDate" class="form-control" name="end_date">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button id="filterButton" class="btn btn-primary mt-4" onclick="filterByDate()">Filter</button>
-                                    </div>
+                                <div class="col-md-3">
+                                    <label for="monthPicker">Select Month:</label>
+                                    <input type="month" id="monthPicker" class="form-control" name="month">
                                 </div>
-
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button id="filterButton" class="btn btn-primary w-100" onclick="filterByMonth()">Filter</button>
+                                </div>
                             </div>
-
                             <!-- Table for displaying the students with the most absences -->
                             <table class="table table-bordered table-hover" id="absenceTable">
                                 <thead>
@@ -261,21 +265,19 @@ $conn->close();
     <script>
         document.addEventListener('DOMContentLoaded', function() {
         
-            function filterByDate() {
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
+            function filterByMonth() {
+                const month = document.getElementById('monthPicker').value;
 
-                if (startDate && endDate) {
+                if (month) {
                     const url = new URL(window.location.href);
-                    url.searchParams.set('start_date', startDate);
-                    url.searchParams.set('end_date', endDate);
+                    url.searchParams.set('month', month);
                     window.location.href = url.toString();
                 } else {
-                    alert("Please select both a start date and an end date.");
+                    alert("Please select a month.");
                 }
             }
 
-            document.getElementById('filterButton').addEventListener('click', filterByDate);
+            document.getElementById('filterButton').addEventListener('click', filterByMonth);
         });
            // Add click functionality to table rows
            document.addEventListener('DOMContentLoaded', (event) => {
