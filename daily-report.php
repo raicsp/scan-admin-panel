@@ -28,17 +28,13 @@ try {
 } catch (Exception $e) {
     die('Error loading template file: ' . $e->getMessage());
 }
-
-// Query for student list
-$studentQuery = "SELECT studentID, name FROM student WHERE class_id = $class_id ORDER BY 
-        SUBSTRING_INDEX(name, ' ', -1) ASC, 
-        SUBSTRING_INDEX(name, ' ', 1) ASC";
+// Query for student list, ordered by name alphabetically
+$studentQuery = "SELECT studentID, name FROM student WHERE class_id = $class_id ORDER BY name ASC";
 $studentResult = $conn->query($studentQuery);
 
 // Setting up month (September) and year
 $month = isset($_GET['month']) ? intval($_GET['month']) : 0; // Default to September if not provided
 $year = date("Y"); // Current year or specify as needed
-
 
 // Map each column in row 11 to the correct date
 $dateColumnMap = [];
@@ -66,22 +62,11 @@ $lateCountPerDate = [];   // Array to store late counts per date (keyed by colum
 if ($studentResult->num_rows > 0) {
     while ($studentRow = $studentResult->fetch_assoc()) {
         $studentID = $studentRow['studentID'];
-        $nameParts = explode(' ', $studentRow['name']);
         
-        // Assuming the last part is the last name, the first part is the first name, and the rest is middle name/initials
-        $firstName = $nameParts[0];
-        $lastName = $nameParts[count($nameParts) - 1];
-        $middleName = count($nameParts) > 2 ? $nameParts[1] : ''; // Middle name or initial if it exists
-        
-        // Format as 'lastname, firstname middle' or 'lastname, firstname M.'
-        $formattedName = $lastName . ', ' . $firstName;
-        if ($middleName) {
-            $formattedName .= ' ' . substr($middleName, 0, 1) . '.'; // Add middle initial
-        }
-    
-        $sheet->setCellValue('B' . $row, $formattedName);
+        // Insert the full name directly into Column B
+        $sheet->setCellValue('B' . $row, $studentRow['name']);
 
-        // Fetch this student's attendance for September
+        // Fetch this student's attendance for the specified month and year
         $attendanceQuery = "SELECT DATE(date) AS attendance_date, status FROM attendance 
                             WHERE studentID = $studentID AND MONTH(date) = $month AND YEAR(date) = $year";
         $attendanceResult = $conn->query($attendanceQuery);
@@ -100,28 +85,23 @@ if ($studentResult->num_rows > 0) {
                     $cell = $column . $row;
 
                     if ($status == 'Absent') {
-                        // Mark "Absent" as an "X"
                         $sheet->setCellValue($cell, 'X');
                         $absentCount++; // Increment Absent count
                     } elseif ($status == 'Late') {
-                        // Apply the "Late" image (instead of triangle)
                         $imagePath = 'late.png'; // Replace with the actual path to the late image
 
                         if (file_exists($imagePath)) {
                             $drawing = new Drawing();
-                            $drawing->setPath($imagePath); // Set image path
-                            
-                            // Adjust image dimensions (height: 0.76 cm = 28.7 pixels, width: 0.89 cm = 33.7 pixels)
-                            $drawing->setHeight(28.7);  // Set height (0.76 cm * 37.795)
-                            $drawing->setWidth(33.7);   // Set width (0.89 cm * 37.795)
-                            
-                            $drawing->setCoordinates($cell); // Place the image in the correct cell
-                            $drawing->setWorksheet($sheet); // Add image to sheet
+                            $drawing->setPath($imagePath);
+                            $drawing->setHeight(28.7);
+                            $drawing->setWidth(33.7);
+                            $drawing->setCoordinates($cell);
+                            $drawing->setWorksheet($sheet);
                         } else {
                             echo "Image not found: " . $imagePath;
                         }
 
-                        // Set text alignment for "Late" status (to place it in the lower part of the cell)
+                        // Set text alignment for "Late" status
                         $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                         $sheet->getStyle($cell)->getAlignment()->setVertical(Alignment::VERTICAL_BOTTOM);
                         $lateCount++; // Increment Late count
@@ -132,7 +112,7 @@ if ($studentResult->num_rows > 0) {
 
         // Set the Absent and Late counts in columns AC and AD
         $sheet->setCellValue('AC' . $row, $absentCount); // Set Absent count in column AC
-        $sheet->setCellValue('AD' . $row, $lateCount);  // Set Late count in column AD
+        $sheet->setCellValue('AD' . $row, $lateCount);   // Set Late count in column AD
 
         // Count the absent and late for each date and update
         foreach ($dateColumnMap as $date => $column) {
@@ -143,15 +123,9 @@ if ($studentResult->num_rows > 0) {
             if ($attendanceResult->num_rows > 0) {
                 $status = $attendanceResult->fetch_assoc()['status'];
                 if ($status == 'Absent') {
-                    if (!isset($absentCountPerDate[$column])) {
-                        $absentCountPerDate[$column] = 0;
-                    }
-                    $absentCountPerDate[$column]++;
+                    $absentCountPerDate[$column] = ($absentCountPerDate[$column] ?? 0) + 1;
                 } elseif ($status == 'Late') {
-                    if (!isset($lateCountPerDate[$column])) {
-                        $lateCountPerDate[$column] = 0;
-                    }
-                    $lateCountPerDate[$column]++;
+                    $lateCountPerDate[$column] = ($lateCountPerDate[$column] ?? 0) + 1;
                 }
             }
         }
@@ -159,6 +133,7 @@ if ($studentResult->num_rows > 0) {
         $row++;
     }
 }
+
 
 // Now we calculate the Present count (Total students - Absent - Late) and store it in row 75 starting from D75
 $totalStudents = $studentResult->num_rows;  // Get the total number of students
