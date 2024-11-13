@@ -48,47 +48,60 @@ $sql_student = "SELECT COUNT(DISTINCT s.studentID) AS total_student
 $result_student = $conn->query($sql_student);
 $student = $result_student ? $result_student->fetch_assoc()['total_student'] : 0;
 
-// Modify the student name format and order by last name
-$absences_sql = "SELECT s.studentID, 
-                 s.name AS student_name, 
-                 c.grade_level, c.section, COUNT(a.status) AS absence_count, 
-                    s.srcode,
-                 ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
-                 FROM attendance a
-                 JOIN student s ON a.studentID = s.studentID
-                 JOIN classes c ON s.class_id = c.class_id
-                 WHERE a.status = 'Absent' AND c.class_id = '$class_id'
-                 GROUP BY s.studentID
-                 ORDER BY SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
-                 LIMIT 5";
+// Query to get students with the highest absence count, ordered by absence count
+$absences_sql = "
+SELECT s.studentID, 
+       s.name AS student_name, 
+       c.grade_level, 
+       c.section, 
+       COUNT(a.status) AS absence_count, 
+       s.srcode,
+       ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
+FROM attendance a
+JOIN student s ON a.studentID = s.studentID
+JOIN classes c ON s.class_id = c.class_id
+WHERE a.status = 'Absent' AND c.class_id = '$class_id'
+GROUP BY s.studentID
+ORDER BY absence_count DESC, SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
+LIMIT 5";
 $absences_result = $conn->query($absences_sql);
 
-$late_sql = "SELECT s.studentID, 
-            s.name AS student_name, 
-             c.grade_level, c.section, COUNT(a.status) AS late_count, 
-             s.srcode,
-             ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
-             FROM attendance a
-             JOIN student s ON a.studentID = s.studentID
-             JOIN classes c ON s.class_id = c.class_id
-             WHERE a.status = 'Late' AND c.class_id = '$class_id'
-             GROUP BY s.studentID
-             ORDER BY SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
-             LIMIT 5";
+// Query to get students with the highest late count, ordered by late count
+$late_sql = "
+SELECT s.studentID, 
+       s.name AS student_name, 
+       c.grade_level, 
+       c.section, 
+       COUNT(a.status) AS late_count, 
+       s.srcode,
+       ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
+FROM attendance a
+JOIN student s ON a.studentID = s.studentID
+JOIN classes c ON s.class_id = c.class_id
+WHERE a.status = 'Late' AND c.class_id = '$class_id'
+GROUP BY s.studentID
+ORDER BY late_count DESC, SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
+LIMIT 5";
 $late_result = $conn->query($late_sql);
 
-$perfect_attendance_sql = "SELECT s.studentID, 
-                           s.name AS student_name, 
-                           c.grade_level, c.section, s.srcode
-                           FROM student s
-                           JOIN classes c ON s.class_id = c.class_id
-                           JOIN attendance a ON s.studentID = a.studentID
-                           WHERE c.class_id = '$class_id'
-                           GROUP BY s.studentID, s.name, c.grade_level, c.section
-                           HAVING COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
-                           ORDER BY SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
-                           LIMIT 5";
+
+$perfect_attendance_sql = "
+SELECT s.studentID, 
+       s.name AS student_name, 
+       c.grade_level, 
+       c.section, 
+       s.srcode
+FROM student s
+JOIN classes c ON s.class_id = c.class_id
+JOIN attendance a ON s.studentID = a.studentID
+WHERE c.class_id = '$class_id'
+GROUP BY s.studentID, s.name, c.grade_level, c.section
+HAVING COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
+ORDER BY s.name ASC
+LIMIT 5";
 $perfect_attendance_result = $conn->query($perfect_attendance_sql);
+
+
 
 // Get gender distribution
 $gender_query = "SELECT gender, COUNT(*) as count FROM student WHERE class_id = '$class_id' GROUP BY gender";
