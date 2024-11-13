@@ -5,30 +5,37 @@ session_start();
 $userPosition = trim($_SESSION['position'] ?? '');
 $class_id = $_SESSION['class_id'] ?? '';
 
-// Set default values for date range
-$startDate = $_GET['startDate'] ?? '';
-$endDate = $_GET['endDate'] ?? '';
+// Set default values for month filter
+$selectedMonth = $_GET['month'] ?? '';
 
-// Build the query to get students with their total late count without individual lateness dates
+// Build the query to get students with their total late count
 $late_sql = "
 SELECT s.studentID, s.srcode, 
        s.name AS student_name, 
        c.grade_level, c.section,
-       (SELECT COUNT(*) FROM attendance a2 WHERE a2.studentID = s.studentID AND a2.status = 'Late') AS late_count
-FROM attendance a
-JOIN student s ON a.studentID = s.studentID
-JOIN classes c ON s.class_id = c.class_id
-WHERE a.status = 'Late'
-  AND s.class_id = '$class_id'
-";
+       (SELECT COUNT(*) 
+        FROM attendance a2 
+        WHERE a2.studentID = s.studentID 
+          AND a2.status = 'Late' ";
 
-// Apply date range filter if both start and end dates are set
-if ($startDate && $endDate) {
-    $late_sql .= " AND a.date BETWEEN '$startDate' AND '$endDate'";
+// If a month filter is applied, filter the attendance records by that month
+if ($selectedMonth) {
+    $late_sql .= " AND DATE_FORMAT(a2.date, '%Y-%m') = '$selectedMonth'";
 }
 
-// Final ordering of results by late count in descending order
-$late_sql .= " GROUP BY s.studentID ORDER BY late_count DESC";
+$late_sql .= "
+       ) AS late_count
+FROM student s
+JOIN classes c ON s.class_id = c.class_id
+WHERE s.class_id = '$class_id'
+";
+
+// Only apply the HAVING clause if there is a specific month selected (to show only students with lateness)
+if ($selectedMonth) {
+    $late_sql .= " HAVING late_count > 0";
+}
+
+$late_sql .= " ORDER BY late_count DESC";
 
 $result = $conn->query($late_sql);
 
@@ -40,6 +47,7 @@ if ($result && $result->num_rows > 0) {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +85,8 @@ $conn->close();
     <style>
         /* Make table rows hoverable */
         .table-hover tbody tr:hover {
-            background-color: #f1f1f1; /* Adjust this color as needed */
+            background-color: #f1f1f1;
+            /* Adjust this color as needed */
         }
 
         /* Make the cursor a pointer when hovering over rows */
@@ -112,19 +121,17 @@ $conn->close();
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title mt-4">Students with Most Frequent Tardiness</h5>
-                            <form id="dateFilterForm" class="row g-3">
+                            <form id="filterForm" class="row g-3">
                                 <div class="col-md-5">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="startDate" name="startDate" value="<?= htmlspecialchars($startDate) ?>">
-                                </div>
-                                <div class="col-md-5">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="endDate" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
+                                    <label for="monthFilter" class="form-label">Select Month</label>
+                                    <input type="month" class="form-control" id="monthFilter" name="month" value="<?= htmlspecialchars($selectedMonth) ?>">
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="button" class="btn btn-primary" id="filterButton">Filter</button>
                                 </div>
                             </form>
+
+
 
                             <table class="table table-bordered table-hover" id="absenceTable">
                                 <thead>
@@ -167,18 +174,20 @@ $conn->close();
         });
 
         // Filter button event
-        document.getElementById('filterButton').addEventListener('click', function () {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            if (startDate && endDate) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('startDate', startDate);
-                url.searchParams.set('endDate', endDate);
-                window.location.href = url.toString();
+        document.getElementById('filterButton').addEventListener('click', function() {
+            const selectedMonth = document.getElementById('monthFilter').value; // Get the selected month value
+            const url = new URL(window.location.href);
+
+            // If no month is selected, remove the 'month' parameter from the URL to show all records
+            if (!selectedMonth) {
+                url.searchParams.delete('month');
             } else {
-                alert('Please select both start and end dates');
+                url.searchParams.set('month', selectedMonth); // Add selected month to URL
             }
+
+            window.location.href = url.toString(); // Reload page with the updated URL
         });
+
 
         // Add click functionality to table rows
         document.addEventListener('DOMContentLoaded', (event) => {
