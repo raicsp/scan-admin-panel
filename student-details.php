@@ -5,8 +5,8 @@ include 'database/db_connect.php'; // Include the database connection
 $studentSrCode = isset($_GET['srcode']) ? $_GET['srcode'] : null;
 
 if ($studentSrCode === null) {
-    echo "No student selected.";
-    exit();
+  echo "No student selected.";
+  exit();
 }
 
 // Fetch student details based on the student srcode
@@ -98,7 +98,7 @@ $conn->close();
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Laboratory School | Batangas State University TNEU</title>
+  <title> Laboratory School | Batangas State University TNEU</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <!-- Favicons -->
@@ -358,6 +358,7 @@ $conn->close();
             <table class="table table-striped" id="attendanceTable">
               <thead>
                 <tr>
+                  <th>#</th> <!-- New numbering column -->
                   <th>Date</th>
                   <th>Status</th>
                 </tr>
@@ -366,6 +367,7 @@ $conn->close();
                 <?php foreach ($attendanceRecords as $record): ?>
                   <tr data-date="<?= htmlspecialchars($record['date']) ?>"
                     data-status="<?= htmlspecialchars($record['status']) ?>">
+                    <td class="row-number"></td> <!-- Placeholder for numbering -->
                     <td><?= htmlspecialchars($record['date']) ?></td>
                     <td><?= htmlspecialchars($record['status']) ?></td>
                   </tr>
@@ -373,8 +375,6 @@ $conn->close();
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
 
 
 
@@ -395,51 +395,54 @@ $conn->close();
   <script src="assets/js/main.js"></script>
 
   <script>
-    // Add event listeners to clear conflicting filters
-    document.getElementById("dateFilter").addEventListener("change", function () {
-      document.getElementById("monthFilter").value = ""; // Clear month filter if a date is selected
-      filterAttendance(); // Call the filter function
-    });
-
-    document.getElementById("monthFilter").addEventListener("change", function () {
-      document.getElementById("dateFilter").value = ""; // Clear date filter if a month is selected
-      filterAttendance(); // Call the filter function
-    });
-
-    document.getElementById("statusFilter").addEventListener("change", filterAttendance);
-
-    // Main filter function
-    function filterAttendance() {
-      var statusFilter = document.getElementById("statusFilter").value;
-      var dateFilter = document.getElementById("dateFilter").value;
-      var monthFilter = document.getElementById("monthFilter").value;
-      var rows = document.querySelectorAll("#attendanceTable tbody tr");
-      var visibleCount = 0; // Initialize the count
-      
-
-      rows.forEach(function (row) {
-        var status = row.getAttribute("data-status");
-        var date = row.getAttribute("data-date");
-        var rowMonth = date ? date.slice(0, 7) : "";
-
-        // Define match conditions for each filter
-        var statusMatch = (statusFilter === "All" || status === statusFilter);
-        var dateMatch = (dateFilter !== "" && date === dateFilter);
-        var monthMatch = (monthFilter !== "" && rowMonth === monthFilter);
-
-        // Display the row if it matches all active filters
-        if (statusMatch && (dateFilter ? dateMatch : monthFilter ? monthMatch : true)) {
-          row.style.display = ""; // Show the row
-          visibleCount++; // Increment the count of visible rows
-        } else {
-          row.style.display = "none"; // Hide the row
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+      // Add event listeners to clear conflicting filters
+      document.getElementById("dateFilter").addEventListener("change", function() {
+        document.getElementById("monthFilter").value = ""; // Clear month filter if a date is selected
+        filterAttendance(); // Call the filter function
       });
 
-      // Update the visible count display
-      document.getElementById("visibleCount").textContent = visibleCount;
-    }
+      document.getElementById("monthFilter").addEventListener("change", function() {
+        document.getElementById("dateFilter").value = ""; // Clear date filter if a month is selected
+        filterAttendance(); // Call the filter function
+      });
 
+      document.getElementById("statusFilter").addEventListener("change", filterAttendance);
+
+      // Main filter function
+      function filterAttendance() {
+        var statusFilter = document.getElementById("statusFilter").value;
+        var dateFilter = document.getElementById("dateFilter").value;
+        var monthFilter = document.getElementById("monthFilter").value;
+        var rows = document.querySelectorAll("#attendanceTable tbody tr");
+        var visibleCount = 0; // Initialize the count
+
+        rows.forEach(function(row) {
+          var status = row.getAttribute("data-status");
+          var date = row.getAttribute("data-date");
+          var rowMonth = date ? date.slice(0, 7) : "";
+
+          // Define match conditions for each filter
+          var statusMatch = (statusFilter === "All" || status === statusFilter);
+          var dateMatch = (dateFilter !== "" && date === dateFilter);
+          var monthMatch = (monthFilter !== "" && rowMonth === monthFilter);
+
+          // Display the row if it matches all active filters
+          if (statusMatch && (dateFilter ? dateMatch : monthFilter ? monthMatch : true)) {
+            row.style.display = ""; // Show the row
+            row.querySelector('.row-number').textContent = ++visibleCount; // Update row number
+          } else {
+            row.style.display = "none"; // Hide the row
+          }
+        });
+
+        // Update the visible count display
+        document.getElementById("visibleCount").textContent = visibleCount;
+      }
+
+      // Initial numbering for all records on page load
+      filterAttendance();
+    });
   </script>
 
 
