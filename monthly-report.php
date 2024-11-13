@@ -65,37 +65,19 @@ if ($result->num_rows > 0) {
 } else {
     echo "No attendance data found.";
 }
-
 // Query to get student names where class_id = 1
-$sql = "SELECT studentID, name FROM student WHERE class_id = $class_id ORDER BY 
-        SUBSTRING_INDEX(name, ' ', -1) ASC, 
-        SUBSTRING_INDEX(name, ' ', 1) ASC";
+$sql = "SELECT studentID, name FROM student WHERE class_id = $class_id ORDER BY name ASC";
 $result = $conn->query($sql);
 
 // Starting row for data insertion
 $row = 4; // Data starts from row 4 (A4)
-$totals = []; // To store totals per row for students
 
 // Check if the query returns any results
 if ($result->num_rows > 0) {
     // Loop through the result set and insert names into the Excel sheet starting at A4
     while ($rowData = $result->fetch_assoc()) {
-        // Split the full name into parts
-        $nameParts = explode(' ', $rowData['name']);
-        
-        // Assuming the last part is the last name, the first part is the first name, and the rest is middle name/initials
-        $firstName = $nameParts[0];
-        $lastName = $nameParts[count($nameParts) - 1];
-        $middleName = count($nameParts) > 2 ? $nameParts[1] : ''; // Middle name or initial if it exists
-        
-        // Format as 'lastname, firstname middle' or 'lastname, firstname M.'
-        $formattedName = $lastName . ', ' . $firstName;
-        if ($middleName) {
-            $formattedName .= ' ' . substr($middleName, 0, 1) . '.'; // Add middle initial
-        }
-
-        // Insert the formatted name into column A
-        $sheet->setCellValue('A' . $row, $formattedName);
+        // Insert the name directly into column A
+        $sheet->setCellValue('A' . $row, $rowData['name']);
 
         $totalAbsences = 0; // Initialize total absences for each student
 
@@ -106,16 +88,11 @@ if ($result->num_rows > 0) {
                           FROM attendance
                           WHERE studentID = " . $rowData['studentID'] . " 
                           AND MONTH(date) = $monthNum
-                          AND status = 'Absent'"; // Assuming 'absent' is the value in 'status' for absences
+                          AND status = 'Absent'"; // Assuming 'Absent' is the value in 'status' for absences
             $absentResult = $conn->query($absentSql);
 
             // Get the count of absences for the student in the current month
-            if ($absentResult->num_rows > 0) {
-                $absentData = $absentResult->fetch_assoc();
-                $absentCount = $absentData['absent_count'];
-            } else {
-                $absentCount = 0; // If no attendance record, set absence count to 0
-            }
+            $absentCount = ($absentResult->num_rows > 0) ? $absentResult->fetch_assoc()['absent_count'] : 0;
 
             // Insert the absence count into the corresponding cell for the student and month
             $sheet->setCellValue(chr(64 + $column) . $row, $absentCount); // Set value in the cell corresponding to student and month
@@ -131,6 +108,7 @@ if ($result->num_rows > 0) {
 } else {
     echo "No student data found.";
 }
+
 
 
 // Calculate the total number of distinct days in O2 by considering all months
