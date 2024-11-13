@@ -5,24 +5,25 @@ session_start();
 $userPosition = trim($_SESSION['position'] ?? '');
 $class_id = $_SESSION['class_id'] ?? '';
 
-// Set default values for date range
-$startDate = $_GET['startDate'] ?? '';
-$endDate = $_GET['endDate'] ?? '';
+// Set default value for the month filter
+$month = $_GET['month'] ?? '';
 
 // Build the query to get students with perfect attendance
 $perfect_sql = "
 SELECT s.studentID, 
-  s.name AS student_name, 
-       c.grade_level, c.section, s.srcode
+       s.name AS student_name, 
+       c.grade_level, 
+       c.section, 
+       s.srcode
 FROM student s
 JOIN classes c ON s.class_id = c.class_id
 JOIN attendance a ON s.studentID = a.studentID
 WHERE c.class_id = '$class_id'
 ";
 
-// Apply date range filter if both start and end dates are set
-if ($startDate && $endDate) {
-    $perfect_sql .= " AND a.date BETWEEN '$startDate' AND '$endDate'";
+// Apply month filter if set
+if ($month) {
+    $perfect_sql .= " AND DATE_FORMAT(a.date, '%Y-%m') = '$month'";
 }
 
 // Filter students with only 'Present' records for perfect attendance
@@ -86,21 +87,17 @@ $conn->close();
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title mt-4">Students with Perfect Attendance</h5>
-                            <form id="dateFilterForm" class="row g-3">
+                            <form id="monthFilterForm" class="row g-3">
                                 <div class="col-md-5">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="startDate" name="startDate" value="<?= htmlspecialchars($startDate) ?>">
-                                </div>
-                                <div class="col-md-5">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="endDate" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
+                                    <label for="month" class="form-label">Select Month</label>
+                                    <input type="month" class="form-control" id="month" name="month" value="<?= htmlspecialchars($month) ?>">
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="button" class="btn btn-primary" id="filterButton">Filter</button>
                                 </div>
                             </form>
 
-                            <table class="table table-bordered table-hover"  id="perfectAttendanceTable">
+                            <table class="table table-bordered table-hover" id="perfectAttendanceTable">
                                 <thead>
                                     <tr>
                                         <th>Sr-Code</th>
@@ -134,9 +131,10 @@ $conn->close();
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="assets/js/main.js"></script>
+
     <script>
-          // Add click functionality to table rows
-          document.addEventListener('DOMContentLoaded', (event) => {
+        // Add click functionality to table rows
+        document.addEventListener('DOMContentLoaded', (event) => {
             const table = document.getElementById('perfectAttendanceTable');
             const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
@@ -150,9 +148,7 @@ $conn->close();
                 });
             }
         });
-    </script>
 
-    <script>
         // Initialize the DataTable
         const dataTable = new simpleDatatables.DataTable("#perfectAttendanceTable", {
             searchable: true,
@@ -162,18 +158,15 @@ $conn->close();
 
         // Filter button event
         document.getElementById('filterButton').addEventListener('click', function () {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            if (startDate && endDate) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('startDate', startDate);
-                url.searchParams.set('endDate', endDate);
-                window.location.href = url.toString();
+            const month = document.getElementById('month').value;
+            const url = new URL(window.location.href);
+            if (month) {
+                url.searchParams.set('month', month);
             } else {
-                alert('Please select both start and end dates');
+                url.searchParams.delete('month'); // Clear month filter
             }
+            window.location.href = url.toString();
         });
-        
     </script>
 </body>
 </html>
