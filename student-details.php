@@ -62,17 +62,23 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Attendance by Category
+$currentMonth = date('m'); // Gets the current month as a two-digit number
+$currentYear = date('Y');  // Gets the current year as a four-digit number
+
 $query = "SELECT status, COUNT(*) as count 
           FROM attendance 
           WHERE studentID = ? 
+          AND YEAR(date) = ? 
+          AND MONTH(date) = ? 
           GROUP BY status";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $studentID);
+$stmt->bind_param("sii", $studentID, $currentYear, $currentMonth);
 $stmt->execute();
 $result = $stmt->get_result();
 
+$attendanceByCategoryData = [];
 while ($row = $result->fetch_assoc()) {
-  $attendanceByCategoryData[] = $row;
+    $attendanceByCategoryData[] = $row;
 }
 
 // Fetching all attendance records for the student
