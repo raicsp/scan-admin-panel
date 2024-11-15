@@ -45,10 +45,11 @@ $profilePicSrc = $profilePicBase64 ? "data:image/jpeg;base64,$profilePicBase64" 
 $monthlyAttendanceData = [];
 $attendanceByCategoryData = [];
 
-// Monthly Attendance Summary
+// Monthly Attendance trends
 $query = "SELECT MONTH(date) as month, 
                  SUM(status='Present') as days_present, 
-                 SUM(status='Absent') as days_absent 
+                 SUM(status='Absent') as days_absent,
+                 SUM(status='Late') as days_late
           FROM attendance 
           WHERE studentID = ? 
           GROUP BY MONTH(date)";
@@ -61,7 +62,7 @@ while ($row = $result->fetch_assoc()) {
   $monthlyAttendanceData[] = $row;
 }
 
-// Attendance by Category
+// Attendance distribution
 $currentMonth = date('m'); // Gets the current month as a two-digit number
 $currentYear = date('Y');  // Gets the current year as a four-digit number
 
@@ -80,6 +81,7 @@ $attendanceByCategoryData = [];
 while ($row = $result->fetch_assoc()) {
     $attendanceByCategoryData[] = $row;
 }
+
 
 // Fetching all attendance records for the student
 $query = "SELECT date, status FROM attendance WHERE studentID = ? ORDER BY date DESC";
@@ -254,14 +256,18 @@ $conn->close();
                   const months = monthlyAttendanceData.map(item => item.month);
                   const daysPresent = monthlyAttendanceData.map(item => item.days_present);
                   const daysAbsent = monthlyAttendanceData.map(item => item.days_absent);
-
+                  const dayslate = monthlyAttendanceData.map(item => item.days_late);
                   new ApexCharts(document.querySelector("#monthlyAttendanceChart1"), {
                     series: [{
-                      name: 'Days Present',
+                      name: 'Present',
                       data: daysPresent
                     }, {
-                      name: 'Days Absent',
+                      name: 'Absent',
                       data: daysAbsent
+                    },
+                    {
+                      name: 'Late',
+                      data: dayslate
                     }],
                     chart: {
                       type: 'line',
