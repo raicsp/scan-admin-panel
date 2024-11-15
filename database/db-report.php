@@ -1,37 +1,49 @@
 <?php
 include 'database/db_connect.php';
 session_start();
+
 $userPosition = trim($_SESSION['position'] ?? '');
+$classID = $_SESSION['class_id'] ?? null; // Check if class_id is set in session
 
-
-$gradeCondition = '';
 $availableGrades = [];
+$gradeCondition = '';
+// Ensure studentsDaily and studentsMonthly are populated correctly with query results.
+$studentsDaily = [];
+$studentsMonthly = [];
 
 // Determine available grades based on user position
 if ($userPosition === 'Elementary Chairperson') {
-    // Allow access only to Kinder to Grade-6
     $availableGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6'];
-} elseif ($userPosition === 'High School Chairperson') {
-    // Allow access only to Grade-7 to Grade-12
-    $availableGrades = ['Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
-} else {
-    $availableGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6','Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
-}
-$gradeCondition = '';
-if ($userPosition === 'Elementary Chairperson') {
-    // Allow access only to Kinder to Grade-6
     $gradeCondition = " AND c.grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
 } elseif ($userPosition === 'High School Chairperson') {
-    // Allow access only to Grade-7 to Grade-12
+    $availableGrades = ['Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
     $gradeCondition = " AND c.grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
+} else {
+    $availableGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6', 
+                        'Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
 }
 
-// Retrieve start and end dates, filters
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : date("Y-m-01");
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : date("Y-m-d");
-$gradeFilter = isset($_GET['gradeFilter']) ? $_GET['gradeFilter'] : '';
-$sectionFilter = isset($_GET['sectionFilter']) ? $_GET['sectionFilter'] : '';
-$syFilter = isset($_GET['syFilter']) ? $_GET['syFilter'] : '';
+// Initialize filter variables
+$monthFilter = $_GET['monthFilter'] ?? '';
+$gradeFilter = $_GET['gradeFilter'] ?? '';
+$sectionFilter = $_GET['sectionFilter'] ?? '';
+$gradeFilterMonthly = $_GET['gradeFilterMonthly'] ?? '';
+$sectionFilterMonthly = $_GET['sectionFilterMonthly'] ?? '';
+
+// Ensure both grade and section are selected
+if (isset($_GET['filterDaily'])) {
+    if (!$gradeFilter || !$sectionFilter) {
+        echo "Please select both grade and section to generate the daily report.";
+        exit;
+    }
+}
+
+if (isset($_GET['filterMonthly'])) {
+    if (!$gradeFilterMonthly || !$sectionFilterMonthly) {
+        echo "Please select both grade and section to generate the monthly report.";
+        exit;
+    }
+}
 
 // Query to fetch all sections based on available grades
 $gradesAndSectionsQuery = "
@@ -39,15 +51,10 @@ $gradesAndSectionsQuery = "
     FROM classes
     WHERE grade_level IN ('" . implode("', '", $availableGrades) . "')
     ORDER BY grade_level, section";
-
-// Execute the query
 $gradesAndSectionsResult = $conn->query($gradesAndSectionsQuery);
 
-// Prepare arrays to hold all grades and sections
 $allGrades = [];
 $allSectionsByGrade = [];
-
-// Process the results to populate grades and sections
 if ($gradesAndSectionsResult->num_rows > 0) {
     while ($row = $gradesAndSectionsResult->fetch_assoc()) {
         $allGrades[] = $row['grade_level'];
@@ -55,125 +62,68 @@ if ($gradesAndSectionsResult->num_rows > 0) {
     }
 }
 
-// Adjust the query to include grade level, section, and school year filters
-$attendanceQuery = "
+// Daily Attendance Query
+$dailyQuery = "
     SELECT a.studentID, a.date, a.status, 
-           s.name, c.grade_level, c.section, s.school_year
+           s.name, c.grade_level, c.section, c.class_id
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
-    WHERE a.date BETWEEN '$startDate' AND '$endDate' $gradeCondition";
+    WHERE 1=1 $gradeCondition";
 
+if ($monthFilter) {
+    $dailyQuery .= " AND MONTH(a.date) = '$monthFilter'";
+}
 if ($gradeFilter) {
-    $attendanceQuery .= " AND c.grade_level = '$gradeFilter'";
+    $dailyQuery .= " AND c.grade_level = '$gradeFilter'";
 }
-
 if ($sectionFilter) {
-    $attendanceQuery .= " AND c.section = '$sectionFilter'";
+    $dailyQuery .= " AND c.section = '$sectionFilter'";
 }
-if ($syFilter) {
-    $attendanceQuery .= " AND s.school_year = '$syFilter'";
+if (isset($_SESSION['class_id'])) {
+    $dailyQuery .= " AND c.class_id = '{$_SESSION['class_id']}'";
 }
+$dailyQuery .= " ORDER BY s.name ASC, a.date ASC";
+$dailyResult = $conn->query($dailyQuery);
 
-$attendanceQuery .= " ORDER BY s.name ASC, a.date ASC";
+// Monthly Attendance Query
+$monthlyQuery = "
+    SELECT a.studentID, a.date, a.status, 
+           s.name, c.grade_level, c.section
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE 1=1 $gradeCondition";
 
-$attendanceResult = $conn->query($attendanceQuery);
-
-$students = [];
-$dates = [];
-$sectionsByGrade = [];
-// Process query results for attendance
-if ($attendanceResult->num_rows > 0) {
-    while ($row = $attendanceResult->fetch_assoc()) {
-        $students[$row['studentID']]['name'] = $row['name'];
-        $students[$row['studentID']]['data'][$row['date']] = $row['status'];
-        $students[$row['studentID']]['grade_level'] = $row['grade_level'];
-        $students[$row['studentID']]['section'] = $row['section'];
-        $students[$row['studentID']]['school_year'] = $row['school_year'];
-
-        // Count statuses
-        if (!isset($students[$row['studentID']]['lateCount'])) {
-            $students[$row['studentID']]['lateCount'] = 0;
-            $students[$row['studentID']]['absentCount'] = 0;
-            $students[$row['studentID']]['presentCount'] = 0;
-        }
-        
-        switch ($row['status']) {
-            case 'Late':
-                $students[$row['studentID']]['lateCount']++;
-                break;
-            case 'Absent':
-                $students[$row['studentID']]['absentCount']++;
-                break;
-            case 'Present':
-                $students[$row['studentID']]['presentCount']++;
-                break;
-        }
-
-        // Populate sections by grade
-        $sectionsByGrade[$row['grade_level']][] = $row['section'];
-
-        if (!in_array($row['date'], $dates)) {
-            $dates[] = $row['date'];
-        }
-    }
+if ($gradeFilterMonthly) {
+    $monthlyQuery .= " AND c.grade_level = '$gradeFilterMonthly'";
+}
+if ($sectionFilterMonthly) {
+    $monthlyQuery .= " AND c.section = '$sectionFilterMonthly'";
 }
 
-// Initialize totals
-$totalPresent = 0;
-$totalAbsent = 0;
-$totalLate = 0;
+$monthlyQuery .= " ORDER BY s.name ASC, a.date ASC";
+$monthlyResult = $conn->query($monthlyQuery);
 
-// (Export to CSV if requested)
+// Process results (code to process results goes here)
+
+// Export CSV functionality (can be extended for both daily and monthly reports)
 if (isset($_GET['export']) && $_GET['export'] == 'csv') {
-    $filename = '';
-
-    if ($gradeFilter) {
-        $filename .= "{$gradeFilter}";
-    }
-    
-    if ($sectionFilter) {
-        $filename .= "_{$sectionFilter}";
-    }
-    
-    $filename .= "_attendance_report.csv";
-    
+    $filename = 'attendance_report.csv';
     header('Content-Type: text/csv');
     header("Content-Disposition: attachment; filename=\"$filename\"");
     
-    
-
     $output = fopen('php://output', 'w');
-    $header = array_merge(['Name', 'Total Number of Present', 'Total Number of Absent', 'Total Number of Late'], $dates);
+    $header = array_merge(['Name', 'Grade', 'Section', 'Date', 'Status']);
     fputcsv($output, $header);
-
-    foreach ($students as $student) {
-        // Create the row with totals first
-        $row = [
-            $student['name'],
-            $student['presentCount'],
-            $student['absentCount'],
-            $student['lateCount']
-        ];
-
-        // Append the attendance data
-        foreach ($dates as $date) {
-            $row[] = isset($student['data'][$date]) ? $student['data'][$date] : 'Absent';
+    
+    $exportData = array_merge($studentsDaily, $studentsMonthly);
+    foreach ($exportData as $student) {
+        foreach ($student['data'] as $date => $status) {
+            fputcsv($output, [$student['name'], $student['grade_level'], $student['section'], $date, $status]);
         }
-
-        // Accumulate totals
-        $totalPresent += $student['presentCount'];
-        $totalAbsent += $student['absentCount'];
-        $totalLate += $student['lateCount'];
-
-        fputcsv($output, $row);
     }
-
-  
-
     fclose($output);
     exit();
 }
-
-// HTML for the grade level combo box
 ?>
