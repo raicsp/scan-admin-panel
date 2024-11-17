@@ -216,17 +216,6 @@ $stacked_bar_data = [
     ]
 ];
 
-// Fetch distinct school years from the students table
-$sql_school_years = "SELECT DISTINCT school_year FROM student ORDER BY school_year DESC";
-$result_school_years = $conn->query($sql_school_years);
-
-$school_years = [];
-if ($result_school_years->num_rows > 0) {
-    while ($row = $result_school_years->fetch_assoc()) {
-        $school_years[] = $row['school_year'];
-    }
-}
-//end of stacked chart
 
 // Query to get attendance data for the line chart
 $query = "
@@ -262,7 +251,8 @@ $last_day_of_month = date("Y-m-t", strtotime($selectedMonth));
 $query = "
     SELECT DATE_FORMAT(a.date, '%d') as day, 
            SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as present_count,
-           SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent_count
+           SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent_count,
+           SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) as late_count
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
@@ -276,17 +266,20 @@ $result = $conn->query($query);
 $days = [];
 $presentCounts = [];
 $absentCounts = [];
+$lateCounts = [];
 
 while ($row = $result->fetch_assoc()) {
     $days[] = $row['day'];
     $presentCounts[] = $row['present_count'];
     $absentCounts[] = $row['absent_count'];
+    $lateCounts[] = $row['late_count'];
 }
 
 $attendance_overview = [
     'days' => $days,
     'presentCounts' => $presentCounts,
-    'absentCounts' => $absentCounts
+    'absentCounts' => $absentCounts,
+    'lateCounts' => $lateCounts
 ];
 
 
