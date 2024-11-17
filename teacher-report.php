@@ -16,7 +16,8 @@ $activePage = 'generate-report';
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
     rel="stylesheet">
 
   <!-- Vendor CSS Files -->
@@ -27,6 +28,9 @@ $activePage = 'generate-report';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
   <!-- Template Main CSS File -->
@@ -88,123 +92,128 @@ $activePage = 'generate-report';
   <?php include 'sidebar.php'; ?>
 
   <main id="main" class="main">
-  <div class="pagetitle">
-    <h1>Attendance Report</h1>
-    <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="teacher-dashboard.php">Dashboard</a></li>
-        <li class="breadcrumb-item active">Attendance Report</li>
-      </ol>
-    </nav>
-  </div>
+    <div class="pagetitle">
+      <h1>Attendance Report</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="teacher-dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Attendance Report</li>
+        </ol>
+      </nav>
+    </div>
 
-  <section class="section">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Attendance Report</h5>
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Attendance Report</h5>
 
-            <!-- Daily Attendance Report Section -->
-            <div class="mb-4">
-              <div class="col-md-12">
-                <p><b>Daily Attendance Report:</b></p>
+              <!-- Daily Attendance Report Section -->
+              <div class="mb-4">
+                <div class="col-md-12">
+                  <p><b>Daily Attendance Report:</b></p>
+                </div>
+                <form method="GET" action="daily-report.php">
+                  <div class="form-row mb-3">
+                    <div class="col-md-4">
+                      <label for="month" class="form-label"><b>Select Month</b></label>
+                      <select name="month" id="month" class="form-select">
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4 mb-4">
+                    <button type="submit" class="btn btn-primary">Generate Daily Report</button>
+                  </div>
+                </form>
               </div>
-              <form method="GET" action="daily-report.php">
+
+              <!-- Divider Line -->
+              <hr class="my-4">
+
+              <!-- Monthly Attendance Report Section -->
+              <div class="mb-4">
+                <div class="col-md-12">
+                  <p><b>Monthly Attendance Report:</b></p>
+                </div>
+                <form method="POST" action="monthly-report.php">
+                  <button type="submit" name="export" value="csv" class="btn btn-success">Generate Monthly
+                    Report</button>
+                </form>
+              </div>
+
+              <hr class="my-4">
+
+              <!-- Date Range Filter for the Attendance Table -->
+              <form method="GET">
                 <div class="form-row mb-3">
-                  <div class="col-md-4">
-                    <label for="month" class="form-label"><b>Select Month</b></label>
-                    <select name="month" id="month" class="form-select">
-                      <option value="01">January</option>
-                      <option value="02">February</option>
-                      <option value="03">March</option>
-                      <option value="04">April</option>
-                      <option value="05">May</option>
-                      <option value="06">June</option>
-                      <option value="07">July</option>
-                      <option value="08">August</option>
-                      <option value="09">September</option>
-                      <option value="10">October</option>
-                      <option value="11">November</option>
-                      <option value="12">December</option>
-                    </select>
+                  <div class="col-md-3">
+                    <label for="startDate" class="form-label"><b>Initial Date</b></label>
+                    <input type="date" id="startDate" class="form-control" name="startDate"
+                      value="<?= htmlspecialchars($startDate) ?>">
+                  </div>
+                  <div class="col-md-3">
+                    <label for="endDate" class="form-label"><b>Ending Date</b></label>
+                    <input type="date" id="endDate" class="form-control" name="endDate"
+                      value="<?= htmlspecialchars($endDate) ?>">
                   </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                  <button type="submit" class="btn btn-primary">Generate Daily Report</button>
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                  </div>
                 </div>
               </form>
-            </div>
 
-            <!-- Divider Line -->
-            <hr class="my-4">
-
-            <!-- Monthly Attendance Report Section -->
-            <div class="mb-4">
-              <div class="col-md-12">
-                <p><b>Monthly Attendance Report:</b></p>
-              </div>
-              <form method="POST" action="monthly-report.php">
-                <button type="submit" name="export" value="csv" class="btn btn-success">Generate Monthly Report</button>
-              </form>
-            </div>
-
-            <hr class="my-4">
-
-            <!-- Date Range Filter for the Attendance Table -->
-            <form method="GET">
-              <div class="form-row mb-3">
-                <div class="col-md-3">
-                  <label for="startDate" class="form-label"><b>Initial Date</b></label>
-                  <input type="date" id="startDate" class="form-control" name="startDate" value="<?= htmlspecialchars($startDate) ?>">
-                </div>
-                <div class="col-md-3">
-                  <label for="endDate" class="form-label"><b>Ending Date</b></label>
-                  <input type="date" id="endDate" class="form-control" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
-              </div>
-            </form>
-
-            <!-- Attendance Table -->
-            <div class="table-responsive">
-              <table class="table table-hover table-bordered" id="studentsTable">
-                <thead>
-                  <tr>
-                    <th>Sr-Code</th>
-                    <th>Name</th>
-                    <?php foreach ($dates as $date) : ?>
-                      <th><?= htmlspecialchars($date) ?></th>
-                    <?php endforeach; ?>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($students as $student) : ?>
+              <!-- Attendance Table -->
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered" id="studentsTable">
+                  <thead>
                     <tr>
-                      <td><?= htmlspecialchars($student['srcode']) ?></td>
-                      <td><?= htmlspecialchars($student['name']) ?></td>
-                      <?php foreach ($dates as $date) : ?>
-                        <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?></td>
+                      <th>Sr-Code</th>
+                      <th>Name</th>
+                      <?php foreach ($dates as $date): ?>
+                        <th><?= htmlspecialchars($date) ?></th>
                       <?php endforeach; ?>
                     </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($students as $student): ?>
+                      <tr>
+                        <td><?= htmlspecialchars($student['srcode']) ?></td>
+                        <td><?= htmlspecialchars($student['name']) ?></td>
+                        <?php foreach ($dates as $date): ?>
+                          <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?>
+                          </td>
+                        <?php endforeach; ?>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
 
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
@@ -216,7 +225,7 @@ $activePage = 'generate-report';
   <script src="assets/js/main.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const dataTable = new simpleDatatables.DataTable("#studentsTable", {
         searchable: true,
         paging: true,
@@ -231,6 +240,66 @@ $activePage = 'generate-report';
       });
     });
   </script>
+  <script>
+    function updateSections() {
+      const gradeFilter = document.getElementById('gradeFilter').value;
+      const sectionFilter = document.getElementById('sectionFilter');
+      sectionFilter.innerHTML = '<option value="">Select Section</option>';
+
+      const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+      if (sectionsByGrade[gradeFilter]) {
+        sectionsByGrade[gradeFilter].forEach(section => {
+          const option = document.createElement('option');
+          option.value = section;
+          option.textContent = section;
+          sectionFilter.appendChild(option);
+        });
+      }
+    }
+
+    function updateSectionsMonthly() {
+      const gradeFilterMonthly = document.getElementById('gradeFilterMonthly').value;
+      const sectionFilterMonthly = document.getElementById('sectionFilterMonthly');
+      sectionFilterMonthly.innerHTML = '<option value="">Select Section</option>';
+
+      const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+      if (sectionsByGrade[gradeFilterMonthly]) {
+        sectionsByGrade[gradeFilterMonthly].forEach(section => {
+          const option = document.createElement('option');
+          option.value = section;
+          option.textContent = section;
+          sectionFilterMonthly.appendChild(option);
+        });
+      }
+    }
+
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function (event) {
+        Swal.fire({
+          title: 'Generating Report...',
+          text: 'Please wait while the report is being generated.',
+          icon: 'info',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading(); // Show loading spinner
+          }
+        });
+
+        // Simulate an API request or file generation here (example)
+        setTimeout(function () {
+          // When file generation is completed
+          Swal.close();  // Close the loading spinner
+
+          // Trigger download or redirect
+          window.location.href = 'teacher-report.php'; // Or use anchor link <a href="...">download</a>
+        }, 3000);  // Simulate a 3-second delay for generation
+      });
+    });
+
+  </script>
+
 </body>
 
 </html>
