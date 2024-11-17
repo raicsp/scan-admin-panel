@@ -48,7 +48,7 @@ include 'database/db-add-student.php';
             });
 
             // Populate sections based on selected grade
-            gradeSelect.addEventListener('change', function () {
+            gradeSelect.addEventListener('change', function() {
                 const selectedGrade = this.value;
                 const sections = <?php echo json_encode($sections); ?>;
 
@@ -113,7 +113,7 @@ include 'database/db-add-student.php';
         <div id="alertContainer" class="container mt-3">
             <?php if (isset($_SESSION['alertMessage']) && !empty($_SESSION['alertMessage'])): ?>
                 <script>
-                    document.addEventListener("DOMContentLoaded", function () {
+                    document.addEventListener("DOMContentLoaded", function() {
                         Swal.fire({
                             icon: '<?= $_SESSION['alertType'] ?>', // 'success', 'error', 'warning', 'info'
                             title: 'Success!',
@@ -169,9 +169,14 @@ include 'database/db-add-student.php';
                                 <div class="col-md-6">
                                     <label for="inputName" class="form-label"><b>Full Name</b></label>
                                     <input type="text" name="student_name" class="form-control" id="inputName"
-                                        placeholder="John Doe" required maxlength="50" pattern="[a-zA-Z\s]+"
-                                        title="Only letters are allowed, up to 50 characters">
+                                        placeholder="Doe, John L." required maxlength="100"
+                                        pattern="^[A-Za-z]+,\s[A-Za-z]+(\s[A-Za-z]+)?\s[A-Za-z]\.$"
+                                        title="Please enter the name in the format: Lastname, Firstname MiddleInitial."
+                                        oninput="validateNameFormat()">
                                 </div>
+
+
+
                                 <div class="col-md-6">
                                     <label for="inputGender" class="form-label"><b>Gender</b></label>
                                     <select name="gender" id="inputGender" class="form-select" required>
@@ -224,53 +229,53 @@ include 'database/db-add-student.php';
                             </form>
 
 
- <!-- CSV Import Form -->
-<form id="csvForm" class="row g-3 d-none" method="POST" action="" enctype="multipart/form-data">
+                            <!-- CSV Import Form -->
+                            <form id="csvForm" class="row g-3 d-none" method="POST" action="" enctype="multipart/form-data">
 
-<!-- Download CSV Template Section -->
-<div class="col-md-12 mt-3">
-    <h5><b>Download CSV Template</b></h5>
-    <p>To ensure proper formatting, use the template below to add students:</p>
-    <a href="student_template.csv" class="btn btn-secondary mb-3" download>Download Template (CSV)</a>
-</div>
+                                <!-- Download CSV Template Section -->
+                                <div class="col-md-12 mt-3">
+                                    <h5><b>Download CSV Template</b></h5>
+                                    <p>To ensure proper formatting, use the template below to add students:</p>
+                                    <a href="student_template.csv" class="btn btn-secondary mb-3" download>Download Template (CSV)</a>
+                                </div>
 
-<!-- Horizontal line separator -->
-<hr class="mt-0 mb-4">
+                                <!-- Horizontal line separator -->
+                                <hr class="mt-0 mb-4">
 
-<!-- Grade Level and Section Inputs -->
-<div class="col-md-6">
-    <label for="inputGradeLevelCSV" class="form-label"><b>Grade Level</b></label>
-    <select name="grade_level" id="inputGradeLevelCSV" class="form-select" required>
-        <option value="">Select Grade Level</option>
-        <!-- Populate dynamically as needed -->
-    </select>
-</div>
+                                <!-- Grade Level and Section Inputs -->
+                                <div class="col-md-6">
+                                    <label for="inputGradeLevelCSV" class="form-label"><b>Grade Level</b></label>
+                                    <select name="grade_level" id="inputGradeLevelCSV" class="form-select" required>
+                                        <option value="">Select Grade Level</option>
+                                        <!-- Populate dynamically as needed -->
+                                    </select>
+                                </div>
 
-<div class="col-md-6">
-    <label for="inputSectionCSV" class="form-label"><b>Section</b></label>
-    <select name="section" id="inputSectionCSV" class="form-select" required>
-        <option value="">Select Section</option>
-        <!-- Populate dynamically as needed -->
-    </select>
-</div>
-
-
-<!-- File Upload Section -->
-<div class="col-md-12">
-    <label for="inputCSVFile" class="form-label"><b>Select CSV File to Upload</b></label>
-    <input type="file" name="csv_file" class="form-control" id="inputCSVFile" accept=".csv" required>
-    <small class="form-text text-muted">Only .csv files are supported.</small>
-</div>
-
-<!-- Submit Button -->
-<div class="col-md-12 text-center mt-3">
-    <button type="submit" name="import_csv" class="btn btn-primary">Import CSV</button>
-</div>
-
-</form>
+                                <div class="col-md-6">
+                                    <label for="inputSectionCSV" class="form-label"><b>Section</b></label>
+                                    <select name="section" id="inputSectionCSV" class="form-select" required>
+                                        <option value="">Select Section</option>
+                                        <!-- Populate dynamically as needed -->
+                                    </select>
+                                </div>
 
 
-                            
+                                <!-- File Upload Section -->
+                                <div class="col-md-12">
+                                    <label for="inputCSVFile" class="form-label"><b>Select CSV File to Upload</b></label>
+                                    <input type="file" name="csv_file" class="form-control" id="inputCSVFile" accept=".csv" required>
+                                    <small class="form-text text-muted">Only .csv files are supported.</small>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="col-md-12 text-center mt-3">
+                                    <button type="submit" name="import_csv" class="btn btn-primary">Import CSV</button>
+                                </div>
+
+                            </form>
+
+
+
 
 
                         </div>
@@ -326,7 +331,7 @@ include 'database/db-add-student.php';
             });
 
             // Populate sections based on selected grade for CSV import
-            gradeSelectCSV.addEventListener('change', function () {
+            gradeSelectCSV.addEventListener('change', function() {
                 const selectedGrade = this.value;
                 sectionSelectCSV.innerHTML = '<option value="">Select Section</option>';
 
@@ -340,6 +345,19 @@ include 'database/db-add-student.php';
                 }
             });
         });
+
+        function validateNameFormat() {
+            const input = document.getElementById('inputName');
+            const name = input.value.trim();
+
+            const regex = /^[A-Za-z]+,\s[A-Za-z]+(\s[A-Za-z]+)?\s[A-Za-z]\.$/;
+
+            if (!regex.test(name)) {
+                input.setCustomValidity("Please enter the name in the format: Lastname, Firstname MiddleInitial.");
+            } else {
+                input.setCustomValidity(""); // Clear the custom validity message
+            }
+        }
     </script>
 
 
