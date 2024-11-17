@@ -166,6 +166,7 @@ $conn->close();
                                 </div>
                                 <div class="col-md-3 d-flex align-items-end">
                                     <button id="filterButton" class="btn btn-primary w-100" onclick="filterByMonth()">Filter</button>
+                                    <button id="clearButton" class="btn btn-secondary w-100 ms-2">Clear</button>
                                 </div>
                             </div>
 
@@ -217,99 +218,110 @@ $conn->close();
     <script src="assets/js/main.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dataTable = new simpleDatatables.DataTable("#absenceTable", {
-                searchable: true,
-                paging: true,
-                perPage: 10,
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataTable = new simpleDatatables.DataTable("#absenceTable", {
+            searchable: true,
+            paging: true,
+            perPage: 10,
+            fixedHeight: true,
+            labels: {
+                placeholder: "Search...",
+                perPage: "entries per page",
+                noRows: "No results found",
+                info: "Showing {start} to {end} of {rows} results"
+            }
+        });
 
-            function filterTable() {
-                const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
-                const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
+        function filterTable() {
+            const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
+            const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
 
-                // Build filter query based on selected values
-                let filterQuery = '';
+            // Build filter query based on selected values
+            let filterQuery = '';
 
-                // Append grade filter
-                if (gradeFilter) {
-                    filterQuery += gradeFilter;
-                }
-
-                // Append section filter
-                if (sectionFilter) {
-                    filterQuery += ' ' + sectionFilter; // Add space to separate terms
-                }
-
-
-                // Apply the search/filter on the datatable
-                dataTable.search(filterQuery.trim()); // Use search method to filter the table
+            // Append grade filter
+            if (gradeFilter) {
+                filterQuery += gradeFilter;
             }
 
-            document.getElementById('gradeFilter').addEventListener('change', function() {
-                const selectedGrade = this.value;
-
-                // Filter sections based on selected grade
-                const sections = gradeSections[selectedGrade] || [];
-                const sectionDropdown = document.getElementById('sectionFilter');
-                sectionDropdown.innerHTML = '<option value="">All Sections</option>';
-
-                sections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section;
-                    option.textContent = section;
-                    sectionDropdown.appendChild(option);
-                });
-
-                // Trigger table filtering after updating the section dropdown
-                filterTable();
-            });
-
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dataTable = new simpleDatatables.DataTable("#absenceTable", {
-                searchable: true,
-                paging: true,
-                fixedHeight: true,
-                perPage: 10,
-                labels: {
-                    placeholder: "Search...",
-                    perPage: "entries per page",
-                    noRows: "No results found",
-                    info: "Showing {start} to {end} of {rows} results"
-                }
-            });
-
-            function filterByMonth() {
-                const month = document.getElementById('monthPicker').value;
-
-                if (month) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('month', month);
-                    window.location.href = url.toString();
-                } else {
-                    alert("Please select a month.");
-                }
+            // Append section filter
+            if (sectionFilter) {
+                filterQuery += ' ' + sectionFilter; // Add space to separate terms
             }
 
-            document.getElementById('filterButton').addEventListener('click', filterByMonth);
+            // Apply the search/filter on the datatable
+            dataTable.search(filterQuery.trim()); // Use search method to filter the table
+        }
 
+        // Filter sections based on grade selection
+        document.getElementById('gradeFilter').addEventListener('change', function() {
+            const selectedGrade = this.value;
+
+            // Update sections based on the selected grade
+            const sections = gradeSections[selectedGrade] || [];
+            const sectionDropdown = document.getElementById('sectionFilter');
+            sectionDropdown.innerHTML = '<option value="">All Sections</option>';
+
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section;
+                option.textContent = section;
+                sectionDropdown.appendChild(option);
+            });
+
+            // Trigger table filtering after updating the section dropdown
+            filterTable();
         });
+
+        // Function to filter by month
+        function filterByMonth() {
+            const month = document.getElementById('monthPicker').value;
+
+            if (month) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('month', month);
+                window.location.href = url.toString();
+            } else {
+                alert("Please select a month.");
+            }
+        }
+
+        // Add event listener for the Filter button
+        document.getElementById('filterButton').addEventListener('click', filterByMonth);
+
+        // Function to clear all filters and reset the table
+        function clearFilters() {
+            // Reset all filter inputs
+            document.getElementById('gradeFilter').value = "";
+            document.getElementById('sectionFilter').innerHTML = '<option value="">All Sections</option>';
+            document.getElementById('monthPicker').value = "";
+
+            // Clear the table search filter
+            dataTable.search("");
+
+            // Reload the page without query parameters
+            const url = new URL(window.location.href);
+            url.searchParams.delete('month');
+            url.searchParams.delete('start_date');
+            url.searchParams.delete('end_date');
+            window.location.href = url.toString();
+        }
+
+        // Add event listener for the Clear button
+        document.getElementById('clearButton').addEventListener('click', clearFilters);
+
         // Add click functionality to table rows
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const table = document.getElementById('absenceTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        const table = document.getElementById('absenceTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-            for (let row of rows) {
-                row.classList.add('clickable-row');
-                row.addEventListener('click', function(event) {
-                    if (!event.target.closest('.action-buttons')) {
-                        const studentName = row.getAttribute('data-name');
-                        window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
-                    }
-                });
-            }
-        });
-    </script>
+        for (let row of rows) {
+            row.classList.add('clickable-row');
+            row.addEventListener('click', function(event) {
+                if (!event.target.closest('.action-buttons')) {
+                    const studentName = row.getAttribute('data-name');
+                    window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
+                }
+            });
+        }
+    });
+</script>
