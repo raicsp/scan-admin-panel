@@ -31,6 +31,9 @@ $activePage = 'attendance-report';
 
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <style>
         .table-responsive {
@@ -80,11 +83,12 @@ $activePage = 'attendance-report';
                 flex-direction: column;
             }
         }
-        /* Ensure buttons have consistent width */
-.btn-container .btn {
-    width: 200px; /* Adjust this value as needed for your layout */
-}
 
+        /* Ensure buttons have consistent width */
+        .btn-container .btn {
+            width: 200px;
+            /* Adjust this value as needed for your layout */
+        }
     </style>
 </head>
 
@@ -112,8 +116,33 @@ $activePage = 'attendance-report';
                                 <div class="form-row mb-3">
                                     <div class="col-md-3">
                                         <label for="monthFilter" class="form-label"><b>Select Month</b></label>
-                                        <input type="month" id="monthFilter" name="monthFilter" class="form-control"
-                                            value="<?= htmlspecialchars($monthFilter) ?>">
+                                        <select name="monthFilter" id="monthFilter" class="form-select">
+                                            <option value="">Select Month</option>
+                                            <?php
+                                            // List of months
+                                            $months = [
+                                                '01' => 'January',
+                                                '02' => 'February',
+                                                '03' => 'March',
+                                                '04' => 'April',
+                                                '05' => 'May',
+                                                '06' => 'June',
+                                                '07' => 'July',
+                                                '08' => 'August',
+                                                '09' => 'September',
+                                                '10' => 'October',
+                                                '11' => 'November',
+                                                '12' => 'December'
+                                            ];
+
+                                            // Loop through the months and create the options
+                                            foreach ($months as $monthNum => $monthName):
+                                                ?>
+                                                <option value="<?= $monthNum ?>" <?= $monthNum == $monthFilter ? 'selected' : '' ?>>
+                                                    <?= $monthName ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="gradeFilter" class="form-label"><b>Select Grade</b></label>
@@ -121,7 +150,9 @@ $activePage = 'attendance-report';
                                             onchange="updateSections()">
                                             <option value="">Select Grade</option>
                                             <?php foreach ($allGrades as $grade): ?>
-                                                <option value="<?= htmlspecialchars($grade) ?>" <?= $grade == $gradeFilter ? 'selected' : '' ?>><?= htmlspecialchars($grade) ?></option>
+                                                <option value="<?= htmlspecialchars($grade) ?>" <?= $grade == $gradeFilter ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($grade) ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -133,16 +164,15 @@ $activePage = 'attendance-report';
                                                 foreach ($allSectionsByGrade[$gradeFilter] as $section): ?>
                                                     <option value="<?= htmlspecialchars($section) ?>"
                                                         <?= $section == $sectionFilter ? 'selected' : '' ?>>
-                                                        <?= htmlspecialchars($section) ?></option>
+                                                        <?= htmlspecialchars($section) ?>
+                                                    </option>
                                                 <?php endforeach;
                                             endif; ?>
                                         </select>
                                     </div>
                                 </div>
-                                <!-- <button type="submit" class="btn btn-secondary" name="filterDaily">Filter</button> -->
                                 <button type="submit" class="btn btn-primary">Generate Daily Report</button>
                             </form>
-
 
                             <hr>
 
@@ -157,7 +187,8 @@ $activePage = 'attendance-report';
                                             <?php foreach ($allGrades as $grade): ?>
                                                 <option value="<?= htmlspecialchars($grade) ?>"
                                                     <?= $grade == $gradeFilterMonthly ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($grade) ?></option>
+                                                    <?= htmlspecialchars($grade) ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -171,7 +202,8 @@ $activePage = 'attendance-report';
                                                 foreach ($allSectionsByGrade[$gradeFilterMonthly] as $section): ?>
                                                     <option value="<?= htmlspecialchars($section) ?>"
                                                         <?= $section == $sectionFilterMonthly ? 'selected' : '' ?>>
-                                                        <?= htmlspecialchars($section) ?></option>
+                                                        <?= htmlspecialchars($section) ?>
+                                                    </option>
                                                 <?php endforeach;
                                             endif; ?>
                                         </select>
@@ -241,6 +273,66 @@ $activePage = 'attendance-report';
             document.getElementById('dailyFilters').style.display = reportType === 'daily' ? 'block' : 'none';
         }
     </script>
+    <script>
+        function updateSections() {
+            const gradeFilter = document.getElementById('gradeFilter').value;
+            const sectionFilter = document.getElementById('sectionFilter');
+            sectionFilter.innerHTML = '<option value="">Select Section</option>';
+
+            const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+            if (sectionsByGrade[gradeFilter]) {
+                sectionsByGrade[gradeFilter].forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionFilter.appendChild(option);
+                });
+            }
+        }
+
+        function updateSectionsMonthly() {
+            const gradeFilterMonthly = document.getElementById('gradeFilterMonthly').value;
+            const sectionFilterMonthly = document.getElementById('sectionFilterMonthly');
+            sectionFilterMonthly.innerHTML = '<option value="">Select Section</option>';
+
+            const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+            if (sectionsByGrade[gradeFilterMonthly]) {
+                sectionsByGrade[gradeFilterMonthly].forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionFilterMonthly.appendChild(option);
+                });
+            }
+        }
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                Swal.fire({
+                    title: 'Generating Report...',
+                    text: 'Please wait while the report is being generated.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Show loading spinner
+                    }
+                });
+
+                // Simulate an API request or file generation here (example)
+                setTimeout(function () {
+                    // When file generation is completed
+                    Swal.close();  // Close the loading spinner
+
+                    // Trigger download or redirect
+                    window.location.href = 'report.php'; // Or use anchor link <a href="...">download</a>
+                }, 3000);  // Simulate a 3-second delay for generation
+            });
+        });
+
+    </script>
+
 </body>
 
 </html>
