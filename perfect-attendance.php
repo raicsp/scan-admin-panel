@@ -10,8 +10,8 @@ if ($userPosition === 'Elementary Chairperson') {
     $allowedGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6'];
 } elseif ($userPosition === 'High School Chairperson') {
     $allowedGrades = ['Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
-} else {
-    $allowedGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6', 'Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
+}else{
+    $allowedGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6','Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
 }
 
 // Retrieve date range from request, if provided
@@ -50,30 +50,28 @@ if ($month) {
 
 // Query to get students with perfect attendance
 $perfectAttendance_sql = "
-    SELECT 
-        s.srcode,
-        s.studentID, 
-        CONCAT(s.name) AS student_name, 
-        c.grade_level, 
-        c.section,
-        COUNT(a.date) AS total_days,
-        SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) AS present_days
-    FROM 
-        student s
-    JOIN 
-        classes c ON s.class_id = c.class_id
-    JOIN 
-        attendance a ON s.studentID = a.studentID
-    WHERE 
-        1=1
-        $gradeCondition
-        $dateCondition
-    GROUP BY 
-        s.studentID, s.name, c.grade_level, c.section
-    HAVING 
-        total_days = present_days
-";
+   SELECT 
+    s.srcode,
+    s.studentID, 
+    CONCAT(s.name) AS student_name, 
+    c.grade_level, 
+    c.section
+FROM 
+    student s
+JOIN 
+    classes c ON s.class_id = c.class_id
+JOIN 
+    attendance a ON s.studentID = a.studentID
+WHERE 
+    1=1
+    $gradeCondition
+    $dateCondition
+GROUP BY 
+    s.studentID, s.name, c.grade_level, c.section
+HAVING 
+    COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
 
+";
 
 $result = $conn->query($perfectAttendance_sql);
 
@@ -114,9 +112,7 @@ $conn->close();
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -157,9 +153,8 @@ $conn->close();
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Students with Perfect Attendance<br>
-
-                                <!-- Filter Section -->
+                            <h5 class="card-title">Students with Perfect Attendance<br> 
+                       
                             </h5>
                             <div class="row mb-3">
                                 <div class="col-md-3">
@@ -182,7 +177,7 @@ $conn->close();
                                     <input type="month" id="monthPicker" class="form-control" name="month">
                                 </div>
                                 <div class="col-md-3 d-flex align-items-end">
-                                    <button id="filterButton" class="btn btn-primary w-100">Filter</button>
+                                    <button id="filterButton" class="btn btn-primary w-100" onclick="filterByMonth()">Filter</button>
                                     <button id="clearButton" class="btn btn-secondary w-100 ms-2">Clear</button>
                                 </div>
                             </div>
@@ -198,19 +193,15 @@ $conn->close();
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($perfectAttendanceStudents as $student): ?>
-                                        <tr data-srcode="<?= htmlspecialchars($student['srcode']) ?>"
-                                            data-grade="<?= htmlspecialchars($student['grade_level']) ?>"
-                                            data-section="<?= htmlspecialchars($student['section']) ?>"
-                                            data-date="<?= $startOfMonth ?>">
-                                            <td><?= htmlspecialchars($student['srcode']) ?></td>
+                                    <?php foreach ($perfectAttendanceStudents as $student) : ?>
+                                        <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">                                
+                                        <td><?= htmlspecialchars($student['srcode']) ?></td>
                                             <td><?= htmlspecialchars($student['student_name']) ?></td>
                                             <td><?= htmlspecialchars($student['grade_level']) ?></td>
                                             <td><?= htmlspecialchars($student['section']) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
-
                             </table>
                         </div>
                     </div>
@@ -220,8 +211,7 @@ $conn->close();
     </main>
 
     <!-- Back to Top Button -->
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
@@ -237,83 +227,101 @@ $conn->close();
     <script src="assets/js/main.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dataTable = new simpleDatatables.DataTable("#attendanceTable", {
-                searchable: true,
-                paging: true,
-                perPage: 10,
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataTable = new simpleDatatables.DataTable("#attendanceTable", {
+            searchable: true,
+            paging: true,
+            perPage: 10,
+        });
 
-            // Initialize filter variables
-            const gradeFilter = document.getElementById('gradeFilter');
-            const sectionFilter = document.getElementById('sectionFilter');
-            const monthPicker = document.getElementById('monthPicker');
+        function filterTable() {
+            const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
+            const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
 
-            // Function to filter the table based on selected filters
-            function applyFilters() {
-                const gradeValue = gradeFilter.value.toUpperCase();
-                const sectionValue = sectionFilter.value.toUpperCase();
-                const monthValue = monthPicker.value;
+            // Build filter query based on selected values
+            let filterQuery = '';
 
-                const rows = document.querySelectorAll('#attendanceTable tbody tr');
-
-                rows.forEach(row => {
-                    const grade = row.getAttribute('data-grade').toUpperCase();
-                    const section = row.getAttribute('data-section').toUpperCase();
-                    const rowDate = row.getAttribute('data-date');
-
-                    let showRow = true;
-
-                    // Apply grade filter
-                    if (gradeValue && grade !== gradeValue) showRow = false;
-
-                    // Apply section filter
-                    if (sectionValue && section !== sectionValue) showRow = false;
-
-                    // Apply month filter
-                    if (monthValue) {
-                        const [selectedYear, selectedMonth] = monthValue.split('-');
-                        const selectedMonthStart = new Date(selectedYear, selectedMonth - 1, 1);
-                        const selectedMonthEnd = new Date(selectedYear, selectedMonth, 0);
-                        const attendanceDate = new Date(rowDate);
-
-                        if (!(attendanceDate >= selectedMonthStart && attendanceDate <= selectedMonthEnd)) showRow = false;
-                    }
-
-                    // Show or hide the row based on filters
-                    row.style.display = showRow ? '' : 'none';
-                });
+            // Append grade filter
+            if (gradeFilter) {
+                filterQuery += gradeFilter;
             }
 
+            // Append section filter
+            if (sectionFilter) {
+                filterQuery += ' ' + sectionFilter; // Add space to separate terms
+            }
 
-            // Apply filters when the filter button is clicked
-            document.getElementById('filterButton').addEventListener('click', applyFilters);
+            // Apply the search/filter on the datatable
+            dataTable.search(filterQuery.trim()); // Use search method to filter the table
+        }
 
-            // Reset filters and table content when the clear button is clicked
-            document.getElementById('clearButton').addEventListener('click', function () {
-                gradeFilter.value = '';
-                sectionFilter.innerHTML = '<option value="">All Sections</option>';
-                monthPicker.value = '';
-                dataTable.search('');
-                applyFilters();
+        document.getElementById('gradeFilter').addEventListener('change', function() {
+            const selectedGrade = this.value;
+
+            // Filter sections based on selected grade
+            const sections = gradeSections[selectedGrade] || [];
+            const sectionDropdown = document.getElementById('sectionFilter');
+            sectionDropdown.innerHTML = '<option value="">All Sections</option>';
+
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section;
+                option.textContent = section;
+                sectionDropdown.appendChild(option);
             });
 
-            // Update section dropdown based on selected grade
-            gradeFilter.addEventListener('change', function () {
-                const selectedGrade = this.value;
-                const sections = gradeSections[selectedGrade] || [];
-                sectionFilter.innerHTML = '<option value="">All Sections</option>';
-
-                sections.forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section;
-                    option.textContent = section;
-                    sectionFilter.appendChild(option);
-                });
-            });
+            // Trigger table filtering after updating the section dropdown
+            filterTable();
         });
-    </script>
+
+        function filterByMonth() {
+            const month = document.getElementById('monthPicker').value;
+
+            if (month) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('month', month);
+                window.location.href = url.toString();
+            } else {
+                alert("Please select a month.");
+            }
+        }
+
+        document.getElementById('filterButton').addEventListener('click', filterByMonth);
+
+        function clearFilters() {
+            // Reset all filter inputs
+            document.getElementById('gradeFilter').value = "";
+            document.getElementById('sectionFilter').innerHTML = '<option value="">All Sections</option>';
+            document.getElementById('monthPicker').value = "";
+
+            // Clear the table search filter
+            dataTable.search("");
+
+            // Reload the page without query parameters
+            const url = new URL(window.location.href);
+            url.searchParams.delete('month');
+            url.searchParams.delete('start_date');
+            url.searchParams.delete('end_date');
+            window.location.href = url.toString();
+        }
+
+        document.getElementById('clearButton').addEventListener('click', clearFilters);
+
+        // Add click functionality to table rows
+        const table = document.getElementById('attendanceTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (let row of rows) {
+            row.classList.add('clickable-row');
+            row.addEventListener('click', function(event) {
+                if (!event.target.closest('.action-buttons')) {
+                    const studentName = row.getAttribute('data-name');
+                    window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
+                }
+            });
+        }
+    });
+</script>
 
 </body>
-
 </html>
