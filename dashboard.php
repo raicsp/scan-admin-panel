@@ -713,7 +713,8 @@ include 'database/db-dashboard.php';
         var data = {
           days: <?= json_encode($attendance_overview['days']); ?>,
           presentCounts: <?= json_encode($attendance_overview['presentCounts']); ?>,
-          absentCounts: <?= json_encode($attendance_overview['absentCounts']); ?>
+          absentCounts: <?= json_encode($attendance_overview['absentCounts']); ?>,
+          lateCounts: <?= json_encode($attendance_overview['lateCounts']); ?>
         };
 
         var lineChartOptions = {
@@ -723,6 +724,10 @@ include 'database/db-dashboard.php';
           }, {
             name: 'Absent',
             data: data.absentCounts
+          },
+          {
+            name: 'Late',
+            data: data.lateCounts
           }],
           chart: {
             height: 280,
