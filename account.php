@@ -75,13 +75,7 @@ include 'database/db-add-teacher.php';
                 </button>
               </div>
 
-              <!-- Search and Filter -->
-              <div class="row mb-3">
-                <div class="col-md-6">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
-
-                </div>
-              </div>
+    
 
               <!-- Table with Data -->
               <table id="accountsTable" class="table">
@@ -328,36 +322,11 @@ include 'database/db-add-teacher.php';
       passwordField.setAttribute('type', type);
     }
   </script>
-  <script>
-  // Function to search the table
-  function searchTable() {
-    // Get the search input value and convert it to lowercase for case-insensitive search
-    const searchValue = document.getElementById('searchInput').value.toLowerCase();
-    
-    // Get all table rows from the tbody
-    const tableRows = document.querySelectorAll('#accountsTable tbody tr');
-    
-    // Loop through all table rows and hide those that don't match the search value
-    tableRows.forEach(row => {
-      const nameCell = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-      const emailCell = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-      
-      // Check if either name or email contains the search value
-      if (nameCell.includes(searchValue) || emailCell.includes(searchValue)) {
-        row.style.display = '';  // Show the row
-      } else {
-        row.style.display = 'none';  // Hide the row
-      }
-    });
-  }
 
-  // Attach the searchTable function to the search input
-  document.getElementById('searchInput').addEventListener('input', searchTable);
-</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
       const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-        searchable: false,
+        searchable: true,
         paging: true,
         fixedHeight: true,
         perPage: 10, // Set the number of rows per page
