@@ -89,10 +89,9 @@ echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</
                         <table id="studentsTable" class="table">
                             <thead>
                                 <tr>
-                                    <th>SrCode</th>
+                                    <th>Sr-Code</th>
                                     <th>Name</th>
-                                    <th>Grade Level</th>
-                                    <th>Section</th>
+                                 
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -150,8 +149,6 @@ echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</
                                     echo "<tr class='clickable-row' data-name='" . htmlspecialchars($student['srcode']) . "'>
                                     <td>{$student['srcode']}</td>
                                     <td>{$student['name']}</td>
-                                    <td>{$student['grade_level']}</td>
-                                    <td>{$student['section']}</td>
                                     <td class='action-buttons'>
                                         <button class='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#editStudentModal'
                                             onclick=\"editStudent(
@@ -203,7 +200,7 @@ echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</
 
                         <div class="col-md-6">
                             <label for="editFullName" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters are allowed, up to 50 characters">
+                            <input type="text" placeholder="Doe,John L." class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s,\.]+" title="Only letters are allowed, up to 50 characters">
                         </div>
 
                         <div class="col-md-6">
@@ -240,7 +237,7 @@ echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</
 
                         <div class="col-md-6">
                             <label for="editParentContact" class="form-label">Parent Contact Number</label>
-                            <input type="text" class="form-control" id="editParentContact" name="parent_contact" required pattern="\d{11}" maxlength="11" title="Enter exactly 11 digits">
+                            <input type="text" class="form-control" placeholder="9876543210" id="editParentContact" name="parent_contact" required pattern="\d{10}" maxlength="10" title="Enter exactly 10 digits">
                         </div>
 
                         <div class="col-md-6">
