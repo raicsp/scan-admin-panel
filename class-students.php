@@ -68,7 +68,7 @@ include 'database/db-class-students.php';
               </h5>
               <div class="d-flex justify-content-start">
               <span class="text-muted" style="padding-right: 30px;">
-                <?= count($students); ?> Students
+               Total Students in Class: <?= count($students); ?> 
               </span>
             </div>
 
@@ -77,7 +77,7 @@ include 'database/db-class-students.php';
             <div class="card-body">
               <!-- Table with student list -->
               <!-- Table with student list -->
-              <table class="table table-hover">
+              <table class="table table-hover" id="classTable">
                 <thead>
                   <tr>
                     <th scope="col">#</th> <!-- Add a column header for the numbering -->
@@ -112,6 +112,22 @@ include 'database/db-class-students.php';
 
   </main><!-- End #main -->
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataTable = new simpleDatatables.DataTable("#classTable", {
+        searchable: true,
+        paging: true,
+        fixedHeight: true,
+        perPage: 10, // Set the number of rows per page
+        labels: {
+          placeholder: "Search...",
+          perPage: "entries per page",
+          noRows: "No results found",
+          info: "Showing {start} to {end} of {rows} results"
+        }
+      });
+    });
+</script>
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
