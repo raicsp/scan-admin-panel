@@ -55,7 +55,7 @@ include 'database/db-administrator.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Administrators Account</h1>
+      <h1>Administrators Account Management</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
@@ -79,12 +79,7 @@ include 'database/db-administrator.php';
                 </button>
               </div>
 
-              <!-- Search and Filter -->
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
-                </div>
-              </div>
+  
 
               <!-- Table with Data -->
               <table id="accountsTable" class="table  table-bordered ">
@@ -339,27 +334,12 @@ include 'database/db-administrator.php';
         });
     }
 
-    // Search function
-    document.getElementById('searchInput').addEventListener('input', function () {
-        const searchQuery = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#accountsTable tbody tr');
-
-        rows.forEach(row => {
-            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-            const email = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-
-            if (name.includes(searchQuery) || email.includes(searchQuery)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
+ 
 
     // DataTables initialization
     document.addEventListener('DOMContentLoaded', function () {
         const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-            searchable: false,
+            searchable: true,
             paging: true,
             fixedHeight: true,
             perPage: 10,
