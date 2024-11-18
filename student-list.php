@@ -247,7 +247,7 @@ if ($userPosition === 'Elementary Chairperson') {
 
           <div class="col-md-6">
             <label for="editFullName" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters are allowed, up to 50 characters">
+            <input type="text" class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s,\.]+" title="Only letters are allowed, up to 50 characters">
           </div>
 
           <div class="col-md-6">
@@ -287,7 +287,7 @@ if ($userPosition === 'Elementary Chairperson') {
 
           <div class="col-md-6">
             <label for="editParentContact" class="form-label">Parent Contact Number</label>
-            <input type="text" class="form-control" id="editParentContact" name="parent_contact" required pattern="\d{11}" maxlength="11" title="Enter exactly 11 digits">
+            <input type="text" class="form-control" placeholder="9876543210" id="editParentContact" name="parent_contact" required pattern="\d{10}" maxlength="10" title="Enter exactly 10 digits">
           </div>
 
           <div class="col-md-6">
