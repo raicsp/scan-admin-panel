@@ -138,7 +138,7 @@ include 'database/db-class.php';
     // Initialize DataTable
     const table = $('#classTable').DataTable({
       paging: true,
-      searching: true,
+      searching: false,
       ordering: true,
       pageLength: 10,
       order: [[0, 'asc']], // Default sorting on the Grade Level column (index 0)
