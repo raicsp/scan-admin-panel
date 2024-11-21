@@ -32,6 +32,9 @@ include 'database/db-administrator.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -79,40 +82,37 @@ include 'database/db-administrator.php';
                 </button>
               </div>
 
-  
 
-              <!-- Table with Data -->
-              <table id="accountsTable" class="table  table-bordered ">
-                <thead>
-                  <tr>
 
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Position</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $result = $conn->query("SELECT * FROM admin");
-                  if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                      echo "<tr>
-                                
-                                  <td>{$row['firstname']} {$row['lastname']}</td>
-                                  <td>{$row['email']}</td>
-                                  <td>{$row['position']}</td>
-                                  <td>
-                                      <button class='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#editTeacherModal' onclick=\"editTeacher({$row['id']}, '{$row['firstname']}', '{$row['lastname']}', '{$row['email']}', '{$row['position']}')\">Edit</button>
-                                      <button class='btn btn-danger btn-sm' onclick='deleteTeacher({$row['id']})'>Delete</button>
-
-                                  </td>
-                                </tr>";
-                    }
-                  }
-                  ?>
-                </tbody>
-              </table>
+<!-- Table with Data -->
+<table id="accountsTable" class="table table-striped display">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Position</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    $result = $conn->query("SELECT * FROM admin");
+    if ($result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+        echo "<tr>
+                <td>" . htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) . "</td>
+                <td>" . htmlspecialchars($row['email']) . "</td>
+                <td>" . htmlspecialchars($row['position']) . "</td>
+                <td>
+                  <button class='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#editTeacherModal' onclick=\"editTeacher({$row['id']}, '{$row['firstname']}', '{$row['lastname']}', '{$row['email']}', '{$row['position']}')\">Edit</button>
+                  <button class='btn btn-danger btn-sm' onclick='deleteTeacher({$row['id']})'>Delete</button>
+                </td>
+              </tr>";
+      }
+    }
+    ?>
+  </tbody>
+</table>
               <!-- End Table with stripped rows -->
 
             </div>
@@ -292,86 +292,86 @@ include 'database/db-administrator.php';
   <script>
     // Edit teacher function
     function editTeacher(id, firstName, lastName, email, position) {
-        document.getElementById('editTeacherId').value = id;
-        document.getElementById('editFirstName').value = firstName;
-        document.getElementById('editLastName').value = lastName;
-        document.getElementById('editEmail').value = email;
-        document.getElementById('editPosition').value = position;
+      document.getElementById('editTeacherId').value = id;
+      document.getElementById('editFirstName').value = firstName;
+      document.getElementById('editLastName').value = lastName;
+      document.getElementById('editEmail').value = email;
+      document.getElementById('editPosition').value = position;
     }
 
     // Delete teacher function
     function deleteTeacher(id) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteTeacherId').value = id; // Set the id in hidden input
-                document.getElementById('deleteTeacherForm').submit(); // Submit the form
-            }
-        });
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById('deleteTeacherId').value = id; // Set the id in hidden input
+          document.getElementById('deleteTeacherForm').submit(); // Submit the form
+        }
+      });
     }
 
     // Confirmation for form submission
     function confirmSubmit(event, actionType) {
-        event.preventDefault(); // Prevent the default form submission
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Please confirm your action.",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, proceed!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.target.form.submit(); // Submit the form after confirmation
-            }
-        });
+      event.preventDefault(); // Prevent the default form submission
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "Please confirm your action.",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          event.target.form.submit(); // Submit the form after confirmation
+        }
+      });
     }
 
- 
+
 
     // DataTables initialization
     document.addEventListener('DOMContentLoaded', function () {
-        const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-            searchable: true,
-            paging: true,
-            fixedHeight: true,
-            perPage: 10,
-            labels: {
-                placeholder: "Search...",
-                perPage: "entries per page",
-                noRows: "No results found",
-                info: "Showing {start} to {end} of {rows} results"
-            }
-        });
+    const dataTable = new simpleDatatables.DataTable("#accountsTable", {
+      searchable: true,
+      paging: true,
+      fixedHeight: true,
+      perPage: 10,
+      labels: {
+        placeholder: "Search...",
+        perPage: "entries per page",
+        noRows: "No results found",
+        info: "Showing {start} to {end} of {rows} results"
+      }
     });
+  });
 
     <?php if (isset($_SESSION['message'])): ?>
-        Swal.fire({
-            icon: '<?php echo $_SESSION['message_type']; ?>',
-            title: '<?php echo $_SESSION['message']; ?>',
-            showConfirmButton: true, // Show OK button
-            confirmButtonText: 'OK', // Text for the OK butto
-            timer: 1500
-        }).then(() => {
-            // Optionally redirect after showing the SweetAlert message
-            window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>';
-        });
+      Swal.fire({
+        icon: '<?php echo $_SESSION['message_type']; ?>',
+        title: '<?php echo $_SESSION['message']; ?>',
+        showConfirmButton: true, // Show OK button
+        confirmButtonText: 'OK', // Text for the OK butto
+        timer: 1500
+      }).then(() => {
+        // Optionally redirect after showing the SweetAlert message
+        window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>';
+      });
     <?php endif; ?>
 
-</script>
+  </script>
 
-<?php
-// Clear session message after displaying it
-unset($_SESSION['message']);
-unset($_SESSION['message_type']);
-?>
+  <?php
+  // Clear session message after displaying it
+  unset($_SESSION['message']);
+  unset($_SESSION['message_type']);
+  ?>
 </body>
 
 </html>
