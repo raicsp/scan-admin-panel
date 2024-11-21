@@ -31,6 +31,7 @@ include 'database/db-class-management.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -68,14 +69,19 @@ include 'database/db-class-management.php';
 <body>
 
   <!-- Alert Container -->
-  <div id="alertContainer" class="container mt-3">
-    <?php if (!empty($alertMessage)) : ?>
-      <div class="alert alert-<?= $alertType ?> alert-dismissible fade show" role="alert">
-        <?= $alertMessage ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <?php endif; ?>
-  </div>
+  <?php if (!empty($alertMessage)) : ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      Swal.fire({
+        icon: '<?= $alertType === "success" ? "success" : "error" ?>', // Dynamically set the icon
+        title: '<?= $alertType === "success" ? "Success!" : "Error!" ?>',
+        text: '<?= $alertMessage ?>',
+        confirmButtonText: 'OK'
+      });
+    });
+  </script>
+<?php endif; ?>
+
 
   <!-- ======= Header ======= -->
   <?php include 'header.php'; ?>
@@ -125,11 +131,11 @@ include 'database/db-class-management.php';
                       <form id="addClassForm" method="POST" action="">
                         <div class="mb-3">
                           <label for="inputGradeLevel" class="form-label">Grade Level</label>
-                          <input type="text" class="form-control" id="inputGradeLevel" name="gradeLevel" placeholder="e.g., 10th Grade" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 50 characters">
+                          <input type="text" class="form-control" id="inputGradeLevel" name="gradeLevel" placeholder="e.g., Grade-1" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 50 characters">
                         </div>
                         <div class="mb-3">
                           <label for="inputSection" class="form-label">Section</label>
-                          <input type="text" class="form-control" id="inputSection" name="section" value= "N/A" placeholder="e.g., A" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
+                          <input type="text" class="form-control" id="inputSection" name="section" value="N/A" placeholder="e.g., A (if none, N/A)" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
                         </div>
                       </form>
                     </div>
@@ -243,6 +249,7 @@ include 'database/db-class-management.php';
 
   <!-- Custom JS for Form Submission and Modal Handling -->
   <script>
+    
     document.addEventListener('DOMContentLoaded', function() {
       const dataTable = new simpleDatatables.DataTable("#classTable", {
         searchable: false,
@@ -280,6 +287,23 @@ include 'database/db-class-management.php';
       };
       confirmDeleteModal.show();
     }
+
+    function showConfirmDeleteModal(classId) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Do you want to delete this class? This action cannot be undone.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = '?delete_id=' + classId;
+    }
+  });
+}
+
   </script>
 
 </body>
