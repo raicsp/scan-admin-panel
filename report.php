@@ -111,7 +111,7 @@ $activePage = 'attendance-report';
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Daily Attendance Report</h5>
+                            <h5 class="card-title">School Form (SF2) Daily Attendance Report of Learners</h5>
                             <form method="GET" action="admin-daily-report.php">
                                 <div class="form-row mb-3">
                                     <div class="col-md-3">
@@ -176,7 +176,7 @@ $activePage = 'attendance-report';
 
                             <hr>
 
-                            <h5 class="card-title">Monthly Attendance Report</h5>
+                            <h5 class="card-title">Monthly Attendance Report of Learners</h5>
                             <form method="GET" action="admin-monthly-report.php">
                                 <div class="form-row mb-3">
                                     <div class="col-md-3">
@@ -222,7 +222,8 @@ $activePage = 'attendance-report';
     </main>
 
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+        <i
             class="bi bi-arrow-up-short"></i></a>
     <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
