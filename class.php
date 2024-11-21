@@ -110,8 +110,6 @@ include 'database/db-class.php';
         </select>
     </div>
 </div>
-
-
               <!-- Table with stripped rows -->
               <table id="classTable" class="table">
                 <thead>
@@ -184,6 +182,7 @@ include 'database/db-class.php';
         searchable: false,
         paging: true,
         fixedHeight: true,
+        perPageSelect: [10, 20, 50],
         perPage: 10, // Set the number of rows per page
         labels: {
           placeholder: "Search...",
