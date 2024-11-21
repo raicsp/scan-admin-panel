@@ -194,30 +194,59 @@ include 'database/db-class.php';
 
   // Update teacher functionality
   function updateTeacher(selectElement) {
-    const classId = selectElement.getAttribute('data-class-id');
-    const teacherId = selectElement.value;
+  const classId = selectElement.getAttribute('data-class-id');
+  const teacherId = selectElement.value;
 
-    if (!teacherId) {
-      alert("Please select a teacher.");
-      return;
-    }
+  // Get selected teacher's name for display
+  const selectedTeacher = selectElement.options[selectElement.selectedIndex].text;
 
-    if (confirm("Are you sure you want to assign this teacher?")) {
+  // Show SweetAlert confirmation dialog
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you want to assign ${selectedTeacher} to this class?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, assign!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Send AJAX request on confirmation
       $.post('database/db-class.php', {
         class_id: classId,
         teacher_id: teacherId
       }).done(function (response) {
         if (response.trim() === 'success') {
-          alert("Teacher assigned successfully.");
-          location.reload();
+          // Success message
+          Swal.fire({
+            icon: 'success',
+            title: 'Assigned!',
+            text: 'The teacher has been successfully assigned.',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            location.reload(); // Reload the page after success
+          });
         } else {
-          alert("Failed to assign teacher.");
+          // Error message
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'There was an error assigning the teacher.',
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
       }).fail(function () {
-        alert("Error occurred while assigning teacher.");
+        // Error on request failure
+        Swal.fire({
+          icon: 'error',
+          title: 'Request Failed!',
+          text: 'Could not connect to the server. Please try again later.'
+        });
       });
     }
-  }
+  });
+}
 </script>
 
 
