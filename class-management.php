@@ -129,7 +129,7 @@ include 'database/db-class-management.php';
                         </div>
                         <div class="mb-3">
                           <label for="inputSection" class="form-label">Section</label>
-                          <input type="text" class="form-control" id="inputSection" name="section" placeholder="e.g., A" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
+                          <input type="text" class="form-control" id="inputSection" name="section" value= "N/A" placeholder="e.g., A" required maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Only letters, numbers, and spaces are allowed, up to 10 characters">
                         </div>
                       </form>
                     </div>

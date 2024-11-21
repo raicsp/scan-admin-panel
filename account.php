@@ -132,12 +132,12 @@ include 'database/db-add-teacher.php';
           <div class="col-md-6">
             <label for="inputFirstName" class="form-label">First Name</label>
             <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required 
-              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+              maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Only letters and spaces are allowed, up to 50 characters">
           </div>
           <div class="col-md-6">
             <label for="inputLastName" class="form-label">Last Name</label>
             <input type="text" class="form-control" id="inputLastName" name="last_name" placeholder="Doe" required 
-              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+              maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Only letters and spaces are allowed, up to 50 characters">
           </div>
           <div class="col-md-6">
             <label for="inputEmail" class="form-label">Email</label>

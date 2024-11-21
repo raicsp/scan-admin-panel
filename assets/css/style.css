@@ -238,6 +238,10 @@ h6 {
   padding: 15px;
 }
 
+#calendarFilter:focus {
+  outline: none; /* Remove focus outline */
+  border: none; /* Completely remove border */
+}
 .card-title {
   padding: 20px 0 15px 0;
   font-size: 20px;
@@ -245,7 +249,7 @@ h6 {
   /* color: #012970; */
   color: #000;
   font-family: "Poppins", sans-serif;
-  text-align: center;
+  text-align: left;
 }
 
 .card-title span {
