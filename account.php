@@ -32,6 +32,8 @@ include 'database/db-add-teacher.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -78,7 +80,7 @@ include 'database/db-add-teacher.php';
     
 
               <!-- Table with Data -->
-              <table id="accountsTable" class="table">
+              <table id="accountsTable" class="table table-striped display">
                 <thead>
                   <tr>
      
