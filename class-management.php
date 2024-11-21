@@ -199,7 +199,7 @@ include 'database/db-class-management.php';
               <!-- Table with hoverable rows -->
               <div class="card-body">
                 <!-- Table with hoverable rows -->
-                <table class="table table-hover" id="classTable">
+                <table class="table table-hover table-striped " id="classTable">
                   <thead>
                     <tr>
 
