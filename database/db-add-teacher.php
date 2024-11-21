@@ -44,22 +44,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $passwordPlain = $first_name . $last_name;
+
+    // Remove spaces and periods, and convert to lowercase
+    $first_name_cleaned = strtolower(str_replace([' ', '.'], '', $first_name));
+    $last_name_cleaned = strtolower(str_replace([' ', '.'], '', $last_name));
+
+    // Combine first and last name for password
+    $passwordPlain = $first_name_cleaned . $last_name_cleaned;
+    
+    // Hash the password
     $password = password_hash($passwordPlain, PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO users (firstname, lastname, email, password) VALUES ('$first_name', '$last_name', '$email', '$password')";
+    // Check if the email already exists
+    $emailCheckSql = "SELECT * FROM users WHERE email = '$email'";
+    $result = $conn->query($emailCheckSql);
 
-    if ($conn->query($sql) === TRUE) {
-        $_SESSION['message'] = "Teacher added successfully!";
-        $_SESSION['message_type'] = "success";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+    if ($result->num_rows > 0) {
+        // Email already exists
+        $_SESSION['message'] = "Email is already registered.";
+        $_SESSION['message_type'] = "error";
     } else {
-        $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+        // Insert teacher data into the database
+        $sql = "INSERT INTO users (firstname, lastname, email, password) VALUES ('$first_name', '$last_name', '$email', '$password')";
+
+        if ($conn->query($sql) === TRUE) {
+            $_SESSION['message'] = "Teacher added successfully!";
+            $_SESSION['message_type'] = "success";
+        } else {
+            $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
+            $_SESSION['message_type'] = "error";
+        }
     }
+
+    // Redirect to the same page to display the message
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 
 // Handle Edit Teacher Form submission
@@ -78,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
         exit();
     } else {
         $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
+        $_SESSION['message_type'] = "error";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
@@ -97,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
         exit();
     } else {
         $_SESSION['message'] = "Error: " . $sql . "<br>" . $conn->error;
-        $_SESSION['message_type'] = "danger";
+        $_SESSION['message_type'] = "error";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
