@@ -237,6 +237,7 @@ $activePage = 'attendance-report';
     <script src="assets/js/main.js"></script>
 
     <script>
+        // Function for updating sections by grade (for daily report)
         function updateSections() {
             const gradeFilter = document.getElementById('gradeFilter').value;
             const sectionFilter = document.getElementById('sectionFilter');
@@ -253,6 +254,7 @@ $activePage = 'attendance-report';
             }
         }
 
+        // Function for updating sections by grade (for monthly report)
         function updateSectionsMonthly() {
             const gradeFilterMonthly = document.getElementById('gradeFilterMonthly').value;
             const sectionFilterMonthly = document.getElementById('sectionFilterMonthly');
@@ -268,99 +270,107 @@ $activePage = 'attendance-report';
                 });
             }
         }
-    </script>
-    <script>
+
+        // Event listener to toggle filters based on report type
         function toggleFilters() {
             const reportType = document.getElementById('reportType').value;
             document.getElementById('dailyFilters').style.display = reportType === 'daily' ? 'block' : 'none';
         }
-    </script>
-    <script>
-        function updateSections() {
-            const gradeFilter = document.getElementById('gradeFilter').value;
-            const sectionFilter = document.getElementById('sectionFilter');
-            sectionFilter.innerHTML = '<option value="">Select Section</option>';
 
-            const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
-            if (sectionsByGrade[gradeFilter]) {
-                sectionsByGrade[gradeFilter].forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section;
-                    option.textContent = section;
-                    sectionFilter.appendChild(option);
-                });
-            }
-        }
-
-        function updateSectionsMonthly() {
-            const gradeFilterMonthly = document.getElementById('gradeFilterMonthly').value;
-            const sectionFilterMonthly = document.getElementById('sectionFilterMonthly');
-            sectionFilterMonthly.innerHTML = '<option value="">Select Section</option>';
-
-            const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
-            if (sectionsByGrade[gradeFilterMonthly]) {
-                sectionsByGrade[gradeFilterMonthly].forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section;
-                    option.textContent = section;
-                    sectionFilterMonthly.appendChild(option);
-                });
-            }
-        }
-
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                Swal.fire({
-                    title: 'Generating Report...',
-                    text: 'Please wait while the report is being generated.',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.showLoading(); // Show loading spinner
-                    }
-                });
-
-                // Simulate an API request or file generation here (example)
-                setTimeout(function() {
-                    // When file generation is completed
-                    Swal.close(); // Close the loading spinner
-
-                    // Trigger download or redirect
-                    window.location.href = 'report.php'; // Or use anchor link <a href="...">download</a>
-                }, 3000); // Simulate a 3-second delay for generation
-            });
-        });
-    </script>
-    <script>
+   
+        // Generate Daily Report button click event
         document.getElementById('generateDailyReport').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent form submission
+
             const month = document.getElementById('monthFilter').value;
             const grade = document.getElementById('gradeFilter').value;
             const section = document.getElementById('sectionFilter').value;
 
+            // Check if selections are incomplete
             if (!month || !grade || !section) {
-                event.preventDefault(); // Prevent form submission
                 Swal.fire({
                     icon: 'warning',
                     title: 'Incomplete Selection',
                     text: 'You need to select a month, grade, and section before generating the report.',
                     confirmButtonText: 'OK'
                 });
+            } else {
+                // Confirmation prompt before generating report
+                Swal.fire({
+                    title: 'Are you sure you want to generate the daily report?',
+                    text: 'Please confirm that you want to generate the report for the selected criteria.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Generate',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show 'Please wait...' message
+                        Swal.fire({
+                            title: "Generating Report...",
+                            text: "Please wait while the report is being prepared.",
+                            icon: "info",
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading(); // Show loading spinner
+                            },
+                        });
+
+                        // Simulate report generation (example)
+                        setTimeout(() => {
+                            Swal.close(); // Close loading spinner
+                            document.querySelector('form[action="admin-daily-report.php"]').submit(); // Submit the form
+                        }, 3000); // Simulate a 3-second delay
+                    }
+                });
             }
         });
 
+        // Generate Monthly Report button click event
         document.getElementById('generateMonthlyReport').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent form submission
+
             const gradeMonthly = document.getElementById('gradeFilterMonthly').value;
             const sectionMonthly = document.getElementById('sectionFilterMonthly').value;
 
+            // Check if selections are incomplete
             if (!gradeMonthly || !sectionMonthly) {
-                event.preventDefault(); // Prevent form submission
                 Swal.fire({
                     icon: 'warning',
                     title: 'Incomplete Selection',
                     text: 'You need to select a grade and section before generating the monthly report.',
                     confirmButtonText: 'OK'
+                });
+            } else {
+                // Confirmation prompt before generating report
+                Swal.fire({
+                    title: 'Are you sure you want to generate the monthly report?',
+                    text: 'Please confirm that you want to generate the report for the selected criteria.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Generate',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show 'Please wait...' message
+                        Swal.fire({
+                            title: "Generating Report...",
+                            text: "Please wait while the report is being prepared.",
+                            icon: "info",
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading(); // Show loading spinner
+                            },
+                        });
+
+                        // Simulate report generation (example)
+                        setTimeout(() => {
+                            Swal.close(); // Close loading spinner
+                            document.querySelector('form[action="admin-monthly-report.php"]').submit(); // Submit the form
+                        }, 3000); // Simulate a 3-second delay
+                    }
                 });
             }
         });
