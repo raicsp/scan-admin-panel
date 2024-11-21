@@ -106,50 +106,52 @@ $activePage = 'generate-report';
       <div class="row">
         <div class="col-lg-12">
           <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Attendance Report</h5>
+            <div class="card-body" >
+            <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
 
               <!-- Daily Attendance Report Section -->
-              <div class="mb-4">
-                <div class="col-md-12">
-                  <p><b>Daily Attendance Report:</b></p>
-                </div>
-                <form method="GET" action="daily-report.php">
-                  <div class="form-row mb-3">
-                    <div class="col-md-4">
-                      <label for="month" class="form-label"><b>Select Month</b></label>
-                      <select name="month" id="month" class="form-select">
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-4 mb-4">
-                    <button type="submit" class="btn btn-primary">Generate Daily Report</button>
-                  </div>
-                </form>
-              </div>
+              <div class="mb-4" style="text-align: center;">
+  <form method="GET" action="daily-report.php">
+    <div class="form-row justify-content-center">
+      <!-- Centered Select Month -->
+      <div class="col-md-4">
+        <label for="month" class="form-label"><b>Select Month</b></label>
+        <select name="month" id="month" class="form-select">
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Centered Button -->
+    <div class="form-row justify-content-center mt-3">
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-primary btn-block">Generate Daily Report</button>
+      </div>
+    </div>
+  </form>
+</div>
 
               <!-- Divider Line -->
               <hr class="my-4">
 
               <!-- Monthly Attendance Report Section -->
-              <div class="mb-4">
+              <div class="mb-4" style="text-align: center;">
                 <div class="col-md-12">
-                  <p><b>Monthly Attendance Report:</b></p>
+                <h5 class="card-title" style="text-align: center;">Monthly Attendance Report of Learners</h5>
                 </div>
                 <form method="POST" action="monthly-report.php">
-                  <button type="submit" name="export" value="csv" class="btn btn-success">Generate Monthly
+                  <button type="submit" name="export" value="csv" class="btn btn-primary">Generate Monthly
                     Report</button>
                 </form>
               </div>
@@ -157,7 +159,7 @@ $activePage = 'generate-report';
               <hr class="my-4">
 
               <!-- Date Range Filter for the Attendance Table -->
-              <form method="GET">
+              <!-- <form method="GET">
                 <div class="form-row mb-3">
                   <div class="col-md-3">
                     <label for="startDate" class="form-label"><b>Initial Date</b></label>
@@ -175,10 +177,10 @@ $activePage = 'generate-report';
                     <button type="submit" class="btn btn-primary">Filter</button>
                   </div>
                 </div>
-              </form>
+              </form> -->
 
               <!-- Attendance Table -->
-              <div class="table-responsive">
+              <!-- <div class="table-responsive">
                 <table class="table table-hover table-bordered" id="studentsTable">
                   <thead>
                     <tr>
@@ -202,7 +204,7 @@ $activePage = 'generate-report';
                     <?php endforeach; ?>
                   </tbody>
                 </table>
-              </div>
+              </div> -->
 
             </div>
           </div>
