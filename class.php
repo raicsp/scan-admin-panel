@@ -145,6 +145,8 @@ include 'database/db-class.php';
       columnDefs: [
         { type: 'grade-level', targets: 0 }, // Apply custom sorting to Grade Level column
       ],
+      dom: 't<"bottom"ip>',
+      stripeClasses: [],
       language: {
         search: "Search:",
         lengthMenu: "Show _MENU_ entries per page",
