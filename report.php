@@ -111,7 +111,7 @@ $activePage = 'attendance-report';
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                        <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
+                            <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
 
                             <form method="GET" action="admin-daily-report.php">
                                 <div class="form-row mb-3">
@@ -138,7 +138,7 @@ $activePage = 'attendance-report';
 
                                             // Loop through the months and create the options
                                             foreach ($months as $monthNum => $monthName):
-                                                ?>
+                                            ?>
                                                 <option value="<?= $monthNum ?>" <?= $monthNum == $monthFilter ? 'selected' : '' ?>>
                                                     <?= $monthName ?>
                                                 </option>
@@ -167,12 +167,12 @@ $activePage = 'attendance-report';
                                                         <?= $section == $sectionFilter ? 'selected' : '' ?>>
                                                         <?= htmlspecialchars($section) ?>
                                                     </option>
-                                                <?php endforeach;
+                                            <?php endforeach;
                                             endif; ?>
                                         </select>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Generate Daily Report</button>
+                                <button type="submit" class="btn btn-primary" id="generateDailyReport">Generate Daily Report</button>
                             </form>
 
                             <hr>
@@ -205,13 +205,13 @@ $activePage = 'attendance-report';
                                                         <?= $section == $sectionFilterMonthly ? 'selected' : '' ?>>
                                                         <?= htmlspecialchars($section) ?>
                                                     </option>
-                                                <?php endforeach;
+                                            <?php endforeach;
                                             endif; ?>
                                         </select>
                                     </div>
                                 </div>
                                 <!-- <button type="submit" class="btn btn-secondary" name="filterMonthly">Filter</button> -->
-                                <button type="submit" class="btn btn-primary">Generate Monthly Report</button>
+                                <button type="submit" class="btn btn-primary" id="generateMonthlyReport">Generate Monthly Report</button>
                             </form>
 
 
@@ -309,7 +309,7 @@ $activePage = 'attendance-report';
         }
 
         document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function (event) {
+            form.addEventListener('submit', function(event) {
                 Swal.fire({
                     title: 'Generating Report...',
                     text: 'Please wait while the report is being generated.',
@@ -323,17 +323,49 @@ $activePage = 'attendance-report';
                 });
 
                 // Simulate an API request or file generation here (example)
-                setTimeout(function () {
+                setTimeout(function() {
                     // When file generation is completed
-                    Swal.close();  // Close the loading spinner
+                    Swal.close(); // Close the loading spinner
 
                     // Trigger download or redirect
                     window.location.href = 'report.php'; // Or use anchor link <a href="...">download</a>
-                }, 3000);  // Simulate a 3-second delay for generation
+                }, 3000); // Simulate a 3-second delay for generation
             });
         });
-
     </script>
+    <script>
+        document.getElementById('generateDailyReport').addEventListener('click', function(event) {
+            const month = document.getElementById('monthFilter').value;
+            const grade = document.getElementById('gradeFilter').value;
+            const section = document.getElementById('sectionFilter').value;
+
+            if (!month || !grade || !section) {
+                event.preventDefault(); // Prevent form submission
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete Selection',
+                    text: 'You need to select a month, grade, and section before generating the report.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
+        document.getElementById('generateMonthlyReport').addEventListener('click', function(event) {
+            const gradeMonthly = document.getElementById('gradeFilterMonthly').value;
+            const sectionMonthly = document.getElementById('sectionFilterMonthly').value;
+
+            if (!gradeMonthly || !sectionMonthly) {
+                event.preventDefault(); // Prevent form submission
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete Selection',
+                    text: 'You need to select a grade and section before generating the monthly report.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
+
 
 </body>
 
