@@ -1,6 +1,6 @@
 <?php
-$activePage = 'class'; // Set the active page
-include 'database/db_connect.php'; // Include the database connection
+$activePage = 'class';
+include 'database/db_connect.php';
 include 'database/db-class.php';
 ?>
 
@@ -19,6 +19,9 @@ include 'database/db-class.php';
   <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -30,35 +33,9 @@ include 'database/db-class.php';
   <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
-
-  <!-- Custom CSS for Alert and Button Layout -->
-  <style>
-    #alertContainer {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1050;
-      /* Ensure it appears above other content */
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-header .btn-primary {
-      margin-left: auto;
-      /* Align the button to the right */
-    }
-  </style>
 </head>
 
 <body>
@@ -68,11 +45,7 @@ include 'database/db-class.php';
 
   <!-- ======= Sidebar ======= -->
   <?php include 'sidebar.php'; ?>
-  <!-- End Sidebar-->
-
-  <!-- Alert Container -->
- 
-
+  <!-- End Sidebar -->
 
   <main id="main" class="main">
     <div class="pagetitle">
@@ -93,25 +66,26 @@ include 'database/db-class.php';
             <div class="card-body">
               <h5 class="card-title">List of Classes</h5>
 
-              <!-- Filter-->
+              <!-- Filters -->
               <div class="row mb-3">
-    <div class="col-md-6">
-        <select id="gradeFilter" class="form-select">
-            <option value="">Select Grade</option>
-            <?php foreach ($grades as $grade) : ?>
-                <option value="<?php echo htmlspecialchars($grade); ?>"><?php echo htmlspecialchars($grade); ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="col-md-6">
-        <select id="sectionFilter" class="form-select">
-            <option value="">Select Section</option>
-            <!-- Section options will be dynamically populated based on selected grade -->
-        </select>
-    </div>
-</div>
-              <!-- Table with stripped rows -->
-              <table id="classTable" class="table">
+                <div class="col-md-6">
+                  <select id="gradeFilter" class="form-select">
+                    <option value="">Select Grade</option>
+                    <?php foreach ($grades as $grade) : ?>
+                      <option value="<?php echo htmlspecialchars($grade); ?>"><?php echo htmlspecialchars($grade); ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <select id="sectionFilter" class="form-select">
+                    <option value="">Select Section</option>
+                    <!-- Section options will be populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- DataTable -->
+              <table id="classTable" class="table display">
                 <thead>
                   <tr>
                     <th>Grade Level</th>
@@ -138,7 +112,6 @@ include 'database/db-class.php';
                   <?php endforeach; ?>
                 </tbody>
               </table>
-              <!-- End Table with stripped rows -->
 
             </div>
           </div>
@@ -146,168 +119,108 @@ include 'database/db-class.php';
         </div>
       </div>
     </section>
-
-
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="confirmModalLabel">Confirm Assignment</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p id="confirmMessage"></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="confirmButton">Confirm</button>
-          </div>
-        </div>
-      </div>
-    </div><!-- End Confirmation Modal -->
   </main><!-- End #main -->
 
   <!-- Vendor JS Files -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
 
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-
-  <!-- Filter script and updateTeacher function -->
+  <!-- Main JS -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const dataTable = new simpleDatatables.DataTable("#classTable", {
-        searchable: false,
-        paging: true,
-        fixedHeight: true,
-        perPageSelect: [10, 20, 50],
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
+  $(document).ready(function () {
+    // Custom sorting function for numeric values in "Grade Level"
+    jQuery.fn.dataTable.ext.type.order['grade-level-pre'] = function (data) {
+      const match = data.match(/\d+/); // Extract the numeric value from the grade level
+      return match ? parseInt(match[0], 10) : 0; // Return the numeric value for sorting
+    };
+
+    // Initialize DataTable
+    const table = $('#classTable').DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      pageLength: 10,
+      order: [[0, 'asc']], // Default sorting on the Grade Level column (index 0)
+      columnDefs: [
+        { type: 'grade-level', targets: 0 }, // Apply custom sorting to Grade Level column
+      ],
+      language: {
+        search: "Filter records:",
+        lengthMenu: "Show _MENU_ entries per page",
+        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        infoEmpty: "No matching entries",
+        paginate: {
+          previous: "Previous",
+          next: "Next"
         }
-      });
+      },
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const gradeFilter = document.getElementById('gradeFilter');
-        const sectionFilter = document.getElementById('sectionFilter');
-        const table = document.getElementById('classTable');
-        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    // Section Data from PHP
+    const sectionsByGrade = <?php echo json_encode($sectionsByGrade); ?>;
 
-        // Get sections by grade from PHP
-        const sectionsByGrade = <?php echo json_encode($sectionsByGrade); ?>;
+    // Populate Sections Based on Grade Selection
+    $('#gradeFilter').on('change', function () {
+      const selectedGrade = $(this).val();
+      const sectionFilter = $('#sectionFilter');
 
-        // Function to filter the table
-        const filterTable = () => {
-            const gradeValue = gradeFilter.value;
-            const sectionValue = sectionFilter.value;
+      // Clear existing options
+      sectionFilter.empty().append('<option value="">Select Section</option>');
 
-            for (let row of rows) {
-                const grade = row.cells[0].textContent;
-                const section = row.cells[1].textContent;
-
-                if ((gradeValue === "" || grade === gradeValue) && (sectionValue === "" || section === sectionValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        };
-
-        // Populate sections based on the selected grade
-        gradeFilter.addEventListener('change', function() {
-            const selectedGrade = this.value;
-
-            // Clear current section options
-            sectionFilter.innerHTML = '<option value="">Select Section</option>';
-
-            // Populate section options if a grade is selected
-            if (selectedGrade && sectionsByGrade[selectedGrade]) {
-                sectionsByGrade[selectedGrade].forEach(section => {
-                    const option = document.createElement('option');
-                    option.value = section;
-                    option.textContent = section;
-                    sectionFilter.appendChild(option);
-                });
-            }
-
-            // Apply filtering after grade change
-            filterTable();
+      // Populate new options if a grade is selected
+      if (selectedGrade && sectionsByGrade[selectedGrade]) {
+        sectionsByGrade[selectedGrade].forEach(section => {
+          sectionFilter.append(new Option(section, section));
         });
+      }
 
-        // Apply table filtering when the section is changed
-        sectionFilter.addEventListener('change', filterTable);
+      // Trigger filtering
+      $('#sectionFilter').trigger('change');
     });
-    function updateTeacher(selectElement) {
-  const classId = selectElement.getAttribute('data-class-id');
-  const teacherId = selectElement.value;
-  
-  // Prepare confirmation message
-  const selectedTeacher = selectElement.options[selectElement.selectedIndex].text;
-  
-  // Show SweetAlert confirmation dialog
-  Swal.fire({
-    title: 'Are you sure?',
-    text: `Do you want to assign ${selectedTeacher} to this class?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, assign it!',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Send the AJAX request if confirmed
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'database/db-class.php', true); // Adjust path to match the location of db-class.php
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            if (xhr.responseText.trim() === 'success') {
-              Swal.fire({
-                icon: 'success',
-                title: 'Assigned!',
-                text: 'The teacher has been successfully assigned.',
-                showConfirmButton: false,
-                timer: 1500
-              }).then(() => {
-                location.href = 'class.php?status=success'; // Redirect to show success alert
-              });
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'There was an error assigning the teacher.',
-                showConfirmButton: false,
-                timer: 1500
-              }).then(() => {
-                location.href = 'class.php?status=error'; // Redirect to show error alert
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error!',
-              text: `Request failed with status ${xhr.status}: ${xhr.statusText}`,
-            });
-          }
-        }
-      };
 
-      xhr.send('class_id=' + encodeURIComponent(classId) + '&teacher_id=' + encodeURIComponent(teacherId));
-    }
+    // Custom Filters
+    $('#gradeFilter, #sectionFilter').on('change', function () {
+      const grade = $('#gradeFilter').val();
+      const section = $('#sectionFilter').val();
+
+      // Apply exact match search using regex
+      table
+        .columns(0).search(grade ? `^${grade}$` : '', true, false) // Grade Level column (index 0)
+        .columns(1).search(section ? `^${section}$` : '', true, false) // Section column (index 1)
+        .draw();
+    });
   });
-}
+
+  // Update teacher functionality
+  function updateTeacher(selectElement) {
+    const classId = selectElement.getAttribute('data-class-id');
+    const teacherId = selectElement.value;
+
+    if (!teacherId) {
+      alert("Please select a teacher.");
+      return;
+    }
+
+    if (confirm("Are you sure you want to assign this teacher?")) {
+      $.post('database/db-class.php', {
+        class_id: classId,
+        teacher_id: teacherId
+      }).done(function (response) {
+        if (response.trim() === 'success') {
+          alert("Teacher assigned successfully.");
+          location.reload();
+        } else {
+          alert("Failed to assign teacher.");
+        }
+      }).fail(function () {
+        alert("Error occurred while assigning teacher.");
+      });
+    }
+  }
+</script>
 
 
-    
-  </script>
-  
 </body>
 
 </html>
