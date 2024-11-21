@@ -93,11 +93,11 @@ $showAcademicYears = false;  // Set to false to hide it
           <i class="bi bi-circle"></i><span>Generate Report</span>
         </a>
       </li>
-      <li>
+      <!-- <li>
         <a href="teacher-report-template.php" class="<?php echo $activePage === 'template' ? 'active' : ''; ?>">
           <i class="bi bi-circle"></i><span>Report Template</span>
         </a>
-      </li>
+      </li> -->
     </ul>
   <?php else: ?>
     <!-- Show single link for other users -->
