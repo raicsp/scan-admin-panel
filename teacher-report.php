@@ -106,41 +106,41 @@ $activePage = 'generate-report';
       <div class="row">
         <div class="col-lg-12">
           <div class="card">
-            <div class="card-body" >
-            <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
+            <div class="card-body">
+              <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
 
               <!-- Daily Attendance Report Section -->
               <div class="mb-4" style="text-align: center;">
-  <form method="GET" action="daily-report.php">
-    <div class="form-row justify-content-center">
-      <!-- Centered Select Month -->
-      <div class="col-md-4">
-        <label for="month" class="form-label"><b>Select Month</b></label>
-        <select name="month" id="month" class="form-select">
-          <option value="01">January</option>
-          <option value="02">February</option>
-          <option value="03">March</option>
-          <option value="04">April</option>
-          <option value="05">May</option>
-          <option value="06">June</option>
-          <option value="07">July</option>
-          <option value="08">August</option>
-          <option value="09">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-      </div>
-    </div>
+                <form method="GET" action="daily-report.php">
+                  <div class="form-row justify-content-center">
+                    <!-- Centered Select Month -->
+                    <div class="col-md-4">
+                      <label for="month" class="form-label"><b>Select Month</b></label>
+                      <select name="month" id="month" class="form-select">
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </div>
+                  </div>
 
-    <!-- Centered Button -->
-    <div class="form-row justify-content-center mt-3">
-      <div class="col-md-4">
-        <button type="submit" class="btn btn-primary btn-block">Generate Daily Report</button>
-      </div>
-    </div>
-  </form>
-</div>
+                  <!-- Centered Button -->
+                  <div class="form-row justify-content-center mt-3">
+                    <div class="col-md-4">
+                      <button type="submit" class="btn btn-primary btn-block" id="generateDailyReport">Generate Daily Report</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
 
               <!-- Divider Line -->
               <hr class="my-4">
@@ -148,10 +148,10 @@ $activePage = 'generate-report';
               <!-- Monthly Attendance Report Section -->
               <div class="mb-4" style="text-align: center;">
                 <div class="col-md-12">
-                <h5 class="card-title" style="text-align: center;">Monthly Attendance Report of Learners</h5>
+                  <h5 class="card-title" style="text-align: center;">Monthly Attendance Report of Learners</h5>
                 </div>
                 <form method="POST" action="monthly-report.php">
-                  <button type="submit" name="export" value="csv" class="btn btn-primary">Generate Monthly
+                  <button type="submit" name="export" value="csv" class="btn btn-primary" id="generateMonthlyReport">Generate Monthly
                     Report</button>
                 </form>
               </div>
@@ -227,80 +227,113 @@ $activePage = 'generate-report';
   <script src="assets/js/main.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const dataTable = new simpleDatatables.DataTable("#studentsTable", {
-        searchable: true,
-        paging: true,
-        fixedHeight: true,
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
+  document.addEventListener("DOMContentLoaded", function () {
+    const dataTable = new simpleDatatables.DataTable("#studentsTable", {
+      searchable: true,
+      paging: true,
+      fixedHeight: true,
+      perPage: 10,
+      labels: {
+        placeholder: "Search...",
+        perPage: "entries per page",
+        noRows: "No results found",
+        info: "Showing {start} to {end} of {rows} results",
+      },
+    });
+  });
+
+  const updateSections = (gradeId, sectionId) => {
+    const gradeFilter = document.getElementById(gradeId).value;
+    const sectionFilter = document.getElementById(sectionId);
+    sectionFilter.innerHTML = '<option value="">Select Section</option>';
+
+    const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+    if (sectionsByGrade[gradeFilter]) {
+      sectionsByGrade[gradeFilter].forEach((section) => {
+        const option = document.createElement("option");
+        option.value = section;
+        option.textContent = section;
+        sectionFilter.appendChild(option);
+      });
+    }
+  };
+
+  // Event listener for Daily Report generation
+  document.getElementById("generateDailyReport").addEventListener("click", function (event) {
+    event.preventDefault();
+    const month = document.getElementById("month").value;
+
+    if (!month) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Selection",
+        text: "You need to select a month before generating the report.",
+        confirmButtonText: "OK",
+      });
+    } else {
+      Swal.fire({
+        title: "Generate Daily Report?",
+        text: "Are you sure you want to generate the daily report for the selected month?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Generate",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show 'Please wait...' message
+          Swal.fire({
+            title: "Generating Report...",
+            text: "Please wait while the report is being prepared.",
+            icon: "info",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          setTimeout(() => {
+            Swal.close(); // Close loading spinner
+            document.querySelector('form[action="daily-report.php"]').submit();
+          }, 2000); // Simulated delay for generation
         }
       });
-    });
-  </script>
-  <script>
-    function updateSections() {
-      const gradeFilter = document.getElementById('gradeFilter').value;
-      const sectionFilter = document.getElementById('sectionFilter');
-      sectionFilter.innerHTML = '<option value="">Select Section</option>';
-
-      const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
-      if (sectionsByGrade[gradeFilter]) {
-        sectionsByGrade[gradeFilter].forEach(section => {
-          const option = document.createElement('option');
-          option.value = section;
-          option.textContent = section;
-          sectionFilter.appendChild(option);
-        });
-      }
     }
+  });
 
-    function updateSectionsMonthly() {
-      const gradeFilterMonthly = document.getElementById('gradeFilterMonthly').value;
-      const sectionFilterMonthly = document.getElementById('sectionFilterMonthly');
-      sectionFilterMonthly.innerHTML = '<option value="">Select Section</option>';
+  // Event listener for Monthly Report generation
+  document.getElementById("generateMonthlyReport").addEventListener("click", function (event) {
+    event.preventDefault();
 
-      const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
-      if (sectionsByGrade[gradeFilterMonthly]) {
-        sectionsByGrade[gradeFilterMonthly].forEach(section => {
-          const option = document.createElement('option');
-          option.value = section;
-          option.textContent = section;
-          sectionFilterMonthly.appendChild(option);
-        });
-      }
-    }
-
-    document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', function (event) {
+    Swal.fire({
+      title: "Generate Monthly Report?",
+      text: "Are you sure you want to generate the monthly report?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Generate",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Show 'Please wait...' message
         Swal.fire({
-          title: 'Generating Report...',
-          text: 'Please wait while the report is being generated.',
-          icon: 'info',
+          title: "Generating Report...",
+          text: "Please wait while the report is being prepared.",
+          icon: "info",
           allowOutsideClick: false,
-          allowEscapeKey: false,
           showConfirmButton: false,
           didOpen: () => {
-            Swal.showLoading(); // Show loading spinner
-          }
+            Swal.showLoading();
+          },
         });
 
-        // Simulate an API request or file generation here (example)
-        setTimeout(function () {
-          // When file generation is completed
-          Swal.close();  // Close the loading spinner
-
-          // Trigger download or redirect
-          window.location.href = 'teacher-report.php'; // Or use anchor link <a href="...">download</a>
-        }, 3000);  // Simulate a 3-second delay for generation
-      });
+        setTimeout(() => {
+          Swal.close(); // Close loading spinner
+          document.querySelector('form[action="monthly-report.php"]').submit();
+        }, 2000); // Simulated delay for generation
+      }
     });
-
-  </script>
+  });
+</script>
 
 </body>
 
