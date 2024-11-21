@@ -111,7 +111,8 @@ $activePage = 'attendance-report';
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">School Form (SF2) Daily Attendance Report of Learners</h5>
+                        <h5 class="card-title" style="text-align: center;">School Form (SF2) Daily Attendance Report of Learners</h5>
+
                             <form method="GET" action="admin-daily-report.php">
                                 <div class="form-row mb-3">
                                     <div class="col-md-3">
@@ -176,7 +177,7 @@ $activePage = 'attendance-report';
 
                             <hr>
 
-                            <h5 class="card-title">Monthly Attendance Report of Learners</h5>
+                            <h5 class="card-title" style="text-align: center;">Monthly Attendance Report of Learners</h5>
                             <form method="GET" action="admin-monthly-report.php">
                                 <div class="form-row mb-3">
                                     <div class="col-md-3">
