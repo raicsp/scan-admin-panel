@@ -277,16 +277,15 @@ $activePage = 'attendance-report';
             document.getElementById('dailyFilters').style.display = reportType === 'daily' ? 'block' : 'none';
         }
 
-   
+
         // Generate Daily Report button click event
         document.getElementById('generateDailyReport').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
 
             const month = document.getElementById('monthFilter').value;
             const grade = document.getElementById('gradeFilter').value;
             const section = document.getElementById('sectionFilter').value;
 
-            // Check if selections are incomplete
             if (!month || !grade || !section) {
                 Swal.fire({
                     icon: 'warning',
@@ -295,33 +294,58 @@ $activePage = 'attendance-report';
                     confirmButtonText: 'OK'
                 });
             } else {
-                // Confirmation prompt before generating report
                 Swal.fire({
-                    title: 'Are you sure you want to generate the daily report?',
-                    text: 'Please confirm that you want to generate the report for the selected criteria.',
+                    title: 'Generate Daily Report?',
+                    text: 'Confirm to generate the report for the selected month, grade, and section.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, Generate',
+                    confirmButtonText: 'Generate',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Show 'Please wait...' message
+                        // Show a loading alert
                         Swal.fire({
-                            title: "Generating Report...",
-                            text: "Please wait while the report is being prepared.",
-                            icon: "info",
+                            title: 'Generating Report...',
+                            text: 'Please wait while the report is being prepared.',
+                            icon: 'info',
                             allowOutsideClick: false,
                             showConfirmButton: false,
                             didOpen: () => {
-                                Swal.showLoading(); // Show loading spinner
+                                Swal.showLoading();
                             },
                         });
 
-                        // Simulate report generation (example)
+                        // Trigger the form submission
+                        const form = document.createElement('form');
+                        form.method = 'GET';
+                        form.action = 'admin-daily-report.php';
+
+                        // Append the month, grade, and section as hidden inputs
+                        const monthInput = document.createElement('input');
+                        monthInput.type = 'hidden';
+                        monthInput.name = 'monthFilter';
+                        monthInput.value = month;
+                        form.appendChild(monthInput);
+
+                        const gradeInput = document.createElement('input');
+                        gradeInput.type = 'hidden';
+                        gradeInput.name = 'gradeFilter';
+                        gradeInput.value = grade;
+                        form.appendChild(gradeInput);
+
+                        const sectionInput = document.createElement('input');
+                        sectionInput.type = 'hidden';
+                        sectionInput.name = 'sectionFilter';
+                        sectionInput.value = section;
+                        form.appendChild(sectionInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
+
+                        // Close the loading alert after a short delay (to give the download time to start)
                         setTimeout(() => {
-                            Swal.close(); // Close loading spinner
-                            document.querySelector('form[action="admin-daily-report.php"]').submit(); // Submit the form
-                        }, 3000); // Simulate a 3-second delay
+                            Swal.close();
+                        }, 3000);
                     }
                 });
             }
@@ -329,47 +353,65 @@ $activePage = 'attendance-report';
 
         // Generate Monthly Report button click event
         document.getElementById('generateMonthlyReport').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
 
             const gradeMonthly = document.getElementById('gradeFilterMonthly').value;
             const sectionMonthly = document.getElementById('sectionFilterMonthly').value;
 
-            // Check if selections are incomplete
             if (!gradeMonthly || !sectionMonthly) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Incomplete Selection',
-                    text: 'You need to select a grade and section before generating the monthly report.',
+                    text: 'Please select both grade and section to generate the report.',
                     confirmButtonText: 'OK'
                 });
             } else {
-                // Confirmation prompt before generating report
                 Swal.fire({
-                    title: 'Are you sure you want to generate the monthly report?',
-                    text: 'Please confirm that you want to generate the report for the selected criteria.',
+                    title: 'Generate Monthly Report?',
+                    text: 'Confirm to generate the report for the selected grade and section.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, Generate',
+                    confirmButtonText: 'Generate',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Show 'Please wait...' message
+                        // Show a loading alert
                         Swal.fire({
-                            title: "Generating Report...",
-                            text: "Please wait while the report is being prepared.",
-                            icon: "info",
+                            title: 'Generating Report...',
+                            text: 'Please wait while the report is being prepared.',
+                            icon: 'info',
                             allowOutsideClick: false,
                             showConfirmButton: false,
                             didOpen: () => {
-                                Swal.showLoading(); // Show loading spinner
+                                Swal.showLoading();
                             },
                         });
 
-                        // Simulate report generation (example)
+                        // Trigger the form submission
+                        const form = document.createElement('form');
+                        form.method = 'GET';
+                        form.action = 'admin-monthly-report.php';
+
+                        // Append the grade and section as hidden inputs
+                        const gradeInput = document.createElement('input');
+                        gradeInput.type = 'hidden';
+                        gradeInput.name = 'gradeFilterMonthly';
+                        gradeInput.value = gradeMonthly;
+                        form.appendChild(gradeInput);
+
+                        const sectionInput = document.createElement('input');
+                        sectionInput.type = 'hidden';
+                        sectionInput.name = 'sectionFilterMonthly';
+                        sectionInput.value = sectionMonthly;
+                        form.appendChild(sectionInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
+
+                        // Close the loading alert after a short delay (to give the download time to start)
                         setTimeout(() => {
-                            Swal.close(); // Close loading spinner
-                            document.querySelector('form[action="admin-monthly-report.php"]').submit(); // Submit the form
-                        }, 3000); // Simulate a 3-second delay
+                            Swal.close();
+                        }, 5000);
                     }
                 });
             }

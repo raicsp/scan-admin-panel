@@ -71,6 +71,7 @@ $query = "SELECT status, COUNT(*) as count
           WHERE studentID = ? 
           AND YEAR(date) = ? 
           AND MONTH(date) = ? 
+          AND status IN ('Present', 'Late', 'Absent') 
           GROUP BY status";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("sii", $studentID, $currentYear, $currentMonth);
@@ -81,6 +82,7 @@ $attendanceByCategoryData = [];
 while ($row = $result->fetch_assoc()) {
     $attendanceByCategoryData[] = $row;
 }
+
 
 
 // Fetching all attendance records for the student
@@ -295,7 +297,9 @@ $conn->close();
         <div class="col-lg-6  equal-height">
           <div class="card" style="height: 435px;">
             <div class="card-body">
-              <h5 class="card-title">Attendance Distribution</h5>
+            <h5 class="card-title">Attendance Distribution <span> | <?php echo date("F"); ?></span></h5>
+
+
               <!-- Attendance by Category Chart -->
               <div id="attendanceByCategoryChart"></div>
               <script>

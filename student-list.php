@@ -95,7 +95,7 @@ if ($userPosition === 'Elementary Chairperson') {
           <div class="card">
             <div class="card-body">
 
-            <h5 class="card-title">Manage Student Details and Records</h5>
+              <h5 class="card-title">Manage Student Details and Records</h5>
 
 
 
@@ -229,90 +229,90 @@ if ($userPosition === 'Elementary Chairperson') {
   <!-- ======= Edit Student Modal ======= -->
 
   <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editStudentForm" class="row g-3" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-          <input type="hidden" id="editStudentId" name="id">
-          <input type="hidden" name="edit_student" value="1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editStudentForm" class="row g-3" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+            <input type="hidden" id="editStudentId" name="id">
+            <input type="hidden" name="edit_student" value="1">
 
-          <div class="col-md-6">
-            <label for="editSRCode" class="form-label">SR-Code</label>
-            <input type="text" class="form-control" id="editSRCode" name="srcode" required maxlength="20" readonly>
-          </div>
+            <div class="col-md-6">
+              <label for="editSRCode" class="form-label">SR-Code</label>
+              <input type="text" class="form-control" id="editSRCode" name="srcode" required maxlength="20" readonly>
+            </div>
 
-          <div class="col-md-6">
-            <label for="editFullName" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s,\.]+" title="Only letters are allowed, up to 50 characters">
-          </div>
+            <div class="col-md-6">
+              <label for="editFullName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="editFullName" name="full_name" required maxlength="50" pattern="[a-zA-Z\s,\.]+" title="Only letters are allowed, up to 50 characters">
+            </div>
 
-          <div class="col-md-6">
-            <label for="editSchoolYear" class="form-label">School Year</label>
-            <input type="text" class="form-control" id="editSchoolYear" name="school_year" required>
-          </div>
+            <div class="col-md-6">
+              <label for="editSchoolYear" class="form-label">School Year</label>
+              <input type="text" class="form-control" id="editSchoolYear" name="school_year" required>
+            </div>
 
-          <div class="col-md-6">
-            <label for="editGender" class="form-label">Gender</label>
-            <select class="form-control" id="editGender" name="gender" required>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
+            <div class="col-md-6">
+              <label for="editGender" class="form-label">Gender</label>
+              <select class="form-control" id="editGender" name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
 
-          <div class="col-md-6">
-            <label for="editGradeLevel" class="form-label">Grade Level</label>
-            <select class="form-control" id="editGradeLevel" name="grade_level" required>
-              <?php
-              // Fetch available grade levels from the 'classes' table
-              $gradeResult = $conn->query("SELECT DISTINCT grade_level FROM classes");
-              if ($gradeResult->num_rows > 0) {
-                while ($gradeRow = $gradeResult->fetch_assoc()) {
-                  echo "<option value='{$gradeRow['grade_level']}'>{$gradeRow['grade_level']}</option>";
+            <div class="col-md-6">
+              <label for="editGradeLevel" class="form-label">Grade Level</label>
+              <select class="form-control" id="editGradeLevel" name="grade_level" required>
+                <?php
+                // Fetch available grade levels from the 'classes' table
+                $gradeResult = $conn->query("SELECT DISTINCT grade_level FROM classes");
+                if ($gradeResult->num_rows > 0) {
+                  while ($gradeRow = $gradeResult->fetch_assoc()) {
+                    echo "<option value='{$gradeRow['grade_level']}'>{$gradeRow['grade_level']}</option>";
+                  }
                 }
-              }
-              ?>
-            </select>
-          </div>
+                ?>
+              </select>
+            </div>
 
-          <div class="col-md-6">
-            <label for="editSection" class="form-label">Section</label>
-            <select class="form-control" id="editSection" name="section" required>
-              <option value="">Select Section</option> <!-- Default Option -->
-            </select>
-          </div>
+            <div class="col-md-6">
+              <label for="editSection" class="form-label">Section</label>
+              <select class="form-control" id="editSection" name="section" required>
+                <option value="">Select Section</option> <!-- Default Option -->
+              </select>
+            </div>
 
-          <div class="col-md-6">
-            <label for="editParentContact" class="form-label">Parent Contact Number</label>
-            <input type="text" class="form-control" placeholder="9876543210" id="editParentContact" name="parent_contact" required pattern="\d{10}" maxlength="10" title="Enter exactly 10 digits">
-          </div>
+            <div class="col-md-6">
+              <label for="editParentContact" class="form-label">Parent Contact Number</label>
+              <input type="text" class="form-control" placeholder="9876543210" id="editParentContact" name="parent_contact" required pattern="\d{10}" maxlength="10" title="Enter exactly 10 digits">
+            </div>
 
-          <div class="col-md-6">
-            <label for="editParentEmail" class="form-label">Parent Email Address</label>
-            <input type="email" class="form-control" id="editParentEmail" name="parent_email" required maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address, up to 50 characters">
-          </div>
+            <div class="col-md-6">
+              <label for="editParentEmail" class="form-label">Parent Email Address</label>
+              <input type="email" class="form-control" id="editParentEmail" name="parent_email" required maxlength="50" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address, up to 50 characters">
+            </div>
 
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save changes</button>
-          </div>
-        </form><!-- End Edit Student Form -->
-        
-        <!-- Hidden Delete Form -->
-        <form id="deleteStudentForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-          <input type="hidden" name="delete_student" value="1">
-          <input type="hidden" id="deleteStudent" name="id">
-        </form>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </form><!-- End Edit Student Form -->
+
+          <!-- Hidden Delete Form -->
+          <form id="deleteStudentForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="delete_student" value="1">
+            <input type="hidden" id="deleteStudent" name="id">
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-</div><!-- End Edit Student Modal-->
+  </div><!-- End Edit Student Modal-->
 
 
   <script>
-       document.getElementById('editGradeLevel').addEventListener('change', function() {
+    document.getElementById('editGradeLevel').addEventListener('change', function() {
       const selectedGrade = this.value;
       const sectionDropdown = document.getElementById('editSection');
 
@@ -329,7 +329,7 @@ if ($userPosition === 'Elementary Chairperson') {
         });
       }
     });
-   
+
     // This function populates the fields when the modal opens
     function editStudent(id, srcode, name, schoolYear, gender, gradeLevel, section, parentContact, parentEmail) {
       document.getElementById('editStudentId').value = id;
@@ -372,25 +372,24 @@ if ($userPosition === 'Elementary Chairperson') {
 
   <!-- Custom JS to Populate Edit Modal with Data -->
   <script>
-
     //clicable row
     document.addEventListener('DOMContentLoaded', (event) => {
-    const table = document.getElementById('studentsTable');
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+      const table = document.getElementById('studentsTable');
+      const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-    for (let row of rows) {
+      for (let row of rows) {
         row.classList.add('clickable-row');
         row.addEventListener('click', function(event) {
-            // Check if the click is not on an action button
-            if (!event.target.closest('.action-buttons')) {
-                // Get the srcode (not the formatted name) from the data-name attribute
-                const studentSrCode = row.getAttribute('data-name');
-                // Redirect to the student details page, passing srcode as the query parameter
-                window.location.href = `student-details.php?srcode=${encodeURIComponent(studentSrCode)}`;
-            }
+          // Check if the click is not on an action button
+          if (!event.target.closest('.action-buttons')) {
+            // Get the srcode (not the formatted name) from the data-name attribute
+            const studentSrCode = row.getAttribute('data-name');
+            // Redirect to the student details page, passing srcode as the query parameter
+            window.location.href = `student-details.php?srcode=${encodeURIComponent(studentSrCode)}`;
+          }
         });
-    }
-});
+      }
+    });
 
 
 
@@ -441,81 +440,76 @@ if ($userPosition === 'Elementary Chairperson') {
     //     row.style.display = name.includes(filter) ? '' : 'none';
     //   });
     // });
-
-  
   </script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
   <script>
-// Ensure that these variables are properly defined
-const gradeFilter = document.getElementById('filterGrade');
-const sectionFilter = document.getElementById('filterSection');
-const searchInput = document.getElementById('searchInput');
+    $(document).ready(function() {
+      // Initialize DataTable
+      const studentsTable = $('#studentsTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        pageLength: 10,
+        order: [
+          [2, 'asc'],
+          [3, 'asc']
+        ], // Default sort by Grade Level and Section
+        columnDefs: [{
+            targets: [4],
+            orderable: false
+          } // Disable ordering on the Actions column
+        ],
+        language: {
+          search: "Search by Name:",
+          lengthMenu: "Show _MENU_ entries per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+          infoEmpty: "No matching entries found",
+          paginate: {
+            previous: "Previous",
+            next: "Next"
+          }
+        }
+      });
 
-// Initialize DataTable
-const dataTable = new simpleDatatables.DataTable("#studentsTable", {
-    searchable: true, // Enable default search input
-    paging: true,
-    fixedHeight: true,
-    perPage: 10,
-    labels: {
-        placeholder: "Search...",
-        perPage: "entries per page",
-        noRows: "No results found",
-        info: "Showing {start} to {end} of {rows} results"
-    }
-});
+      // Fetch sections for each grade dynamically
+      const gradeSections = <?php echo json_encode($gradeSections); ?>;
 
-// When the grade dropdown changes, update the section options
-gradeFilter.addEventListener('change', () => {
-    const selectedGrade = gradeFilter.value;
-    sectionFilter.innerHTML = '<option value="">Filter by Section</option>'; // Clear previous sections
+      // Populate sections based on grade selection
+      $('#filterGrade').on('change', function() {
+        const selectedGrade = $(this).val();
+        const sectionFilter = $('#filterSection');
 
-    if (selectedGrade && gradeSections[selectedGrade]) {
-        gradeSections[selectedGrade].forEach(section => {
-            const option = document.createElement('option');
-            option.value = section;
-            option.textContent = section;
-            sectionFilter.appendChild(option);
-        });
-    }
+        // Clear section dropdown
+        sectionFilter.empty().append('<option value="">Filter by Section</option>');
 
-    filterTable(); // Apply filter after changing grade
-});
+        if (selectedGrade && gradeSections[selectedGrade]) {
+          gradeSections[selectedGrade].forEach(section => {
+            sectionFilter.append(new Option(section, section));
+          });
+        }
 
-// Filter table based on search and selection
-function filterTable() {
-    const gradeFilterValue = gradeFilter.value.toUpperCase();
-    const sectionFilterValue = sectionFilter.value.toUpperCase();
- //   const searchQuery = searchInput.value.toUpperCase();
+        // Trigger filtering
+        filterTable();
+      });
 
-    // Build filter query based on selected values
-    let filterQuery = '';
+      // Apply grade and section filters
+      function filterTable() {
+        const grade = $('#filterGrade').val().toUpperCase();
+        const section = $('#filterSection').val().toUpperCase();
 
-    // Append grade filter
-    if (gradeFilterValue) {
-        filterQuery += gradeFilterValue;
-    }
+        // Build filter logic for DataTables
+        studentsTable.columns(2).search(grade ? `^${grade}$` : '', true, false); // Exact match for Grade Level
+        studentsTable.columns(3).search(section ? `^${section}$` : '', true, false); // Exact match for Section
 
-    // Append section filter
-    if (sectionFilterValue) {
-        filterQuery += ' ' + sectionFilterValue; // Add space to separate terms
-    }
+        studentsTable.draw();
+      }
 
-    // // Append search query for name
-    // if (searchQuery) {
-    //     filterQuery += ' ' + searchQuery; // Add space to separate terms
-    // }
-
-    // Apply the search/filter on the datatable
-    dataTable.search(filterQuery.trim()); // Use search method to filter the table
-}
-
-// Event listeners for filtering
-gradeFilter.addEventListener('change', filterTable);
-//sectionFilter.addEventListener('change', filterTable);
-searchInput.addEventListener('input', filterTable);
-
-// Clickable row functionality
- 
+      // Attach event listeners for filters
+      $('#filterGrade, #filterSection').on('change', filterTable);
+    });
   </script>
 
 </body>

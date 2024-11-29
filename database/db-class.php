@@ -1,27 +1,33 @@
 <?php
 include 'db_connect.php'; // Adjust the path as needed
-
+session_start();
 $alertMessage = '';
 $alertType = '';
 
-if (isset($_GET['status'])) {
-    if ($_GET['status'] == 'success') {
-        $alertMessage = 'The teacher has been assigned successfully.';
-        $alertType = 'success';
-    } elseif ($_GET['status'] == 'error') {
-        $alertMessage = 'An error occurred. Please try again.';
-        $alertType = 'danger';
-    }
+
+// Check the logged-in user's position
+$userPosition = trim($_SESSION['position'] ?? '');
+
+
+// Define grade conditions based on user position
+$gradeCondition = '';
+if ($userPosition === 'Elementary Chairperson') {
+    // Access only Kinder to Grade-6
+    $gradeCondition = "WHERE grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
+} elseif ($userPosition === 'High School Chairperson') {
+    // Access only Grade-7 to Grade-12
+    $gradeCondition = "WHERE grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
 }
 
-// Fetch data for classes
+// Fetch data for classes with grade conditions
 $classes = [];
 $grades = [];
-$sectionsByGrade = []; // Array to store sections by grade
+$sectionsByGrade = [];
 
-// Fetch classes
-$result = $conn->query("SELECT class_id, grade_level, section, assigned_teacher_id FROM classes");
-if ($result->num_rows > 0) {
+$sql = "SELECT class_id, grade_level, section, assigned_teacher_id FROM classes $gradeCondition";
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $classes[] = $row;
 
@@ -38,7 +44,10 @@ if ($result->num_rows > 0) {
             $sectionsByGrade[$row['grade_level']][] = $row['section'];
         }
     }
+} else {
+    echo 'No classes found for your assigned grade levels.';
 }
+
 
 // Fetch Teachers with IDs
 $teachers = [];
@@ -48,6 +57,12 @@ if ($result->num_rows > 0) {
         $teachers[] = $row;
     }
 }
+
+// Sort the array by fullname in ascending order
+usort($teachers, function ($a, $b) {
+    return strcmp($a['fullname'], $b['fullname']);
+});
+
 
 // Handle Teacher Assignment Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

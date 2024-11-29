@@ -5,8 +5,14 @@ session_start();
 $class_id = $_SESSION['class_id'] ?? 0;
 
 if ($class_id === 0) {
-    die("Class ID is required to display data.");
+    // Display error message with image
+    echo '<div style="text-align: center;">';
+    echo '<img src="./adminimages/error-image.png" alt="Error" style="width: 200px; height: auto;"/>';
+    echo '<p><strong>Error:</strong> Class ID is required to display data.</p>';
+    echo '</div>';
+    exit; // Terminate the script after displaying the error
 }
+
 
 
 $today = date("Y-m-d");
@@ -28,7 +34,8 @@ switch ($filter) {
         break;
 }
 
-function getCount($conn, $class_id, $date_condition, $status) {
+function getCount($conn, $class_id, $date_condition, $status)
+{
     $sql = "SELECT COUNT(*) as count 
             FROM attendance a
             JOIN student s ON a.studentID = s.studentID
@@ -61,6 +68,7 @@ FROM attendance a
 JOIN student s ON a.studentID = s.studentID
 JOIN classes c ON s.class_id = c.class_id
 WHERE a.status = 'Absent' AND c.class_id = '$class_id'
+ AND MONTH(a.date) = MONTH(CURDATE()) 
 GROUP BY s.studentID
 ORDER BY absence_count DESC, SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
 LIMIT 5";
@@ -79,6 +87,7 @@ FROM attendance a
 JOIN student s ON a.studentID = s.studentID
 JOIN classes c ON s.class_id = c.class_id
 WHERE a.status = 'Late' AND c.class_id = '$class_id'
+ AND MONTH(a.date) = MONTH(CURDATE()) 
 GROUP BY s.studentID
 ORDER BY late_count DESC, SUBSTRING_INDEX(s.name, ' ', -1) ASC, SUBSTRING_INDEX(s.name, ' ', 1) ASC
 LIMIT 5";
@@ -95,6 +104,7 @@ FROM student s
 JOIN classes c ON s.class_id = c.class_id
 JOIN attendance a ON s.studentID = a.studentID
 WHERE c.class_id = '$class_id'
+ AND MONTH(a.date) = MONTH(CURDATE()) 
 GROUP BY s.studentID, s.name, c.grade_level, c.section
 HAVING COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
 ORDER BY s.name ASC
@@ -117,31 +127,46 @@ while ($row = $gender_result->fetch_assoc()) {
     }
 }
 
-// Count each Attendance Status
-$status_query = "
-    SELECT a.status, COUNT(*) as count
-    FROM attendance a
-    INNER JOIN student s ON a.studentID = s.studentID
-    WHERE s.class_id = '$class_id' AND a.date = CURDATE()
-    GROUP BY a.status
-";
+// Count each Attendance Status Pie Chart
+if (isset($_GET['date'])) {
+    $date = $_GET['date']; // Get the selected date from the query string
+    // Format the date as needed
+    $formatted_date = date('Y-m-d', strtotime($date));
+    
+    // Modify the query to filter by the selected date
+    $status_query = "
+        SELECT a.status, COUNT(*) as count
+        FROM attendance a
+        INNER JOIN student s ON a.studentID = s.studentID
+        WHERE s.class_id = '$class_id' AND a.date = '$formatted_date'
+        GROUP BY a.status
+    ";
 
-$status_result = $conn->query($status_query);
+    $status_result = $conn->query($status_query);
+    
+    $present_count = 0;
+    $absent_count = 0;
+    $late_count = 0;
 
-// Initialize counters
-$present_count = 0;
-$absent_count = 0;
-$late_count = 0;
-
-while ($row = $status_result->fetch_assoc()) {
-    if ($row['status'] == 'Present') {
-        $present_count = $row['count'];
-    } elseif ($row['status'] == 'Absent') {
-        $absent_count = $row['count'];
-    } elseif ($row['status'] == 'Late') {
-        $late_count = $row['count'];
+    while ($row = $status_result->fetch_assoc()) {
+        if ($row['status'] == 'Present') {
+            $present_count = $row['count'];
+        } elseif ($row['status'] == 'Absent') {
+            $absent_count = $row['count'];
+        } elseif ($row['status'] == 'Late') {
+            $late_count = $row['count'];
+        }
     }
+
+    // Return the data as JSON for use in the front-end
+    echo json_encode([
+        'presentCount' => $present_count,
+        'absentCount' => $absent_count,
+        'lateCount' => $late_count
+    ]);
+    exit;
 }
+
 
 
 // Monthly Attendance Query
@@ -183,4 +208,3 @@ while ($row = $dailyDataResult->fetch_assoc()) {  // Correct variable name here
 }
 
 $conn->close();
-?>

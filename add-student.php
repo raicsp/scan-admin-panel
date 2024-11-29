@@ -141,15 +141,16 @@ include 'database/db-add-student.php';
                             <div class="row">
                                 <label class="form-label"><strong>Choose Encoding Type: </strong></label>
                                 <div class="col-md-6" style="text-align: center;">
-                                    <input class="form-check-input" type="radio" name="encodingType"
-                                        id="individualEncoding" value="individual" checked>
-                                    <label class="form-check-label" for="individualEncoding">Individual Encoding</label>
-                                </div>
-                                <div class="col-md-6" style="text-align: center;">
                                     <input class="form-check-input" type="radio" name="encodingType" id="csvImport"
-                                        value="csv">
+                                        value="csv" checked>
                                     <label class="form-check-label" for="csvImport">CSV Import</label>
                                 </div>
+                                <div class="col-md-6" style="text-align: center;">
+                                    <input class="form-check-input" type="radio" name="encodingType"
+                                        id="individualEncoding" value="individual" >
+                                    <label class="form-check-label" for="individualEncoding">Individual Encoding</label>
+                                </div>
+                                
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -207,7 +208,7 @@ include 'database/db-add-student.php';
                                 <div class="col-md-6">
                                     <label for="inputContact" class="form-label"><b>Parent's Contact</b></label>
                                     <input type="text" name="parent_contact" class="form-control" id="inputContact"
-                                        placeholder="09123456789" required pattern="\d{11}" required maxlength="11"
+                                        placeholder="9123456789" required pattern="\d{10}" required maxlength="11"
                                         title="Enter exactly 11 digits">
                                 </div>
                                 <div class="col-md-6">
@@ -236,7 +237,7 @@ include 'database/db-add-student.php';
                                 <div class="col-md-12 mt-3">
                                     <h5><b>Download CSV Template</b></h5>
                                     <p>To ensure proper formatting, use the template below to add students:</p>
-                                    <a href="student_template.csv" class="btn btn-secondary mb-3" download>Download Template (CSV)</a>
+                                    <a href="Laboratory-School-Class-List.csv" class="btn btn-secondary mb-3" download>Download Template (CSV)</a>
                                 </div>
 
                                 <!-- Horizontal line separator -->
@@ -286,79 +287,132 @@ include 'database/db-add-student.php';
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const individualEncodingRadio = document.getElementById('individualEncoding');
-            const csvImportRadio = document.getElementById('csvImport');
-            const individualForm = document.getElementById('individualForm');
-            const csvForm = document.getElementById('csvForm');
+    document.addEventListener('DOMContentLoaded', () => {
+        const individualEncodingRadio = document.getElementById('individualEncoding');
+        const csvImportRadio = document.getElementById('csvImport');
+        const individualForm = document.getElementById('individualForm');
+        const csvForm = document.getElementById('csvForm');
+        // Show the correct form based on radio selection
+    csvImportRadio.addEventListener('change', () => {
+        csvForm.classList.remove('d-none');
+        individualForm.classList.add('d-none');
+    });
+        individualEncodingRadio.addEventListener('change', () => {
+            individualForm.classList.remove('d-none');
+            csvForm.classList.add('d-none');
+        });
 
-            individualEncodingRadio.addEventListener('change', () => {
-                individualForm.classList.remove('d-none');
-                csvForm.classList.add('d-none');
+         // Initially show the CSV import form since it is selected by default
+    if (csvImportRadio.checked) {
+        csvForm.classList.remove('d-none');
+        individualForm.classList.add('d-none');
+    }
+
+        // Display alert message if set
+        const alertMessage = <?= json_encode($alertMessage) ?>;
+        const alertType = <?= json_encode($alertType) ?>;
+        if (alertMessage) {
+            Swal.fire({
+                icon: alertType,
+                title: alertType.charAt(0).toUpperCase() + alertType.slice(1), // Capitalize first letter
+                text: alertMessage,
+                confirmButtonText: 'OK',
+            }).then((result) => {
+                // This ensures no reload happens after SweetAlert
+                if (result.isConfirmed) {
+                    // Handle any post-SweetAlert actions here if necessary
+                }
             });
+        }
 
-            csvImportRadio.addEventListener('change', () => {
-                individualForm.classList.add('d-none');
-                csvForm.classList.remove('d-none');
-            });
+        // Handle CSV import dynamic population of grade and section selects
+        const gradeSelectCSV = document.getElementById('inputGradeLevelCSV');
+        const sectionSelectCSV = document.getElementById('inputSectionCSV');
 
-            // Display alert message if set
-            const alertMessage = <?= json_encode($alertMessage) ?>;
-            const alertType = <?= json_encode($alertType) ?>;
-            if (alertMessage) {
-                Swal.fire({
-                    icon: alertType,
-                    title: alertType.charAt(0).toUpperCase() + alertType.slice(1), // Capitalize first letter
-                    text: alertMessage,
-                    confirmButtonText: 'OK'
+        const grades = <?php echo json_encode($grades); ?>;
+        const sections = <?php echo json_encode($sections); ?>;
+
+        // Populate grade levels for CSV import
+        grades.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            gradeSelectCSV.appendChild(option);
+        });
+
+        // Populate sections based on selected grade for CSV import
+        gradeSelectCSV.addEventListener('change', function() {
+            const selectedGrade = this.value;
+            sectionSelectCSV.innerHTML = '<option value="">Select Section</option>';
+
+            if (selectedGrade && sections[selectedGrade]) {
+                sections[selectedGrade].forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionSelectCSV.appendChild(option);
                 });
             }
         });
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const gradeSelectCSV = document.getElementById('inputGradeLevelCSV');
-            const sectionSelectCSV = document.getElementById('inputSectionCSV');
+    // Handle the Import button click to prevent reload and show SweetAlert
+    document.getElementById('importButton').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent the default form action (reload)
 
-            const grades = <?php echo json_encode($grades); ?>;
-            const sections = <?php echo json_encode($sections); ?>;
-
-            // Populate grade levels for CSV import
-            grades.forEach(grade => {
-                const option = document.createElement('option');
-                option.value = grade;
-                option.textContent = grade;
-                gradeSelectCSV.appendChild(option);
-            });
-
-            // Populate sections based on selected grade for CSV import
-            gradeSelectCSV.addEventListener('change', function() {
-                const selectedGrade = this.value;
-                sectionSelectCSV.innerHTML = '<option value="">Select Section</option>';
-
-                if (selectedGrade && sections[selectedGrade]) {
-                    sections[selectedGrade].forEach(section => {
-                        const option = document.createElement('option');
-                        option.value = section;
-                        option.textContent = section;
-                        sectionSelectCSV.appendChild(option);
-                    });
+        // Show SweetAlert after preventing the default action
+        const alertMessage = <?= json_encode($alertMessage) ?>;
+        const alertType = <?= json_encode($alertType) ?>;
+        if (alertMessage) {
+            Swal.fire({
+                icon: alertType,
+                title: alertType.charAt(0).toUpperCase() + alertType.slice(1), // Capitalize first letter
+                text: alertMessage,
+                confirmButtonText: 'OK',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Optionally handle post-alert actions here (like submitting the form or any other logic)
                 }
             });
-        });
-
-        function validateNameFormat() {
-            const input = document.getElementById('inputName');
-            const name = input.value.trim();
-
-            const regex = /^[A-Za-z]+,\s[A-Za-z]+(\s[A-Za-z]+)?\s[A-Za-z]\.$/;
-
-            if (!regex.test(name)) {
-                input.setCustomValidity("Please enter the name in the format: Lastname, Firstname MiddleInitial.");
-            } else {
-                input.setCustomValidity(""); // Clear the custom validity message
-            }
         }
-    </script>
+    });
+
+    // Prevent page reload after form submission if needed
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent form submission (and reload)
+        
+        // Handle SweetAlert after form submission is prevented
+        const alertMessage = <?= json_encode($alertMessage) ?>;
+        const alertType = <?= json_encode($alertType) ?>;
+        if (alertMessage) {
+            Swal.fire({
+                icon: alertType,
+                title: alertType.charAt(0).toUpperCase() + alertType.slice(1), // Capitalize first letter
+                text: alertMessage,
+                confirmButtonText: 'OK',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Optionally handle post-alert actions here
+                }
+            });
+        }
+    });
+
+    // Validate name format function for individual encoding
+    function validateNameFormat() {
+        const input = document.getElementById('inputName');
+        const name = input.value.trim();
+
+        const regex = /^[A-Za-z]+,\s[A-Za-z]+(\s[A-Za-z]+)?\s[A-Za-z]\.$/;
+
+        if (!regex.test(name)) {
+            input.setCustomValidity("Please enter the name in the format: Lastname, Firstname MiddleInitial.");
+        } else {
+            input.setCustomValidity(""); // Clear the custom validity message
+        }
+    }
+</script>
+
 
 
 

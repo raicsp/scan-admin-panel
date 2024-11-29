@@ -1,19 +1,9 @@
 <?php
-if (isset($_SESSION['profile_update_success'])) {
-    echo "<script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Profile Updated!',
-            text: 'Your profile has been updated successfully.',
-            confirmButtonText: 'OK'
-        });
-    </script>";
-    unset($_SESSION['profile_update_success']); // Remove the session flag after showing the message
-}
 
-include 'database/db_connect.php'; // Connect to the database
 include 'database/db-header.php';
 include 'database/db-profile-settings.php';
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,8 +11,17 @@ include 'database/db-profile-settings.php';
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Profile Settings</title>
-    <link href="assets/img/bsu.png" rel="icon">
+
+    <title>Administrator | Laboratory School | Batangas State University TNEU</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="bsu.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+
+
     <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
@@ -96,16 +95,16 @@ include 'database/db-profile-settings.php';
     <div class="container-fluid">
         <div class="container profile-wrapper">
             <div class="profile-card">
-            <div class="back-btn">
-    <?php
-    // Redirect based on user position
-    if (isset($_SESSION['position']) && $_SESSION['position'] === 'Teacher') {
-        echo '<a href="teacher-dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
-    } else {
-        echo '<a href="dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
-    }
-    ?>
-</div>
+                <div class="back-btn">
+                    <?php
+                    // Redirect based on user position
+                    if (isset($_SESSION['position']) && $_SESSION['position'] === 'Teacher') {
+                        echo '<a href="teacher-dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
+                    } else {
+                        echo '<a href="dashboard.php" class="btn btn-secondary"><i class="bi bi-house-door"></i> Home</a>';
+                    }
+                    ?>
+                </div>
 
 
                 <!-- Left Side (Profile Picture Form) -->
@@ -196,75 +195,141 @@ include 'database/db-profile-settings.php';
 
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('profile-pic-input').addEventListener('change', function () {
-            const savePicBtn = document.getElementById('save-pic-btn');
-            const profilePic = document.getElementById('profile-pic');
+        // Profile Picture Upload
+// Profile Picture Upload
+document.getElementById('profile-pic-input').addEventListener('change', function() {
+    const savePicBtn = document.getElementById('save-pic-btn');
+    const profilePic = document.getElementById('profile-pic');
 
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    profilePic.src = e.target.result;
-                }
-                reader.readAsDataURL(this.files[0]);
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            profilePic.src = e.target.result;
+        }
+        reader.readAsDataURL(this.files[0]);
 
-                savePicBtn.style.display = 'inline-block';
-            }
-        });
+        savePicBtn.style.display = 'inline-block';
+    }
+});
 
-        document.getElementById('save-pic-btn').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default form submission
+document.getElementById('save-pic-btn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission
 
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to save this profile picture?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, save it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('profile-settings-form').submit();
+
+            // Show success alert after submission
             Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to save this profile picture?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, save it!',
-                cancelButtonText: 'No, cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('profile-settings-form').submit();
-                }
+                icon: 'success',
+                title: 'Profile Picture Updated!',
+                text: 'Your profile picture has been successfully updated.',
+                confirmButtonText: 'OK'
             });
+        }
+    });
+});
+
+// Profile Info Update
+document.getElementById('confirm-update-profile').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!firstName || !lastName || !email) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Incomplete Information',
+            text: 'All fields are required. Please fill them out before updating.',
+            confirmButtonText: 'OK'
         });
+        return;
+    }
 
-        document.getElementById('confirm-update-profile').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default form submission
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to update your profile information?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, update it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('profile-settings-form').submit();
 
+            // Show success alert after submission
             Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to update your profile information?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, update it!',
-                cancelButtonText: 'No, cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('profile-settings-form').submit();
-                }
+                icon: 'success',
+                title: 'Profile Information Updated!',
+                text: 'Your profile information has been successfully updated.',
+                confirmButtonText: 'OK',
+
             });
+        }
+    });
+});
+
+// Password Change Update
+document.getElementById('confirm-change-password').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const previousPassword = document.getElementById('previousPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const retypePassword = document.getElementById('retypePassword').value.trim();
+
+    if (!previousPassword || !newPassword || !retypePassword) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Incomplete Information',
+            text: 'All fields are required. Please fill them out before changing your password.',
+            confirmButtonText: 'OK'
         });
+        return;
+    }
 
-        document.getElementById('confirm-change-password').addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default form submission
+    if (newPassword !== retypePassword) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Passwords Do Not Match',
+            text: 'Please make sure the new password and confirmation match.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
 
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to change your password?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, change it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('password-change-form').submit();
+
+            // Show success alert after submission
             Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to change your password?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, change it!',
-                cancelButtonText: 'No, cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('password-change-form').submit();
-                }
+                icon: 'success',
+                title: 'Password Changed!',
+                text: 'Your password has been successfully changed.',
+                confirmButtonText: 'OK'
             });
-        });
-
-
+        }
+    });
+});
 
     </script>
+    
 </body>
 
 </html>

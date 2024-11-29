@@ -4,7 +4,6 @@ session_start();
 
 $userPosition = trim($_SESSION['position'] ?? '');
 
-
 // Define grade conditions based on user position
 $gradeCondition = '';
 if ($userPosition === 'Elementary Chairperson') {
@@ -59,6 +58,16 @@ $sql_present = "
 $result_present = $conn->query($sql_present);
 $present_today = $result_present->fetch_assoc()['count'];
 
+$sql_present_card = "
+    SELECT COUNT(*) as count 
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE date= '$today' AND status = 'Present' $gradeCondition";
+$result_present_card = $conn->query($sql_present_card);
+$present_today_card = $result_present_card->fetch_assoc()['count'];
+
+
 // Query to get the count of students late
 $sql_late = "
     SELECT COUNT(*) as count 
@@ -68,6 +77,15 @@ $sql_late = "
     WHERE $date_condition AND status = 'Late' $grade_condition $gradeCondition";
 $result_late = $conn->query($sql_late);
 $late_today = $result_late->fetch_assoc()['count'];
+
+$sql_late_card = "
+    SELECT COUNT(*) as count 
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE date= '$today' AND status = 'Late' $gradeCondition";
+$result_late_card = $conn->query($sql_late_card);
+$late_today_card = $result_late_card->fetch_assoc()['count'];
 
 // Query to get the count of students absent
 $sql_absent = "
@@ -79,25 +97,20 @@ $sql_absent = "
 $result_absent = $conn->query($sql_absent);
 $absent_today = $result_absent->fetch_assoc()['count'];
 
+$sql_absent_card = "
+    SELECT COUNT(*) as count 
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id 
+    WHERE date = '$today' AND status = 'Absent' $gradeCondition";
+$result_absent_card = $conn->query($sql_absent_card);
+$absent_today_card = $result_absent_card->fetch_assoc()['count'];
+
 // Check if no data is available
 $total_count = $present_today + $late_today + $absent_today;
 
 if ($total_count == 0) {
-    $present_today = $late_today = $absent_today = 0; // Set each count to 1 to show the circle
-}
-// Query to get gender
-$query = "SELECT gender, COUNT(*) as count FROM student GROUP BY gender";
-$result = $conn->query($query);
-
-$male_count = $female_count = 0;
-if ($result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-    if ($row['gender'] == 'Male') {
-      $male_count = $row['count'];
-    } elseif ($row['gender'] == 'Female') {
-      $female_count = $row['count'];
-    }
-  }
+    $present_today = $late_today = $absent_today = 0;
 }
 
 // Query to get the count of teachers
@@ -119,9 +132,40 @@ $row_student = $result_student->fetch_assoc();
 $student = $row_student['total_student']; // Use the alias 'total_teachers'
 
 
+// Query to get gender distribution based on grade filter pie chart
+$grade = isset($_GET['gendergrade']) ? $_GET['gendergrade'] : '';
+
+// Build the WHERE clause
+$where_clause = "1"; // Default to no filtering
+if (!empty($grade)) {
+    // Filter only by grade level, disregarding sections
+    $where_clause .= " AND c.grade_level = '$grade'";
+}
+
+// Query to fetch gender distribution for the selected grade
+$query = "
+  SELECT s.gender, COUNT(*) as count
+  FROM student s
+  INNER JOIN classes c ON s.class_id = c.class_id
+  WHERE $where_clause $gradeCondition
+  GROUP BY s.gender
+";
+$result = $conn->query($query);
+
+// Initialize gender counts
+$male_count = $female_count = 0;
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        if ($row['gender'] == 'Male') {
+            $male_count = $row['count'];
+        } elseif ($row['gender'] == 'Female') {
+            $female_count = $row['count'];
+        }
+    }
+}
 
 // Query to get monthly attendance data
-// stacked chart
+// stacked chart Attendance overview by Grade
 $today = date("Y-m-d");
 $currentYear = date("Y");
 $first_day_of_month = date("Y-m-01");
@@ -163,58 +207,6 @@ if (!$selectedSchoolYear) {
         }
     }
 }
-
-
-// Query to get monthly attendance data
-$sql_monthly_attendance = "
-   SELECT 
-    MONTHNAME(date) as month, 
-    SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
-    SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent,
-    SUM(CASE WHEN status = 'Late' THEN 1 ELSE 0 END) as late
-  FROM attendance a
-  JOIN student s ON a.studentID = s.studentID
-  JOIN classes c ON s.class_id = c.class_id  -- Join with classes to access grade level
-  WHERE YEAR(date) = '$currentYear' 
-    AND s.school_year = '$selectedSchoolYear' 
-    $gradeCondition  -- Include grade condition here
-  GROUP BY MONTH(date)
-  ORDER BY MONTH(date) ASC";
-
-$result_monthly_attendance = $conn->query($sql_monthly_attendance);
-
-$months = [];
-$presentData = [];
-$absentData = [];
-$lateData = [];
-
-while ($row = $result_monthly_attendance->fetch_assoc()) {
-    $months[] = $row['month'];
-    $presentData[] = $row['present'];
-    $absentData[] = $row['absent'];
-    $lateData[] = $row['late'];
-}
-
-$stacked_bar_data = [
-    'labels' => $months,
-    'datasets' => [
-        [
-            'label' => 'Present',
-            'data' => $presentData,
-            'backgroundColor' => '#FF1654'
-        ],
-        [
-            'label' => 'Absent',
-            'data' => $absentData,
-            'backgroundColor' => '#247BA0'
-        ],
-        [
-            'label' => 'Late',
-            'data' => $lateData,
-            'backgroundColor' => '#F9D342'
-        ]
-    ]
-];
 
 
 // Query to get attendance data for the line chart
@@ -291,6 +283,7 @@ $absences_sql = "  SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name,
     JOIN student s ON a.studentID = s.studentID
     JOIN classes c ON s.class_id = c.class_id
     WHERE a.status = 'Absent' 
+    AND MONTH(a.date) = MONTH(CURDATE()) 
     $gradeCondition  -- Include the grade condition here
     GROUP BY s.studentID
     ORDER BY absence_count DESC
@@ -306,6 +299,7 @@ $late_sql = "SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name,
              JOIN student s ON a.studentID = s.studentID
              JOIN classes c ON s.class_id = c.class_id
              WHERE a.status = 'Late'
+             AND MONTH(a.date) = MONTH(CURDATE()) 
              $gradeCondition
              GROUP BY s.studentID
              ORDER BY late_count DESC
@@ -330,6 +324,7 @@ JOIN
 WHERE 
     1=1
     $gradeCondition
+     AND MONTH(a.date) = MONTH(CURDATE()) 
 GROUP BY 
     s.studentID, s.name, c.grade_level, c.section
 HAVING 
@@ -340,7 +335,6 @@ LIMIT 5;
 $perfect_attendance_result = $conn->query($perfect_attendance_sql);
 
 //bar chart
-
 // Initialize selected school year
 $schoolYear = isset($_POST['schoolYear']) ? $_POST['schoolYear'] : '';
 
@@ -419,5 +413,35 @@ $school_year_result = $conn->query($school_year_query);
 while ($row = $school_year_result->fetch_assoc()) {
     $school_years[] = $row['school_year']; // Change to the correct column name
 }
+
+//function for grade level dropdown
+function renderGradeDropdown($conn, $userPosition, $selectedGrade = '')
+{
+    // Determine grade condition based on user position
+    $gradeCondition = '';
+    if ($userPosition === 'Elementary Chairperson') {
+        $gradeCondition = "WHERE grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
+    } elseif ($userPosition === 'High School Chairperson') {
+        $gradeCondition = "WHERE grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
+    }
+
+    // Fetch grades based on the condition
+    $query = "SELECT DISTINCT grade_level FROM classes $gradeCondition";
+    $result = $conn->query($query);
+
+    // Start building the dropdown
+    $output = '';
+    $output .= '<option value="">All Grades</option>'; // Default option
+
+    while ($row = $result->fetch_assoc()) {
+        $grade = htmlspecialchars($row['grade_level']);
+        $selected = ($grade === $selectedGrade) ? 'selected' : '';
+        $output .= "<option value='$grade' $selected>$grade</option>";
+    }
+
+    $output .= '</select>';
+    return $output;
+}
+
 // Close connection
 $conn->close();

@@ -35,6 +35,14 @@ include 'database/db-add-teacher.php';
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
   <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
@@ -77,19 +85,19 @@ include 'database/db-add-teacher.php';
                 </button>
               </div>
 
-    
+
 
               <!-- Table with Data -->
               <table id="accountsTable" class="table table-striped display">
                 <thead>
                   <tr>
-     
+
                     <th>Name</th>
                     <th>Email</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody >
+                <tbody>
                   <?php
                   $result = $conn->query("SELECT * FROM users");
                   if ($result->num_rows > 0) {
@@ -120,7 +128,7 @@ include 'database/db-add-teacher.php';
   </main><!-- End #main -->
 
  <!-- ======= Add Teacher Modal ======= -->
-<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+ <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -162,7 +170,7 @@ include 'database/db-add-teacher.php';
     </div>
   </div>
 </div><!-- End Add Teacher Modal -->
- 
+
 <!-- ======= Edit Teacher Modal ======= -->
 <div class="modal fade" id="editTeacherModal" tabindex="-1" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -179,7 +187,7 @@ include 'database/db-add-teacher.php';
           <div class="col-md-6">
             <label for="editFirstName" class="form-label">First Name</label>
             <input type="text" class="form-control" id="editFirstName" name="first_name" required 
-              maxlength="50" pattern="[a-zA-Z\s]+" title="Only letters and spaces are allowed, up to 50 characters">
+              maxlength="50" pattern="[a-zA-Z\s\.]+" title="Only letters and spaces are allowed, up to 50 characters">
           </div>
           <div class="col-md-6">
             <label for="editLastName" class="form-label">Last Name</label>
@@ -221,20 +229,19 @@ include 'database/db-add-teacher.php';
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+  <script>
     // Show success or error messages using SweetAlert if present in the session
     <?php if (isset($_SESSION['message'])): ?>
-        Swal.fire({
-            title: 'Notification',
-            text: "<?php echo $_SESSION['message']; ?>",
-            icon: '<?php echo $_SESSION['message_type']; ?>',
-            confirmButtonText: 'OK'
-        });
-        <?php
-        // Clear the session message after displaying it
-        unset($_SESSION['message']);
-        unset($_SESSION['message_type']);
-        ?>
+      Swal.fire({
+        text: "<?php echo $_SESSION['message']; ?>",
+        icon: '<?php echo $_SESSION['message_type']; ?>',
+        confirmButtonText: 'OK'
+      });
+      <?php
+      // Clear the session message after displaying it
+      unset($_SESSION['message']);
+      unset($_SESSION['message_type']);
+      ?>
     <?php endif; ?>
 
     // Initialize a flag to track form submissions
@@ -325,22 +332,25 @@ include 'database/db-add-teacher.php';
     }
   </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-        searchable: true,
-        paging: true,
-        fixedHeight: true,
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
+  <script>
+    $(document).ready(function () {
+      // Initialize DataTable with options
+      $('#accountsTable').DataTable({
+        paging: true, // Enable pagination
+        searching: true, // Enable search functionality
+        pageLength: 10, // Number of rows per page
+        language: {
+          search: "Search:", // Customize search input placeholder
+          lengthMenu: "Show _MENU_ entries per page",
+          zeroRecords: "No results found",
+          info: "Showing _START_ to _END_ of _TOTAL_ results",
+          infoEmpty: "No results available",
+          infoFiltered: "(filtered from _MAX_ total entries)"
         }
       });
     });
-</script>
+
+  </script>
 
 
 </body>

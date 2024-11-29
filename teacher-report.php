@@ -1,7 +1,7 @@
 <?php
 include 'database/db_connect.php';
 include 'database/db-teacher-report.php';
-$activePage = 'generate-report';
+$activePage = 'attendance-report';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -227,53 +227,102 @@ $activePage = 'generate-report';
   <script src="assets/js/main.js"></script>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const dataTable = new simpleDatatables.DataTable("#studentsTable", {
-      searchable: true,
-      paging: true,
-      fixedHeight: true,
-      perPage: 10,
-      labels: {
-        placeholder: "Search...",
-        perPage: "entries per page",
-        noRows: "No results found",
-        info: "Showing {start} to {end} of {rows} results",
-      },
+    document.addEventListener("DOMContentLoaded", function() {
+      const dataTable = new simpleDatatables.DataTable("#studentsTable", {
+        searchable: true,
+        paging: true,
+        fixedHeight: true,
+        perPage: 10,
+        labels: {
+          placeholder: "Search...",
+          perPage: "entries per page",
+          noRows: "No results found",
+          info: "Showing {start} to {end} of {rows} results",
+        },
+      });
     });
-  });
 
-  const updateSections = (gradeId, sectionId) => {
-    const gradeFilter = document.getElementById(gradeId).value;
-    const sectionFilter = document.getElementById(sectionId);
-    sectionFilter.innerHTML = '<option value="">Select Section</option>';
+    const updateSections = (gradeId, sectionId) => {
+      const gradeFilter = document.getElementById(gradeId).value;
+      const sectionFilter = document.getElementById(sectionId);
+      sectionFilter.innerHTML = '<option value="">Select Section</option>';
 
-    const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
-    if (sectionsByGrade[gradeFilter]) {
-      sectionsByGrade[gradeFilter].forEach((section) => {
-        const option = document.createElement("option");
-        option.value = section;
-        option.textContent = section;
-        sectionFilter.appendChild(option);
-      });
-    }
-  };
+      const sectionsByGrade = <?php echo json_encode($allSectionsByGrade); ?>;
+      if (sectionsByGrade[gradeFilter]) {
+        sectionsByGrade[gradeFilter].forEach((section) => {
+          const option = document.createElement("option");
+          option.value = section;
+          option.textContent = section;
+          sectionFilter.appendChild(option);
+        });
+      }
+    };
 
-  // Event listener for Daily Report generation
-  document.getElementById("generateDailyReport").addEventListener("click", function (event) {
-    event.preventDefault();
-    const month = document.getElementById("month").value;
+    // Event listener for Daily Report generation
+    document.getElementById("generateDailyReport").addEventListener("click", function(event) {
+      event.preventDefault();
+      const month = document.getElementById("month").value;
 
-    if (!month) {
+      if (!month) {
+        Swal.fire({
+          icon: "warning",
+          title: "Incomplete Selection",
+          text: "You need to select a month before generating the report.",
+          confirmButtonText: "OK",
+        });
+      } else {
+        Swal.fire({
+          title: "Generate Daily Report?",
+          text: "Are you sure you want to generate the daily report for the selected month?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, Generate",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Show 'Please wait...' message
+            Swal.fire({
+              title: "Generating Report...",
+              text: "Please wait while the report is being prepared.",
+              icon: "info",
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              didOpen: () => {
+                Swal.showLoading(); // Show loading spinner
+              },
+            });
+
+            // Create a form and submit it after delay
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = 'daily-report.php';
+
+            // Add the month filter as a hidden input
+            const monthInput = document.createElement('input');
+            monthInput.type = 'hidden';
+            monthInput.name = 'month';
+            monthInput.value = month;
+            form.appendChild(monthInput);
+
+            document.body.appendChild(form);
+            form.submit();
+
+            // Close loading spinner after delay
+            setTimeout(() => {
+              Swal.close();
+            }, 8000); // Simulated delay for generation
+          }
+        });
+      }
+    });
+
+    // Event listener for Monthly Report generation
+    document.getElementById("generateMonthlyReport").addEventListener("click", function(event) {
+      event.preventDefault();
+
       Swal.fire({
-        icon: "warning",
-        title: "Incomplete Selection",
-        text: "You need to select a month before generating the report.",
-        confirmButtonText: "OK",
-      });
-    } else {
-      Swal.fire({
-        title: "Generate Daily Report?",
-        text: "Are you sure you want to generate the daily report for the selected month?",
+        title: "Generate Monthly Report?",
+        text: "Are you sure you want to generate the monthly report?",
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Yes, Generate",
@@ -288,52 +337,26 @@ $activePage = 'generate-report';
             allowOutsideClick: false,
             showConfirmButton: false,
             didOpen: () => {
-              Swal.showLoading();
+              Swal.showLoading(); // Show loading spinner
             },
           });
 
+          // Create a form and submit it after delay
+          const form = document.createElement('form');
+          form.method = 'GET';
+          form.action = 'monthly-report.php';
+
+          document.body.appendChild(form);
+          form.submit();
+
+          // Close loading spinner after delay
           setTimeout(() => {
-            Swal.close(); // Close loading spinner
-            document.querySelector('form[action="daily-report.php"]').submit();
-          }, 2000); // Simulated delay for generation
+            Swal.close();
+          }, 3000); // Simulated delay for generation
         }
       });
-    }
-  });
-
-  // Event listener for Monthly Report generation
-  document.getElementById("generateMonthlyReport").addEventListener("click", function (event) {
-    event.preventDefault();
-
-    Swal.fire({
-      title: "Generate Monthly Report?",
-      text: "Are you sure you want to generate the monthly report?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, Generate",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Show 'Please wait...' message
-        Swal.fire({
-          title: "Generating Report...",
-          text: "Please wait while the report is being prepared.",
-          icon: "info",
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        setTimeout(() => {
-          Swal.close(); // Close loading spinner
-          document.querySelector('form[action="monthly-report.php"]').submit();
-        }, 2000); // Simulated delay for generation
-      }
     });
-  });
-</script>
+  </script>
 
 </body>
 

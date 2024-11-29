@@ -135,20 +135,24 @@ if ($studentResult->num_rows > 0) {
 }
 
 
-// Now we calculate the Present count (Total students - Absent - Late) and store it in row 75 starting from D75
+// Now we calculate the Present count (Total students - Absent) and store it in row 75 starting from D75
 $totalStudents = $studentResult->num_rows;  // Get the total number of students
-$presentCountTotal = 0; // Initialize total present count for the day
+$presentCountTotal = 0; // Initialize total present count for all days
 
 $colIndex = 'D';  // Start from column D
 foreach ($dateColumnMap as $date => $column) {
     $absentCount = isset($absentCountPerDate[$column]) ? $absentCountPerDate[$column] : 0;
-    $lateCount = isset($lateCountPerDate[$column]) ? $lateCountPerDate[$column] : 0;
-    $presentCount = $totalStudents - $absentCount - $lateCount;
-    
+
+    // Calculate Present count (excluding Late)
+    $presentCount = $totalStudents - $absentCount;
+
     // Store Present count in row 75
     $sheet->setCellValue($column . '75', $presentCount);
-    $presentCountTotal += $presentCount;  // Update the total present count
+    
+    // Update the total present count across all days
+    $presentCountTotal += $presentCount;
 }
+
 
 // Set the total present count in AK75
 $sheet->setCellValue('AK75', $presentCountTotal);
@@ -160,22 +164,20 @@ $sheet->setCellValue('AJ79', $totalStudents); // Set total students
 $sheet->mergeCells('AJ83:AJ84'); // Merge AJ83 and AJ84
 $sheet->setCellValue('AJ83', $totalStudents); // Set total students again
 
-// ** Average Present Count (AJ87) **
-// Count the number of days by counting non-empty cells in row 11 (D11 to AB11)
-$daysCount = 0;
-foreach (range('D', 'AB') as $column) {
-    if (!empty($sheet->getCell($column . '11')->getValue())) {
-        $daysCount++;
-    }
-}
+// Fetch the grade and section for the given class_id
+$classQuery = "SELECT grade_level, section FROM classes WHERE class_id = $class_id";
+$classResult = $conn->query($classQuery);
 
-// Calculate the average number of Present students per day
-if ($daysCount > 0) {
-    $averagePresent = $presentCountTotal / $daysCount;
-    $sheet->setCellValue('AJ87', $averagePresent); // Set average present count in AJ87
+if ($classResult->num_rows > 0) {
+    $classRow = $classResult->fetch_assoc();
+    $grade = $classRow['grade_level']; // Grade level
+    $section = $classRow['section']; // Section
 } else {
-    $sheet->setCellValue('AJ87', 0); // If no days, set 0
+    die("Grade and section not found for the given class ID.");
 }
+$sheet->setCellValue('X8', $grade);  // Grade level in X8
+$sheet->setCellValue('AC8', $section);  // Section in AC8
+$sheet->setCellValue('X6', DateTime::createFromFormat('!m', $month)->format('F'));  
 
 $conn->close();
 

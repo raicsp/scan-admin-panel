@@ -145,91 +145,88 @@ include 'database/db-teacher-dashboard.php';
           </div>
         </div><!-- End 1st Layer -->
         <div class="col-md-6">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Gender Distribution</h5>
-      <div id="genderChart" style="width: 100%; height: 400px;"></div>
-    </div>
-  </div>
-</div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Gender Distribution</h5>
+              <div id="genderChart" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+        </div>
 
-<div class="col-md-6">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Attendance Status Overview</h5>
-      <div id="attendancePieChart" style="width: 100%; height: 400px;"></div> <!-- Div for ApexCharts -->
-    </div>
-  </div>
-</div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Attendance Status Overview</h5>
+              <div id="attendancePieChart" style="width: 100%; height: 400px;"></div> <!-- Div for ApexCharts -->
+            </div>
+          </div>
+        </div>
         <div class="col-12">
           <div class="card">
             <div class="card-body">
               <!-- Nav tabs -->
               <ul class="nav nav-tabs" id="attendanceTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <a class="nav-link active" id="monthly-tab" data-bs-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="true">Monthly Attendance</a>
+                  <!-- Daily Attendance Tab as active -->
+                  <a class="nav-link active" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">Daily Attendance</a>
                 </li>
                 <li class="nav-item" role="presentation">
-                  <a class="nav-link" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="false">Daily Attendance</a>
+                  <!-- Monthly Attendance Tab -->
+                  <a class="nav-link" id="monthly-tab" data-bs-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="false">Monthly Attendance</a>
                 </li>
               </ul>
 
               <!-- Tab content -->
               <div class="tab-content mt-3" id="attendanceTabsContent">
-                <!-- Monthly Attendance Tab -->
-                <div class="tab-pane fade show active" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
-                  <h5 class="card-title">Monthly Attendance Trend</h5>
-                  <div id="attendanceTrendChart"></div>
-                </div>
-
                 <!-- Daily Attendance Tab -->
-                <div class="tab-pane fade" id="daily" role="tabpanel" aria-labelledby="daily-tab">
+                <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
                   <h5 class="card-title">Daily Attendance Trend</h5>
                   <div id="dailyTrendChart"></div>
+                </div>
+
+                <!-- Monthly Attendance Tab -->
+                <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+                  <h5 class="card-title">Monthly Attendance Trend</h5>
+                  <div id="attendanceTrendChart"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-
-
         <div class="col-12">
           <div class="row">
             <div class="col-md-6 equal-height">
-              <div class="card top-students overflow-auto">
+            <div class="card top-students overflow-auto">
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-                    <li><a class="dropdown-item" href="teacher-tardiness.php">View All</a></li>
+                    <li><a class="dropdown-item" href="teacher-perfect.php">View All</a></li>
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Most Late Arrivals</h5>
-                  <table class="table table-hover" id="lateTable">
+                  <h5 class="card-title">Students with Perfect Attendance </h5>
+                  <table class="table table-hover" id="perfectAttendanceTable">
                     <thead>
                       <tr>
                         <th scope="col">Sr-Code</th>
                         <th scope="col">Student Name</th>
-                        <th scope="col">Late Count</th>
 
                       </tr>
                     </thead>
                     <tbody>
-                      <?php while ($row = $late_result->fetch_assoc()) : ?>
-
+                      <?php while ($row = $perfect_attendance_result->fetch_assoc()) : ?>
                         <tr class="clickable-row" data-name="<?= htmlspecialchars($row['student_name']) ?>">
-                          <td><?php echo $row['srcode']; ?> <!-- Display student code here --></td>
+                          <td><?php echo $row['srcode']; ?> </td>
                           <td><?php echo $row['student_name']; ?></td>
-                          <td class="fw-bold"><?php echo $row['late_count']; ?></td>
                         </tr>
                       <?php endwhile; ?>
                     </tbody>
                   </table>
                 </div>
+
               </div>
             </div><!-- End Top Students with Most Late -->
 
@@ -267,38 +264,41 @@ include 'database/db-teacher-dashboard.php';
             </div><!-- End Top Students with Most Absences -->
 
             <div class="col-md-12 equal-height">
-              <div class="card top-students overflow-auto">
+            <div class="card top-students overflow-auto">
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filter</h6>
                     </li>
-                    <li><a class="dropdown-item" href="teacher-perfect.php">View All</a></li>
+                    <li><a class="dropdown-item" href="teacher-tardiness.php">View All</a></li>
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Perfect Attendance </h5>
-                  <table class="table table-hover" id="perfectAttendanceTable">
+                  <h5 class="card-title">Students with Most Late Arrivals</h5>
+                  <table class="table table-hover" id="lateTable">
                     <thead>
                       <tr>
                         <th scope="col">Sr-Code</th>
                         <th scope="col">Student Name</th>
+                        <th scope="col">Late Count</th>
 
                       </tr>
                     </thead>
                     <tbody>
-                      <?php while ($row = $perfect_attendance_result->fetch_assoc()) : ?>
+                      <?php while ($row = $late_result->fetch_assoc()) : ?>
+
                         <tr class="clickable-row" data-name="<?= htmlspecialchars($row['student_name']) ?>">
-                          <td><?php echo $row['srcode']; ?> </td>
+                          <td><?php echo $row['srcode']; ?> <!-- Display student code here --></td>
                           <td><?php echo $row['student_name']; ?></td>
+                          <td class="fw-bold"><?php echo $row['late_count']; ?></td>
                         </tr>
                       <?php endwhile; ?>
                     </tbody>
                   </table>
                 </div>
-
               </div>
+         
             </div><!-- End Top Students with Most Late -->
 
           </div>
@@ -317,107 +317,113 @@ include 'database/db-teacher-dashboard.php';
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
+
 
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
   <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const maleCount = <?php echo $male_count; ?>;
-    const femaleCount = <?php echo $female_count; ?>;
+    document.addEventListener("DOMContentLoaded", function() {
+      const maleCount = <?php echo $male_count; ?>;
+      const femaleCount = <?php echo $female_count; ?>;
 
-    const options = {
-      series: [maleCount, femaleCount],
-      chart: {
-        type: 'pie',
-        height: 500
-      },
-      labels: ['Male', 'Female'],
-      colors: ['#4e73df', '#e74a3b'],
-      legend: {
-        position: 'top'
-      },
-      tooltip: {
-        y: {
-          formatter: function(value) {
-            const total = maleCount + femaleCount;
-            const percentage = ((value / total) * 100).toFixed(2);
-            return `${value} (${percentage}%)`;
-          }
-        }
-      },
-      dataLabels: {
-        enabled: true,
-        formatter: function(value, { seriesIndex, w }) {
-          const total = w.config.series.reduce((acc, val) => acc + val, 0);
-          const count = w.config.series[seriesIndex];
-          const percentage = ((count / total) * 100).toFixed(2);
-          return `${count} (${percentage}%)`;
+      const options = {
+        series: [maleCount, femaleCount],
+        chart: {
+          type: 'pie',
+          height: 500
         },
-        style: {
-          fontSize: '14px',
-          fontWeight: 'bold',
-          colors: ['#fff']
-        }
-      },
-
-    };
-
-    const chart = new ApexCharts(document.querySelector("#genderChart"), options);
-    chart.render();
-  });
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // PHP data passed to JavaScript
-    const presentCount = <?php echo $present_count; ?>;
-    const absentCount = <?php echo $absent_count; ?>;
-    const lateCount = <?php echo $late_count; ?>;
-
-    const total = presentCount + absentCount + lateCount;
-
-    const options = {
-      series: [presentCount, absentCount, lateCount],
-      chart: {
-        type: 'pie',
-        height: 500
-      },
-      labels: ['Present', 'Absent', 'Late'],
-      colors: ['#4caf50', '#f44336', '#ff9800'], // Colors for Present, Absent, and Late
-      legend: {
-        position: 'top'
-      },
-      tooltip: {
-        y: {
-          formatter: function(value) {
-            const percentage = ((value / total) * 100).toFixed(2);
-            return `${value} students (${percentage}%)`;
-          }
-        }
-      },
-      dataLabels: {
-        enabled: true,
-        formatter: function(value, { seriesIndex, w }) {
-          const count = w.config.series[seriesIndex];
-          const percentage = ((count / total) * 100).toFixed(2);
-          return `${count} (${percentage}%)`; // Show count and percentage
+        labels: ['Male', 'Female'],
+        colors: ['#4e73df', '#e74a3b'],
+        legend: {
+          position: 'top'
         },
-        style: {
-          fontSize: '14px',
-          fontWeight: 'bold',
-          colors: ['#fff']
-          
-        }
-      },
-   
-    };
+        tooltip: {
+          y: {
+            formatter: function(value) {
+              const total = maleCount + femaleCount;
+              const percentage = ((value / total) * 100).toFixed(2);
+              return `${value} (${percentage}%)`;
+            }
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function(value, {
+            seriesIndex,
+            w
+          }) {
+            const total = w.config.series.reduce((acc, val) => acc + val, 0);
+            const count = w.config.series[seriesIndex];
+            const percentage = ((count / total) * 100).toFixed(2);
+            return `${count} (${percentage}%)`;
+          },
+          style: {
+            fontSize: '14px',
+            fontWeight: 'bold',
+            colors: ['#fff']
+          }
+        },
 
-    const chart = new ApexCharts(document.querySelector("#attendancePieChart"), options);
-    chart.render();
-  });
-</script>
+      };
+
+      const chart = new ApexCharts(document.querySelector("#genderChart"), options);
+      chart.render();
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // PHP data passed to JavaScript
+      const presentCount = <?php echo $present_count; ?>;
+      const absentCount = <?php echo $absent_count; ?>;
+      const lateCount = <?php echo $late_count; ?>;
+
+      const total = presentCount + absentCount + lateCount;
+
+      const options = {
+        series: [presentCount, absentCount, lateCount],
+        chart: {
+          type: 'pie',
+          height: 500
+        },
+        labels: ['Present', 'Absent', 'Late'],
+        colors: ['#4caf50', '#f44336', '#ff9800'], // Colors for Present, Absent, and Late
+        legend: {
+          position: 'top'
+        },
+        tooltip: {
+          y: {
+            formatter: function(value) {
+              const percentage = ((value / total) * 100).toFixed(2);
+              return `${value} students (${percentage}%)`;
+            }
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function(value, {
+            seriesIndex,
+            w
+          }) {
+            const count = w.config.series[seriesIndex];
+            const percentage = ((count / total) * 100).toFixed(2);
+            return `${count} (${percentage}%)`; // Show count and percentage
+          },
+          style: {
+            fontSize: '14px',
+            fontWeight: 'bold',
+            colors: ['#fff']
+
+          }
+        },
+
+      };
+
+      const chart = new ApexCharts(document.querySelector("#attendancePieChart"), options);
+      chart.render();
+    });
+  </script>
 
 
   <script>

@@ -57,7 +57,12 @@ $allGrades = [];
 $allSectionsByGrade = [];
 if ($gradesAndSectionsResult->num_rows > 0) {
     while ($row = $gradesAndSectionsResult->fetch_assoc()) {
-        $allGrades[] = $row['grade_level'];
+        // Add grade level only if it's not already in the allGrades array
+        if (!in_array($row['grade_level'], $allGrades)) {
+            $allGrades[] = $row['grade_level'];
+        }
+
+        // Add section for this grade level
         $allSectionsByGrade[$row['grade_level']][] = $row['section'];
     }
 }

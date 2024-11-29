@@ -19,9 +19,6 @@ include 'database/db-class.php';
   <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -33,6 +30,13 @@ include 'database/db-class.php';
   <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+
+ <!-- jQuery -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -122,9 +126,16 @@ include 'database/db-class.php';
   </main><!-- End #main -->
 
   <!-- Vendor JS Files -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.min.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
 
   <!-- Main JS -->
   <script>
@@ -149,6 +160,7 @@ include 'database/db-class.php';
       stripeClasses: [],
       language: {
         search: "Search:",
+        zeroRecords: "No Classes Available",
         lengthMenu: "Show _MENU_ entries per page",
         info: "Showing _START_ to _END_ of _TOTAL_ entries",
         infoEmpty: "No matching entries",
@@ -196,42 +208,76 @@ include 'database/db-class.php';
 
   // Update teacher functionality
   function updateTeacher(selectElement) {
-      const classId = selectElement.getAttribute('data-class-id');
-      const teacherId = selectElement.value;
+    const classId = selectElement.getAttribute('data-class-id'); // Class ID
+    const teacherId = selectElement.value; // Currently selected teacher ID
+    const teacherName = selectElement.options[selectElement.selectedIndex].text; // Name of the selected teacher
+    const previousValue = selectElement.dataset.previousValue || ''; // Store the previous value (default to empty)
+    const previousText = selectElement.dataset.previousText || 'Assign Teacher'; // Store the previous text (default to 'Assign Teacher')
+    const row = $(selectElement).closest('tr'); // Get the table row
 
-      Swal.fire({
+    // Revert dropdown to the previous value until confirmed
+    selectElement.value = previousValue;
+
+    Swal.fire({
         title: 'Are you sure?',
-        text: `Do you want to assign this teacher to the class?`,
+        text: `Do you want to assign ${teacherName} to this class?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes, assign it!',
-        cancelButtonText: 'Cancel'
-      }).then((result) => {
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
         if (result.isConfirmed) {
-          // AJAX request
-          $.post('database/db-class.php', {
-            class_id: classId,
-            teacher_id: teacherId
-          }, function(response) {
-            if (response.trim() === 'success') {
-              Swal.fire({
-                icon: 'success',
-                title: 'Assigned!',
-                text: 'The teacher has been successfully assigned.',
-                timer: 1500,
-                showConfirmButton: false
-              }).then(() => location.reload());
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'There was an error assigning the teacher.',
-              });
-            }
-          });
+            // AJAX request to assign teacher
+            $.post('database/db-class.php', {
+                class_id: classId,
+                teacher_id: teacherId,
+            }, function (response) {
+                if (response.trim() === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Assigned!',
+                        text: 'The teacher has been successfully assigned.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+
+                    // Update the dropdown to reflect the confirmed assignment
+                    selectElement.dataset.previousValue = teacherId;
+                    selectElement.dataset.previousText = teacherName;
+                    selectElement.value = teacherId;
+
+                    // Update the DataTable dynamically
+                    const table = $('#classTable').DataTable();
+                    const rowIndex = table.row(row).index();
+                    table.cell(rowIndex, 2).data(`
+                        <select class="form-select" data-class-id="${classId}" onchange="updateTeacher(this)" data-previous-value="${teacherId}" data-previous-text="${teacherName}">
+                            <option value="">Assign Teacher</option>
+                            <?php foreach ($teachers as $teacher) : ?>
+                                <option value="<?php echo htmlspecialchars($teacher['id']); ?>" 
+                                ${teacherId == <?php echo $teacher['id']; ?> ? 'selected' : ''}>
+                                <?php echo htmlspecialchars($teacher['fullname']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    `).draw(false); // Update the Action column and redraw the table without reloading
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'There was an error assigning the teacher.',
+                    });
+
+                    // Revert to the previous value on error
+                    selectElement.value = previousValue;
+                }
+            });
+        } else {
+            // Revert dropdown to the previous value if cancelled
+            selectElement.value = previousValue;
         }
-      });
-    }
+    });
+}
+
   </script>
 
 

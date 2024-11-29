@@ -6,35 +6,38 @@ $userPosition = trim($_SESSION['position'] ?? '');
 $class_id = $_SESSION['class_id'] ?? '';
 
 // Set default values for month filter
-$selectedMonth = $_GET['month'] ?? '';
+$selectedMonth = $_GET['month'] ?? ''; // Format: YYYY-MM
 
 // Build the query to get students with their total absent count
 $absent_sql = "
-SELECT s.studentID, s.srcode, 
+SELECT s.studentID, 
+       s.srcode, 
        s.name AS student_name, 
-       c.grade_level, c.section,
+       c.grade_level, 
+       c.section,
        (SELECT COUNT(*) 
         FROM attendance a2 
         WHERE a2.studentID = s.studentID 
-          AND a2.status = 'Absent' ";  // Change to 'Absent'
+          AND a2.status = 'Absent' 
+          AND (";
 
+// If a specific month is selected, filter by it
 if ($selectedMonth) {
-    $absent_sql .= " AND DATE_FORMAT(a2.date, '%Y-%m') = '$selectedMonth'"; // Filter by selected month
+    $absent_sql .= "DATE_FORMAT(a2.date, '%Y-%m') = '$selectedMonth'";
+} else {
+    // Default to the current month
+    $absent_sql .= "YEAR(a2.date) = YEAR(CURDATE()) 
+                     AND MONTH(a2.date) = MONTH(CURDATE())";
 }
 
 $absent_sql .= "
+          )
        ) AS absent_count
 FROM student s
 JOIN classes c ON s.class_id = c.class_id
 WHERE s.class_id = '$class_id'
-";
-
-// Only apply the HAVING clause if there is a specific month selected (to show only students with absences)
-if ($selectedMonth) {
-    $absent_sql .= " HAVING absent_count > 0"; // Show students with absences only
-}
-
-$absent_sql .= " ORDER BY absent_count DESC";
+HAVING absent_count > 0
+ORDER BY absent_count DESC";
 
 $result = $conn->query($absent_sql);
 
@@ -46,8 +49,6 @@ if ($result && $result->num_rows > 0) {
 
 $conn->close();
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -108,8 +109,8 @@ $conn->close();
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            
-                        <h5 class="card-title mt-4">Students with Most Frequent Absences<br>
+
+                            <h5 class="card-title mt-4">Students with Most Frequent Absences<br>
                                 <!-- <span><?= date("F j, Y") ?></span> -->
                             </h5>
 
@@ -173,8 +174,8 @@ $conn->close();
             perPage: 10,
         });
 
-         // Filter button event
-         document.getElementById('filterButton').addEventListener('click', function() {
+        // Filter button event
+        document.getElementById('filterButton').addEventListener('click', function() {
             const selectedMonth = document.getElementById('monthFilter').value; // Get the selected month value
             const url = new URL(window.location.href);
 
@@ -188,8 +189,8 @@ $conn->close();
             window.location.href = url.toString(); // Reload page with the updated URL
         });
 
-          // Add click functionality to table rows
-          document.addEventListener('DOMContentLoaded', (event) => {
+        // Add click functionality to table rows
+        document.addEventListener('DOMContentLoaded', (event) => {
             const table = document.getElementById('absenceTable');
             const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 

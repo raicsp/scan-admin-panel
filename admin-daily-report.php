@@ -126,27 +126,18 @@ if ($studentResult->num_rows > 0) {
 $totalStudents = $studentResult->num_rows;
 $presentCountTotal = 0;
 
-foreach ($dateColumnMap as $date => $column) {
-    $absentCount = $absentCountPerDate[$column] ?? 0;
-    $lateCount = $lateCountPerDate[$column] ?? 0;
-    $presentCount = $totalStudents - $absentCount - $lateCount;
-    $sheet->setCellValue($column . '75', $presentCount);
-    $presentCountTotal += $presentCount;
-}
-
-// Set the total present count in AK75
-$sheet->setCellValue('AK75', $presentCountTotal);
 
 // Set the total number of students in AJ79 and AJ83
 $sheet->mergeCells('AJ79:AJ80');
 $sheet->setCellValue('AJ79', $totalStudents);
 $sheet->mergeCells('AJ83:AJ84');
 $sheet->setCellValue('AJ83', $totalStudents);
+// Insert selected month, grade, and section into the appropriate cells
+$sheet->setCellValue('X6', DateTime::createFromFormat('!m', $month)->format('F'));  // Month in X6 as word (e.g., September)
+$sheet->setCellValue('X8', $grade);  // Grade level in X8
+$sheet->setCellValue('AC8', $section);  // Section in AC8
 
-// Calculate the average number of Present students per day in AJ87
-$daysCount = count($dateColumnMap);
-$averagePresent = $daysCount > 0 ? $presentCountTotal / $daysCount : 0;
-$sheet->setCellValue('AJ87', $averagePresent);
+
 
 $conn->close();
 

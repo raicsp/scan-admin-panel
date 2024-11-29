@@ -3,6 +3,13 @@ session_start();
 include 'database/db_connect.php';  // Include the database connection
 include 'sendVerificationCode.php'; // Include the function for sending verification code email
 
+// Clear session variables if the user is revisiting the page
+if (!isset($_POST['send_code']) && !isset($_POST['validate_code']) && !isset($_POST['change_password'])) {
+    unset($_SESSION['verification_code']);
+    unset($_SESSION['verified']);
+    unset($_SESSION['email']);
+}
+
 // Initialize variables
 $verificationCode = '';
 $error_message = '';
@@ -49,7 +56,6 @@ if (isset($_POST['validate_code'])) {
     if ($inputCode == $_SESSION['verification_code']) {
         $_SESSION['verified'] = true; // Mark as verified
         $match_message = "The verification code matches! You can now reset your password.";  // Show match confirmation
-        // Do not redirect, stay on the same page for the password reset
     } else {
         $error_message = "Invalid verification code!";
     }
@@ -83,9 +89,9 @@ if (isset($_POST['change_password'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -93,77 +99,110 @@ if (isset($_POST['change_password'])) {
     <link href="assets/img/bsu.png" rel="icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
+    <style>
+        /* Additional styles to add spacing and layout improvement */
+        .form-control {
+            margin-bottom: 15px;
+            /* Adds spacing between form fields */
+        }
+
+        .btn {
+            margin-top: 15px;
+            /* Adds space above the buttons */
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            /* Adds space below alerts */
+        }
+
+        .card {
+            padding: 30px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .container {
+            margin-top: 50px;
+            /* Adds space at the top of the container */
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title text-center mb-4">Forgot Password</h5>
-                    <p class="text-center mb-4">Enter your email to receive a verification code</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Forgot Password</h5>
+                        <p class="text-center mb-4">Enter your email to receive a verification code</p>
 
-                    <!-- Display Error Message -->
-                    <?php if ($error_message): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <?php echo $error_message; ?>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <!-- Display Success Message -->
-                    <?php if ($success_message): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo $success_message; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Display Match Confirmation -->
-                    <?php if ($match_message): ?>
-                        <div class="alert alert-info" role="alert">
-                            <?php echo $match_message; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Step 1: Request Verification Code -->
-                    <?php if (!isset($_SESSION['verified'])): ?>
-                        <form method="POST" action="">
-                            <div class="mb-3">
-                                <input type="email" name="email" class="form-control" required placeholder="Email" autofocus>
+                        <!-- Display Error Message -->
+                        <?php if ($error_message): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <?php echo $error_message; ?>
                             </div>
-                            <button type="submit" name="send_code" class="btn btn-primary w-100">Send Verification Code</button>
-                        </form>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
-                    <!-- Step 2: Enter Verification Code -->
-                    <?php if (isset($_SESSION['verification_code']) && !isset($_SESSION['verified'])): ?>
-                        <form method="POST" action="">
-                            <div class="mb-3">
-                                <input type="text" name="code" class="form-control" required placeholder="Enter Verification Code">
+                        <!-- Display Success Message -->
+                        <?php if ($success_message): ?>
+                            <div class="alert alert-success" role="alert">
+                                <?php echo $success_message; ?>
                             </div>
-                            <button type="submit" name="validate_code" class="btn btn-primary w-100">Validate Code</button>
-                        </form>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
-                    <!-- Step 3: Change Password -->
-                    <?php if (isset($_SESSION['verified'])): ?>
-                        <form method="POST" action="">
-                            <input type="hidden" name="email" value="<?php echo $_SESSION['email']; ?>" /> 
-                            <div class="mb-3">
-                                <input type="password" name="new_password" class="form-control" required placeholder="New Password">
+                        <!-- Display Match Confirmation -->
+                        <?php if ($match_message): ?>
+                            <div class="alert alert-info" role="alert">
+                                <?php echo $match_message; ?>
                             </div>
-                            <button type="submit" name="change_password" class="btn btn-success w-100">Change Password</button>
-                        </form>
-                    <?php endif; ?>
+                        <?php endif; ?>
 
+                        <!-- Step 1: Request Verification Code -->
+                        <?php if (!isset($_SESSION['verified'])): ?>
+                            <form method="POST" action="">
+                                <div class="mb-3">
+                                    <input type="email" name="email" class="form-control" required placeholder="Email" autofocus>
+                                </div>
+                                <button type="submit" name="send_code" class="btn btn-primary w-100">Send Verification Code</button>
+                            </form>
+                        <?php endif; ?>
+
+                        <!-- Step 2: Enter Verification Code -->
+                        <?php if (isset($_SESSION['verification_code']) && !isset($_SESSION['verified'])): ?>
+                            <form method="POST" action="" class="mt-4"> <!-- Add mt-4 for more top margin -->
+                                <div class="mb-3">
+                                    <input type="text" name="code" class="form-control" required placeholder="Enter Verification Code">
+                                </div>
+                                <button type="submit" name="validate_code" class="btn btn-primary w-100">Validate Code</button>
+                            </form>
+                        <?php endif; ?>
+
+
+                        <!-- Step 3: Change Password -->
+                        <?php if (isset($_SESSION['verified'])): ?>
+                            <form method="POST" action="">
+                                <input type="hidden" name="email" value="<?php echo $_SESSION['email']; ?>" />
+                                <div class="mb-3">
+                                    <input type="password" name="new_password" class="form-control" required placeholder="New Password">
+                                </div>
+                                <button type="submit" name="change_password" class="btn btn-success w-100">Change Password</button>
+                            </form>
+                        <?php endif; ?>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"></script>
 
 </body>
+
 </html>

@@ -39,6 +39,12 @@ include 'database/db-administrator.php';
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
@@ -84,22 +90,22 @@ include 'database/db-administrator.php';
 
 
 
-<!-- Table with Data -->
-<table id="accountsTable" class="table table-striped display">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Position</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    $result = $conn->query("SELECT * FROM admin");
-    if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        echo "<tr>
+              <!-- Table with Data -->
+              <table id="accountsTable" class="table table-striped display">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Position</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  $result = $conn->query("SELECT * FROM admin");
+                  if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                      echo "<tr>
                 <td>" . htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) . "</td>
                 <td>" . htmlspecialchars($row['email']) . "</td>
                 <td>" . htmlspecialchars($row['position']) . "</td>
@@ -108,11 +114,11 @@ include 'database/db-administrator.php';
                   <button class='btn btn-danger btn-sm' onclick='deleteTeacher({$row['id']})'>Delete</button>
                 </td>
               </tr>";
-      }
-    }
-    ?>
-  </tbody>
-</table>
+                    }
+                  }
+                  ?>
+                </tbody>
+              </table>
               <!-- End Table with stripped rows -->
 
             </div>
@@ -139,7 +145,7 @@ include 'database/db-administrator.php';
             <div class="col-md-6">
               <label for="inputFirstName" class="form-label">First Name</label>
               <input type="text" class="form-control" id="inputFirstName" name="first_name" placeholder="John" required
-                maxlength="50" pattern="[A-Za-z\s]{1,50}"
+                maxlength="50" pattern="[A-Za-z\s.]{1,50}"
                 title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
 
@@ -207,7 +213,7 @@ include 'database/db-administrator.php';
             <div class="col-md-6">
               <label for="editFirstName" class="form-label">First Name</label>
               <input type="text" class="form-control" id="editFirstName" name="first_name" required maxlength="50"
-                pattern="[A-Za-z\s]{1,50}"
+              pattern="[A-Za-z\s.]{1,50}"
                 title="First Name should contain only letters and spaces, max 50 characters.">
             </div>
 
@@ -336,21 +342,23 @@ include 'database/db-administrator.php';
 
 
 
-    // DataTables initialization
-    document.addEventListener('DOMContentLoaded', function () {
-    const dataTable = new simpleDatatables.DataTable("#accountsTable", {
-      searchable: true,
-      paging: true,
-      fixedHeight: true,
-      perPage: 10,
-      labels: {
-        placeholder: "Search...",
-        perPage: "entries per page",
-        noRows: "No results found",
-        info: "Showing {start} to {end} of {rows} results"
-      }
+    $(document).ready(function () {
+      // Initialize DataTable with options
+      $('#accountsTable').DataTable({
+        paging: true, // Enable pagination
+        searching: true, // Enable search functionality
+        pageLength: 10, // Number of rows per page
+        language: {
+          search: "Search:", // Customize search input placeholder
+          lengthMenu: "Show _MENU_ entries per page",
+          zeroRecords: "No results found",
+          info: "Showing _START_ to _END_ of _TOTAL_ results",
+          infoEmpty: "No results available",
+          infoFiltered: "(filtered from _MAX_ total entries)"
+        }
+      });
     });
-  });
+
 
     <?php if (isset($_SESSION['message'])): ?>
       Swal.fire({

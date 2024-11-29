@@ -6,23 +6,45 @@ include 'db_connect.php';
 $alertMessage = '';
 $alertType = '';
 
-// Fetch grades and sections
+// Fetch the logged-in user's position
+$userPosition = trim($_SESSION['position'] ?? '');
+
+// Define grade condition based on the user's position
+$gradeCondition = '';
+if ($userPosition === 'Elementary Chairperson') {
+    // Allow access only to Kinder to Grade-6
+    $gradeCondition = "WHERE grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
+} elseif ($userPosition === 'High School Chairperson') {
+    // Allow access only to Grade-7 to Grade-12
+    $gradeCondition = "WHERE grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
+}
+
+// Fetch grades based on the grade condition
 $grades = [];
+$query = "SELECT DISTINCT grade_level FROM classes $gradeCondition ORDER BY CAST(SUBSTRING_INDEX(grade_level, '-', -1) AS UNSIGNED) ASC";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $grades[] = $row['grade_level'];
+    }
+} else {
+    echo 'No grades found for your assigned grade levels.';
+}
+
+// Fetch sections for each grade based on the grade condition
 $sections = [];
-
-// Fetch grades
-$query = "SELECT DISTINCT grade_level FROM classes ORDER BY grade_level";
+$query = "SELECT grade_level, section FROM classes $gradeCondition ORDER BY grade_level, section";
 $result = $conn->query($query);
-while ($row = $result->fetch_assoc()) {
-    $grades[] = $row['grade_level'];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $sections[$row['grade_level']][] = $row['section'];
+    }
+} else {
+    echo 'No sections found for your assigned grade levels.';
 }
 
-// Fetch sections for each grade
-$query = "SELECT grade_level, section FROM classes ORDER BY grade_level, section";
-$result = $conn->query($query);
-while ($row = $result->fetch_assoc()) {
-    $sections[$row['grade_level']][] = $row['section'];
-}
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -80,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                         $stmt = $conn->prepare($query);
                         $stmt->bind_param('ssssisissss', $srcode, $name, $gender, $profile_pic, $teacher_id, $gmail, $class_id, $p_name, $parent_contact, $schoolYear, $notif);
-                        
+
                         if (!$stmt->execute()) {
                             $_SESSION['alertMessage'] = 'Error adding student: ' . $stmt->error;
                             $_SESSION['alertType'] = 'danger';
@@ -106,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
-
     } else if (isset($_POST['submit_individual'])) {
         // Handle individual form submission
         $gradeLevel = isset($_POST['grade_level']) ? $_POST['grade_level'] : null;
@@ -153,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $insertStmt = $conn->prepare($insertQuery);
                     $insertStmt->bind_param('ssssssssss', $srcode, $gender, $studentName, $p_name, $parentContact, $parentEmail, $schoolYear, $classId, $teacherId, $notif);
-                    
+
                     if (!$insertStmt->execute()) {
                         $_SESSION['alertMessage'] = 'Error adding student: ' . $insertStmt->error;
                         $_SESSION['alertType'] = 'danger';
@@ -187,4 +208,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
-?>

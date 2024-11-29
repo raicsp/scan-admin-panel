@@ -42,6 +42,22 @@ if ($month) {
     $dateCondition = "AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'";
 }
 
+// Retrieve selected grade-section filter
+$selectedGradeSection = $_GET['grade_section'] ?? '';
+
+// Grade and section condition
+$gradeSectionCondition = '';
+if ($selectedGradeSection) {
+    // Check if the selected grade-section is in the format "Grade X - Section"
+    if (strpos($selectedGradeSection, ' - ') !== false) {
+        [$grade, $section] = explode(' - ', $selectedGradeSection);
+        $gradeSectionCondition = "AND c.grade_level = '" . $conn->real_escape_string($grade) . "' AND c.section = '" . $conn->real_escape_string($section) . "'";
+    } else {
+        // Only grade level is selected (e.g., "Grade X" without a section)
+        $gradeSectionCondition = "AND c.grade_level = '" . $conn->real_escape_string($selectedGradeSection) . "' AND c.section = 'N/A'";
+    }
+}
+
 // Query to get students with most absences within the date range
 $absences_sql = "
     SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
@@ -53,6 +69,7 @@ $absences_sql = "
     WHERE a.status = 'Late' 
     $gradeCondition
     $dateCondition
+    $gradeSectionCondition
     GROUP BY s.studentID
     ORDER BY late_count DESC
 ";
@@ -64,20 +81,25 @@ $absentStudents = [];
 if ($result && $result->num_rows > 0) {
     $absentStudents = $result->fetch_all(MYSQLI_ASSOC);
 }
-
 // Query to get grade levels and sections
-$sectionQuery = "SELECT grade_level, section FROM classes WHERE grade_level IN ($gradeList)";
+$sectionQuery = "SELECT DISTINCT grade_level, section FROM classes WHERE grade_level IN ($gradeList)";
 $sectionResult = $conn->query($sectionQuery);
 
 $gradeSections = [];
 while ($row = $sectionResult->fetch_assoc()) {
-    $gradeSections[$row['grade_level']][] = $row['section'];
+    if ($row['section'] === 'N/A') {
+        // If the section is 'N/A', only show the grade level (no section)
+        $gradeSections[] = $row['grade_level'];
+    } else {
+        // If there's a section, show both grade and section
+        $gradeSections[] = $row['grade_level'] . ' - ' . $row['section'];
+    }
 }
 
 // Pass the sections data to JavaScript
 echo "<script>var gradeSections = " . json_encode($gradeSections) . ";</script>";
-
 $conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -124,7 +146,7 @@ $conn->close();
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Students with Most Frequent Absences</h1>
+            <h1>Most Frequent Late Arrivals</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
@@ -139,30 +161,27 @@ $conn->close();
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Students with Most Frequent Late Arrivals<br>
-                            
+
                             </h5>
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label for="gradeFilter">Select Grade:</label>
-                                    <select id="gradeFilter" class="form-select">
-                                        <option value="">Select Grade</option>
-                                        <?php foreach ($allowedGrades as $grade): ?>
-                                            <option value="<?= $grade ?>"><?= $grade ?></option>
+                                    <label for="gradeSectionFilter">Select Grade & Section:</label>
+                                    <select id="gradeSectionFilter" class="form-select">
+                                        <option value="">Select Grade & Section</option>
+                                        <?php foreach ($gradeSections as $gradeSection): ?>
+                                            <option value="<?= htmlspecialchars($gradeSection) ?>"><?= htmlspecialchars($gradeSection) ?></option>
                                         <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="sectionFilter">Select Section:</label>
-                                    <select id="sectionFilter" class="form-select">
-                                        <option value="">All Sections</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label for="monthPicker">Select Month:</label>
                                     <input type="month" id="monthPicker" class="form-control" name="month">
                                 </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button id="filterButton" class="btn btn-primary w-100" onclick="filterByMonth()">Filter</button>
+                                <div class="col-md-3" style="margin-top: 23px;">
+
+                                    <button id="filterButton" class="btn btn-primary w-100">Filter</button>
+                                </div>
+                                <div class="col-md-3" style="margin-top: 23px;">
                                     <button id="clearButton" class="btn btn-secondary w-100 ms-2">Clear</button>
                                 </div>
                             </div>
@@ -211,93 +230,50 @@ $conn->close();
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
-
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dataTable = new simpleDatatables.DataTable("#absenceTable", {
-            searchable: true,
-            paging: true,
-            perPage: 10,
-        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataTable = new simpleDatatables.DataTable("#absenceTable", {
+                searchable: true,
+                paging: true,
+                perPage: 10,
+                fixedHeight: true,
+                labels: {
+                    placeholder: "Search...",
+                    perPage: "entries per page",
+                    noRows: "No results found",
+                    info: "Showing {start} to {end} of {rows} results"
+                }
+            });
+            document.getElementById('filterButton').addEventListener('click', function() {
+                const gradeSection = document.getElementById('gradeSectionFilter').value;
+                const month = document.getElementById('monthPicker').value;
 
-        function filterTable() {
-            const gradeFilter = document.getElementById('gradeFilter').value.toUpperCase();
-            const sectionFilter = document.getElementById('sectionFilter').value.toUpperCase();
+                if (gradeSection || month) {
+                    const url = new URL(window.location.href);
+                    if (gradeSection) url.searchParams.set('grade_section', gradeSection);
+                    if (month) url.searchParams.set('month', month);
 
-            // Build filter query based on selected values
-            let filterQuery = '';
-
-            // Append grade filter
-            if (gradeFilter) {
-                filterQuery += gradeFilter;
-            }
-
-            // Append section filter
-            if (sectionFilter) {
-                filterQuery += ' ' + sectionFilter; // Add space to separate terms
-            }
-
-            // Apply the search/filter on the datatable
-            dataTable.search(filterQuery.trim()); // Use search method to filter the table
-        }
-
-        document.getElementById('gradeFilter').addEventListener('change', function() {
-            const selectedGrade = this.value;
-
-            // Filter sections based on selected grade
-            const sections = gradeSections[selectedGrade] || [];
-            const sectionDropdown = document.getElementById('sectionFilter');
-            sectionDropdown.innerHTML = '<option value="">All Sections</option>';
-
-            sections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section;
-                option.textContent = section;
-                sectionDropdown.appendChild(option);
+                    window.location.href = url.toString();
+                } else {
+                    // Show SweetAlert if no filters are selected
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No Filters Selected',
+                        text: 'Please select at least one filter to proceed.',
+                        confirmButtonText: 'OK',
+                    });
+                }
             });
 
-            // Trigger table filtering after updating the section dropdown
-            filterTable();
-        });
-
-        function clearFilters() {
-            // Reset all filter inputs
-            document.getElementById('gradeFilter').value = "";
-            document.getElementById('sectionFilter').innerHTML = '<option value="">All Sections</option>';
-            document.getElementById('monthPicker').value = "";
-
-            // Clear the table search filter
-            dataTable.search("");
-
-            // Reload the page without query parameters
-            const url = new URL(window.location.href);
-            url.searchParams.delete('month');
-            url.searchParams.delete('start_date');
-            url.searchParams.delete('end_date');
-            window.location.href = url.toString();
-        }
-
-        document.getElementById('clearButton').addEventListener('click', clearFilters);
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        function filterByMonth() {
-            const month = document.getElementById('monthPicker').value;
-
-            if (month) {
+            document.getElementById('clearButton').addEventListener('click', function() {
                 const url = new URL(window.location.href);
-                url.searchParams.set('month', month);
+                url.search = ""; // Clear all query parameters
                 window.location.href = url.toString();
-            } else {
-                alert("Please select a month.");
-            }
-        }
-
-        document.getElementById('filterButton').addEventListener('click', filterByMonth);
-
-        // Add click functionality to table rows
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+        // Add click functionality to table rows in Code 2
         const table = document.getElementById('absenceTable');
         const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
@@ -311,4 +287,5 @@ $conn->close();
             });
         }
     });
-</script>
+    </script>
+  

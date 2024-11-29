@@ -6,47 +6,50 @@ $userPosition = trim($_SESSION['position'] ?? '');
 $class_id = $_SESSION['class_id'] ?? '';
 
 // Set default values for month filter
-$selectedMonth = $_GET['month'] ?? '';
+$selectedMonth = $_GET['month'] ?? ''; // Format: YYYY-MM
 
 // Build the query to get students with their total late count
 $late_sql = "
-SELECT s.studentID, s.srcode, 
+SELECT s.studentID, 
+       s.srcode, 
        s.name AS student_name, 
-       c.grade_level, c.section,
+       c.grade_level, 
+       c.section,
        (SELECT COUNT(*) 
         FROM attendance a2 
         WHERE a2.studentID = s.studentID 
-          AND a2.status = 'Late' ";
+          AND a2.status = 'Late' 
+          AND (";
 
-// If a month filter is applied, filter the attendance records by that month
 if ($selectedMonth) {
-    $late_sql .= " AND DATE_FORMAT(a2.date, '%Y-%m') = '$selectedMonth'";
+    // Filter by the selected month if provided
+    $late_sql .= "DATE_FORMAT(a2.date, '%Y-%m') = '$selectedMonth'";
+} else {
+    // Default to the current month if no filter is applied
+    $late_sql .= "YEAR(a2.date) = YEAR(CURDATE()) 
+                   AND MONTH(a2.date) = MONTH(CURDATE())";
 }
 
 $late_sql .= "
+          )
        ) AS late_count
 FROM student s
 JOIN classes c ON s.class_id = c.class_id
 WHERE s.class_id = '$class_id'
-";
-
-// Only apply the HAVING clause if there is a specific month selected (to show only students with lateness)
-if ($selectedMonth) {
-    $late_sql .= " HAVING late_count > 0";
-}
-
-$late_sql .= " ORDER BY late_count DESC";
+HAVING late_count > 0
+ORDER BY late_count DESC";
 
 $result = $conn->query($late_sql);
 
 // Check if there are any results and store them in an array
-$absentStudents = [];
+$lateStudents = [];
 if ($result && $result->num_rows > 0) {
-    $absentStudents = $result->fetch_all(MYSQLI_ASSOC);
+    $lateStudents = $result->fetch_all(MYSQLI_ASSOC);
 }
 
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -142,7 +145,7 @@ $conn->close();
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($absentStudents as $student) : ?>
+                                    <?php foreach ($lateStudents as $student) : ?>
                                         <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">
                                             <td><?= htmlspecialchars($student['srcode']) ?></td>
                                             <td><?= htmlspecialchars($student['student_name']) ?></td>
@@ -166,6 +169,23 @@ $conn->close();
     <script src="assets/js/main.js"></script>
 
     <script>
+
+        
+        // Add click functionality to table rows
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const table = document.getElementById('absenceTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (let row of rows) {
+                row.classList.add('clickable-row');
+                row.addEventListener('click', function(event) {
+                    if (!event.target.closest('.action-buttons')) {
+                        const studentName = row.getAttribute('data-name');
+                        window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
+                    }
+                });
+            }
+        });
         // Initialize the DataTable
         const dataTable = new simpleDatatables.DataTable("#absenceTable", {
             searchable: true,
@@ -189,21 +209,6 @@ $conn->close();
         });
 
 
-        // Add click functionality to table rows
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const table = document.getElementById('absenceTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-            for (let row of rows) {
-                row.classList.add('clickable-row');
-                row.addEventListener('click', function(event) {
-                    if (!event.target.closest('.action-buttons')) {
-                        const studentName = row.getAttribute('data-name');
-                        window.location.href = `student-details.php?srcode=${encodeURIComponent(studentName)}`;
-                    }
-                });
-            }
-        });
     </script>
 </body>
 

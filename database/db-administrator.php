@@ -37,14 +37,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Handle Add Teacher Form submission
+// Handle Add Admin Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $password = isset($_POST['password']) && !empty($_POST['password']) 
-           ? password_hash($_POST['password'], PASSWORD_BCRYPT) 
-           : password_hash($first_name . $last_name, PASSWORD_BCRYPT);
+
+    // Check if the email already exists
+    $emailCheckQuery = "SELECT * FROM admin WHERE email = '$email'";
+    $result = $conn->query($emailCheckQuery);
+
+    if ($result->num_rows > 0) {
+        // Email exists, show error message
+        $_SESSION['message'] = "The email address is already in use. Please choose a different email.";
+        $_SESSION['message_type'] = "error";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+
+    // Check if a password is provided, otherwise generate one from first and last names
+    $passwordPlain = isset($_POST['password']) && !empty($_POST['password']) ? $_POST['password'] : $first_name . $last_name;
+
+    // Convert the password to lowercase and remove spaces and periods
+    $passwordPlain = strtolower($passwordPlain);  // Convert to lowercase
+    $passwordPlain = str_replace([' ', '.'], '', $passwordPlain);  // Remove spaces and periods
+
+    // Hash the password
+    $password = password_hash($passwordPlain, PASSWORD_BCRYPT);
 
     $position = $_POST['position']; // Get the position value
 
@@ -63,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_teacher'])) {
     }
 }
 
-// Handle Edit Teacher Form submission
+// Handle Edit Admin Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
     $id = $_POST['id'];
     $first_name = $_POST['first_name'];
@@ -86,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_teacher'])) {
     }
 }
 
-// Handle Delete Teacher
+// Handle Delete Admin
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_teacher'])) {
     $id = $_POST['id'];
 
