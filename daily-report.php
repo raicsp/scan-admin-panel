@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_DEPRECATED);
 include 'database/db_connect.php';
 session_start();
 $userPosition = trim($_SESSION['position'] ?? '');

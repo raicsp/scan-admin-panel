@@ -1,6 +1,9 @@
 <?php
 include 'database/db_connect.php'; // Include the database connection
 // Get student srcode from query parameter
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 $studentSrCode = isset($_GET['srcode']) ? $_GET['srcode'] : null;
 
 if ($studentSrCode === null) {
