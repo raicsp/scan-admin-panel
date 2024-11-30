@@ -5,19 +5,23 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libonig-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-install pdo_mysql mbstring zip gd mysqli
 
 # Enable mod_rewrite for Apache (for URL routing if needed)
 RUN a2enmod rewrite
 
-# Install Composer (dependency manager for PHP)
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set the working directory to /var/www/html (Apache's default web directory)
+# Set the working directory to Apache's default web directory
 WORKDIR /var/www/html
 
 # Copy all project files into the container’s /var/www/html directory
 COPY . .
+
+# Install Composer (dependency manager for PHP)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install PHP dependencies via Composer (if any)
 RUN composer install --no-dev --optimize-autoloader
