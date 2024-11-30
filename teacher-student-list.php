@@ -2,14 +2,7 @@
 $activePage = 'student-list'; // Set the active page
 include 'database/db_connect.php';
 include 'database/db-teacher-student-list.php';
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-$userPosition = trim($_SESSION['position'] ?? '');
-$teacherClassId = $_SESSION['class_id'] ?? ''; // Assuming the teacher's class_id is stored in session
-
-echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</script>";
 ?>
 <!DOCTYPE html>
 <html lang="en">
