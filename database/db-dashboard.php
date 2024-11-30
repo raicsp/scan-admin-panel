@@ -214,7 +214,7 @@ $query = "
 SELECT DATE_FORMAT(date, '%Y-%m') as month, 
        DATE_FORMAT(date, '%M %Y') as month_name
 FROM attendance
-GROUP BY month
+GROUP BY month, month_name
 ORDER BY month ASC";
 
 $result = $conn->query($query);
@@ -241,17 +241,17 @@ $first_day_of_month = $selectedMonth . "-01";
 $last_day_of_month = date("Y-m-t", strtotime($selectedMonth));
 
 $query = "
-    SELECT DATE_FORMAT(a.date, '%d') as day, 
-           SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as present_count,
-           SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent_count,
-           SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) as late_count
-    FROM attendance a
-    JOIN student s ON a.studentID = s.studentID
-    JOIN classes c ON s.class_id = c.class_id
-    WHERE a.date BETWEEN '$first_day_of_month' AND '$last_day_of_month'
-    $gradeCondition  -- Include the grade condition here
-    GROUP BY day
-    ORDER BY a.date ASC;";
+SELECT DATE_FORMAT(a.date, '%d') as day, 
+       SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as present_count,
+       SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent_count,
+       SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) as late_count
+FROM attendance a
+JOIN student s ON a.studentID = s.studentID
+JOIN classes c ON s.class_id = c.class_id
+WHERE a.date BETWEEN '$first_day_of_month' AND '$last_day_of_month'
+$gradeCondition  -- Include the grade condition here
+GROUP BY a.date, day  -- Include `a.date` in the GROUP BY clause
+ORDER BY a.date ASC;";
 
 $result = $conn->query($query);
 
@@ -276,7 +276,8 @@ $attendance_overview = [
 
 
 // Fetch top students with most absences
-$absences_sql = "  SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
+$absences_sql = "  
+    SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
            c.grade_level, c.section, COUNT(a.status) AS absence_count, 
            ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
     FROM attendance a
@@ -285,25 +286,28 @@ $absences_sql = "  SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name,
     WHERE a.status = 'Absent' 
     AND MONTH(a.date) = MONTH(CURDATE()) 
     $gradeCondition  -- Include the grade condition here
-    GROUP BY s.studentID
+    GROUP BY s.studentID, s.srcode, s.name, c.grade_level, c.section  -- Add the necessary fields in GROUP BY
     ORDER BY absence_count DESC
     LIMIT 5";
+
 
 $absences_result = $conn->query($absences_sql);
 
 // Fetch top students with most late
-$late_sql = "SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
+$late_sql = "  
+    SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
              c.grade_level, c.section, COUNT(a.status) AS late_count, 
              ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID)) * 100, 2) AS percentage
-             FROM attendance a
-             JOIN student s ON a.studentID = s.studentID
-             JOIN classes c ON s.class_id = c.class_id
-             WHERE a.status = 'Late'
-             AND MONTH(a.date) = MONTH(CURDATE()) 
-             $gradeCondition
-             GROUP BY s.studentID
-             ORDER BY late_count DESC
-             LIMIT 5";
+    FROM attendance a
+    JOIN student s ON a.studentID = s.studentID
+    JOIN classes c ON s.class_id = c.class_id
+    WHERE a.status = 'Late'
+    AND MONTH(a.date) = MONTH(CURDATE()) 
+    $gradeCondition
+    GROUP BY s.studentID, s.srcode, s.name, c.grade_level, c.section  -- Add the necessary fields in GROUP BY
+    ORDER BY late_count DESC
+    LIMIT 5";
+
 
 $late_result = $conn->query($late_sql);
 
@@ -326,11 +330,12 @@ WHERE
     $gradeCondition
      AND MONTH(a.date) = MONTH(CURDATE()) 
 GROUP BY 
-    s.studentID, s.name, c.grade_level, c.section
+    s.studentID, s.srcode, s.name, c.grade_level, c.section  -- Add necessary fields in GROUP BY
 HAVING 
     COUNT(*) = COUNT(CASE WHEN a.status = 'Present' THEN 1 END)
 LIMIT 5;
 ";
+
 
 $perfect_attendance_result = $conn->query($perfect_attendance_sql);
 
@@ -345,7 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Query to get attendance data by grade
     $query = "
- SELECT c.grade_level, 
+    SELECT c.grade_level, 
            SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) AS present_count,
            SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) AS late_count,
            SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) AS absent_count
@@ -357,7 +362,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gradeCondition  -- Include grade condition here
     GROUP BY c.grade_level
     ORDER BY c.grade_level ASC;
-    ";
+";
 
     $result = $conn->query($query);
 
