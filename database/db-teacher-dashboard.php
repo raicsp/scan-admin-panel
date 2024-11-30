@@ -132,7 +132,7 @@ if (isset($_GET['date'])) {
     $date = $_GET['date']; // Get the selected date from the query string
     // Format the date as needed
     $formatted_date = date('Y-m-d', strtotime($date));
-    
+
     // Modify the query to filter by the selected date
     $status_query = "
         SELECT a.status, COUNT(*) as count
@@ -143,7 +143,7 @@ if (isset($_GET['date'])) {
     ";
 
     $status_result = $conn->query($status_query);
-    
+
     $present_count = 0;
     $absent_count = 0;
     $late_count = 0;
@@ -171,12 +171,12 @@ if (isset($_GET['date'])) {
 
 // Monthly Attendance Query
 $monthlyDataQuery = "
-    SELECT DATE_FORMAT(date, '%b') AS month, COUNT(*) AS presentCount
-    FROM attendance
-    JOIN student ON attendance.studentID = student.studentID
-    WHERE status = 'Present' AND YEAR(date) = YEAR(CURDATE()) AND student.class_id = $class_id
-    GROUP BY MONTH(date)
-    ORDER BY MONTH(date);
+SELECT DATE_FORMAT(date, '%b') AS month, COUNT(*) AS presentCount
+FROM attendance
+JOIN student ON attendance.studentID = student.studentID
+WHERE status = 'Present' AND YEAR(date) = YEAR(CURDATE()) AND student.class_id = $class_id
+GROUP BY DATE_FORMAT(date, '%b'), MONTH(date)
+ORDER BY MONTH(date);
 ";
 $monthlyDataResult = $conn->query($monthlyDataQuery);
 
@@ -190,11 +190,13 @@ while ($row = $monthlyDataResult->fetch_assoc()) {
 
 // Daily Attendance Query 
 $dailyDataQuery = " 
-   SELECT DATE_FORMAT(date, '%a') AS day, COUNT(*) AS presentCount
-   FROM attendance
-   JOIN student ON attendance.studentID = student.studentID
-   WHERE status = 'Present' AND WEEK(date) = WEEK(CURDATE()) AND student.class_id = $class_id
-   GROUP BY day;
+SELECT DATE_FORMAT(date, '%a') AS day, COUNT(*) AS presentCount
+FROM attendance
+JOIN student ON attendance.studentID = student.studentID
+WHERE status = 'Present' AND WEEK(date) = WEEK(CURDATE()) AND student.class_id = $class_id
+GROUP BY DATE_FORMAT(date, '%a'), DAYOFWEEK(date)
+ORDER BY DAYOFWEEK(date);
+
 ";
 
 $dailyDataResult = $conn->query($dailyDataQuery);  // Correct variable name here
