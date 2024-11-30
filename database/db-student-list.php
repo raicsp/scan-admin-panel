@@ -1,6 +1,20 @@
 <?php
 include 'database/db_connect.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$userPosition = trim($_SESSION['position'] ?? '');
+echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</script>";
 
+// Define grade conditions based on user position
+$gradeCondition = '';
+if ($userPosition === 'Elementary Chairperson') {
+  // Allow access only to Kinder to Grade-6
+  $gradeCondition = "WHERE c.grade_level IN ('Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6')";
+} elseif ($userPosition === 'High School Chairperson') {
+  // Allow access only to Grade-7 to Grade-12
+  $gradeCondition = "WHERE c.grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
+}
 // Initialize response array
 $response = ['success' => false, 'error' => ''];
 
