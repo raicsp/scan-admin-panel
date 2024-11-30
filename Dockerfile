@@ -1,31 +1,34 @@
-# Use the official PHP image with CLI and web server support
-FROM php:8.2-cli
 
-# Install system dependencies
+# Use the official PHP image with Apache support
+FROM php:8.2-apache
+
+# Install system dependencies and PHP extensions (needed for your project)
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
-    libonig-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip
+@@ -14,20 +14,23 @@
+# Enable mod_rewrite for Apache (for URL routing if needed)
+RUN a2enmod rewrite
 
-# Install Composer
+# Install Composer (dependency manager for PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Set the working directory to /var/www/html (Apache's default web directory)
+# Set the working directory to Apache's default web directory
+WORKDIR /var/www/html
 
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy project files to the working directory
+# Copy all project files into the container’s /var/www/html directory
 COPY . .
 
-# Install PHP dependencies using Composer
+# Install Composer (dependency manager for PHP)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install PHP dependencies via Composer (if any)
 RUN composer install --no-dev --optimize-autoloader
 
-# Expose Render's default port
-EXPOSE 8080
+# Set the DirectoryIndex to login.php to handle root requests
+RUN echo 'DirectoryIndex login.php index.php index.html' >> /etc/apache2/apache2.conf
+# Expose the container’s port 80 (Apache default port)
+EXPOSE 80
 
-# Start the built-in PHP server
-CMD ["php", "-S", "0.0.0.0:8080", "login.php"]
-
-# Copy the .env file into the container
-COPY database/.env /app/config/.env
-
+# Start Apache server when the container is run
+CMD ["apache2-foreground"]
