@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && apt-get clean
 
-# Debug: Verify if the libraries are installed
+# Debug: Verify if the libraries are installed (Check if jpeg and png directories exist)
 RUN ls -l /usr/include/freetype2 /usr/include/jpeg /usr/include/png
 
 # Configure GD extension with FreeType and JPEG support
