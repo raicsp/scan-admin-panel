@@ -86,6 +86,11 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         /* Make table rows hoverable */
         .table-hover tbody tr:hover {
             background-color: #f1f1f1;
@@ -135,7 +140,7 @@ $conn->close();
                             </form>
 
 
-
+                            <div class="table-responsive">
                             <table class="table table-bordered table-hover" id="absenceTable">
                                 <thead>
                                     <tr>
@@ -154,6 +159,7 @@ $conn->close();
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -169,8 +175,6 @@ $conn->close();
     <script src="assets/js/main.js"></script>
 
     <script>
-
-        
         // Add click functionality to table rows
         document.addEventListener('DOMContentLoaded', (event) => {
             const table = document.getElementById('absenceTable');
@@ -207,8 +211,6 @@ $conn->close();
 
             window.location.href = url.toString(); // Reload page with the updated URL
         });
-
-
     </script>
 </body>
 

@@ -41,10 +41,17 @@ include 'database/db-add-teacher.php';
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <!-- DataTables JS -->
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
+ 
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+        .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
 
 </head>
 
@@ -88,6 +95,7 @@ include 'database/db-add-teacher.php';
 
 
               <!-- Table with Data -->
+              <div class="table-responsive">
               <table id="accountsTable" class="table table-striped display">
                 <thead>
                   <tr>
@@ -117,7 +125,7 @@ include 'database/db-add-teacher.php';
                 </tbody>
               </table>
               <!-- End Table with stripped rows -->
-
+              </div>
             </div>
           </div>
 

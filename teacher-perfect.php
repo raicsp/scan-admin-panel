@@ -46,6 +46,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -62,6 +63,13 @@ $conn->close();
     <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
+
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
 </head>
 
 <body>
@@ -96,27 +104,28 @@ $conn->close();
                                     <button type="button" class="btn btn-primary" id="filterButton">Filter</button>
                                 </div>
                             </form>
-
-                            <table class="table table-bordered table-hover" id="perfectAttendanceTable">
-                                <thead>
-                                    <tr>
-                                        <th>Sr-Code</th>
-                                        <th>Name</th>
-                                        <th>Grade Level</th>
-                                        <th>Section</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($perfectAttendanceStudents as $student) : ?>
-                                        <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">
-                                            <td><?= htmlspecialchars($student['srcode']) ?></td>
-                                            <td><?= htmlspecialchars($student['student_name']) ?></td>
-                                            <td><?= htmlspecialchars($student['grade_level']) ?></td>
-                                            <td><?= htmlspecialchars($student['section']) ?></td>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="perfectAttendanceTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr-Code</th>
+                                            <th>Name</th>
+                                            <th>Grade Level</th>
+                                            <th>Section</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($perfectAttendanceStudents as $student) : ?>
+                                            <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">
+                                                <td><?= htmlspecialchars($student['srcode']) ?></td>
+                                                <td><?= htmlspecialchars($student['student_name']) ?></td>
+                                                <td><?= htmlspecialchars($student['grade_level']) ?></td>
+                                                <td><?= htmlspecialchars($student['section']) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -157,7 +166,7 @@ $conn->close();
         });
 
         // Filter button event
-        document.getElementById('filterButton').addEventListener('click', function () {
+        document.getElementById('filterButton').addEventListener('click', function() {
             const month = document.getElementById('month').value;
             const url = new URL(window.location.href);
             if (month) {
@@ -169,4 +178,5 @@ $conn->close();
         });
     </script>
 </body>
+
 </html>

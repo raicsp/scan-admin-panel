@@ -33,54 +33,73 @@ $activePage = 'attendance';
   <link href="assets/css/style.css" rel="stylesheet">
 
   <style>
-    .table-responsive {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    .form-control,
-    .form-select {
-      padding: 0.375rem 0.75rem;
-      font-size: 1rem;
-    }
+  .form-control,
+  .form-select {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+  }
 
-    /* Custom form layout for spacing */
+  /* Custom form layout for spacing */
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .form-row .col-md-3,
+  .form-row .col-md-5,
+  .form-row .col-md-2 {
+    flex-grow: 1;
+  }
+
+  /* Align buttons */
+  .btn-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  /* Styling improvements for buttons */
+  .btn-primary,
+  .btn-success {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Improve table styling */
+  .table {
+    margin-top: 20px;
+  }
+
+  /* Responsive form layout */
+  @media (max-width: 768px) {
     .form-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
+      flex-direction: column;
     }
 
-    .form-row .col-md-3 {
-      flex-grow: 1;
+    .form-row .col-md-3,
+    .form-row .col-md-5,
+    .form-row .col-md-2 {
+      width: 100%;
     }
 
-    /* Align buttons */
     .btn-container {
-      display: flex;
-      justify-content: flex-start;
-      gap: 10px;
+      justify-content: center;
     }
+  }
 
-    /* Styling improvements for buttons */
-    .btn-primary,
-    .btn-success {
-      padding: 0.4rem 1rem;
+  /* Adjust table header and data alignment */
+  @media (max-width: 576px) {
+    .table-responsive {
       font-size: 0.9rem;
     }
-
-    /* Improve table styling */
-    .table {
-      margin-top: 20px;
-    }
-
-    /* Responsive form layout */
-    @media (max-width: 768px) {
-      .form-row {
-        flex-direction: column;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 
 <body>
@@ -132,8 +151,8 @@ $activePage = 'attendance';
                     <label for="endDate" class="form-label"><b>Ending Date</b></label>
                     <input type="date" id="endDate" class="form-control" name="endDate" value="<?= htmlspecialchars($endDate) ?>">
                   </div>
-                  <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-50">Filter</button>
+                  <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
                   </div>
                 </div>
 

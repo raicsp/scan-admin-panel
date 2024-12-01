@@ -25,8 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['firstname'] = $firstname;
                 $_SESSION['lastname'] = $lastname;
                 $_SESSION['position'] = $position;
-                $_SESSION['profile_pic'] = !empty($profile_pic) ? $profile_pic : 'assets/img/default-profile.png';
                 $_SESSION['email'] = $email;
+
+                // Convert BLOB to Base64 and set default if no image is uploaded
+                if (!empty($profile_pic)) {
+                    $profile_pic_base64 = 'data:image/jpeg;base64,' . base64_encode($profile_pic);
+                } else {
+                    $profile_pic_base64 = 'assets/img/default-profile.png'; // Path to default image
+                }
+                $_SESSION['profile_pic'] = $profile_pic_base64;
 
                 header("Location: dashboard.php");
                 exit();
@@ -53,9 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['firstname'] = $firstname;
                     $_SESSION['lastname'] = $lastname;
                     $_SESSION['class_id'] = $class_id;
-                    $_SESSION['profile_pic'] = !empty($profile_pic) ? $profile_pic : 'assets/img/default-profile.png';
                     $_SESSION['email'] = $email;
                     $_SESSION['position'] = "Teacher";
+
+                    // Convert BLOB to Base64 and set default if no image is uploaded
+                    if (!empty($profile_pic)) {
+                        $profile_pic_base64 = 'data:image/jpeg;base64,' . base64_encode($profile_pic);
+                    } else {
+                        $profile_pic_base64 = 'assets/img/default-profile.png'; // Path to default image
+                    }
+                    $_SESSION['profile_pic'] = $profile_pic_base64;
 
                     header("Location: teacher-dashboard.php");
                     exit();

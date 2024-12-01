@@ -36,6 +36,11 @@ include 'database/db-teacher-student-list.php';
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .clickable-row {
             cursor: pointer;
         }
@@ -62,38 +67,39 @@ include 'database/db-teacher-student-list.php';
     <!-- End Sidebar -->
 
     <main id="main" class="main">
-    <div class="pagetitle">
-        <h1>Student Information Management</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="teacher-dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item active">Student Information Management</li>
-            </ol>
-        </nav>
-    </div><!-- End Page Title -->
+        <div class="pagetitle">
+            <h1>Student Information Management</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="teacher-dashboard.php">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Student Information Management</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
 
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
 
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Manage Student Details and Records</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Manage Student Details and Records</h5>
 
-                        <!-- Table with Data -->
-                        <table id="studentsTable" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Sr-Code</th>
-                                    <th>Name</th>
-                                 
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                // Fetch students based on the teacher's class_id
-                                $query = "
+                            <!-- Table with Data -->
+                             <div class= "table-responsive">
+                            <table id="studentsTable" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sr-Code</th>
+                                        <th>Name</th>
+
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    // Fetch students based on the teacher's class_id
+                                    $query = "
                                 SELECT 
                                     s.studentID,
                                     s.srcode,
@@ -112,36 +118,36 @@ include 'database/db-teacher-student-list.php';
                                     s.class_id = '$teacherClassId'
                                 ";
 
-                                $result = $conn->query($query);
-                                $students = [];
+                                    $result = $conn->query($query);
+                                    $students = [];
 
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                       
+                                    if ($result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
 
-                                        // Store each student’s data in an array
-                                        $students[] = [
-                                            'studentID' => $row['studentID'],
-                                            'srcode' => $row['srcode'],
-                                            'name' => $row['student_name'],
-                                            'grade_level' => $row['grade_level'],
-                                            'section' => $row['section'],
-                                            'gender' => $row['gender'],
-                                            'school_year' => $row['school_year'],
-                                            'parent_contact' => $row['parent_contact'],
-                                            'parent_email' => $row['parent_email'],
-                                        ];
+
+                                            // Store each student’s data in an array
+                                            $students[] = [
+                                                'studentID' => $row['studentID'],
+                                                'srcode' => $row['srcode'],
+                                                'name' => $row['student_name'],
+                                                'grade_level' => $row['grade_level'],
+                                                'section' => $row['section'],
+                                                'gender' => $row['gender'],
+                                                'school_year' => $row['school_year'],
+                                                'parent_contact' => $row['parent_contact'],
+                                                'parent_email' => $row['parent_email'],
+                                            ];
+                                        }
                                     }
-                                }
 
-                                // Sort the array by the formatted name
-                                usort($students, function ($a, $b) {
-                                    return strcmp($a['name'], $b['name']);
-                                });
+                                    // Sort the array by the formatted name
+                                    usort($students, function ($a, $b) {
+                                        return strcmp($a['name'], $b['name']);
+                                    });
 
-                                // Display sorted data in the table
-                                foreach ($students as $student) {
-                                    echo "<tr class='clickable-row' data-name='" . htmlspecialchars($student['srcode']) . "'>
+                                    // Display sorted data in the table
+                                    foreach ($students as $student) {
+                                        echo "<tr class='clickable-row' data-name='" . htmlspecialchars($student['srcode']) . "'>
                                     <td>{$student['srcode']}</td>
                                     <td>{$student['name']}</td>
                                     <td class='action-buttons'>
@@ -160,19 +166,19 @@ include 'database/db-teacher-student-list.php';
                                         <button class='btn btn-danger btn-sm' onclick='deleteStudent({$student['studentID']})'>Delete</button>
                                     </td>
                                 </tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                        <!-- End Table -->
-
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                            <!-- End Table -->
+                          <div>
+                        </div>
                     </div>
-                </div>
 
+                </div>
             </div>
-        </div>
-    </section>
-</main><!-- End #main -->
+        </section>
+    </main><!-- End #main -->
 
 
     <!-- Edit Student Modal -->
@@ -261,9 +267,9 @@ include 'database/db-teacher-student-list.php';
             document.getElementById('editParentContact').value = parentContact;
             document.getElementById('editParentEmail').value = parentEmail;
             console.log('Name:', document.getElementById('editFullName').value);
-console.log('School Year:', document.getElementById('editSchoolYear').value);
-console.log('Parent Contact:', document.getElementById('editParentContact').value);
-console.log('Parent Email:', document.getElementById('editParentEmail').value);
+            console.log('School Year:', document.getElementById('editSchoolYear').value);
+            console.log('Parent Contact:', document.getElementById('editParentContact').value);
+            console.log('Parent Email:', document.getElementById('editParentEmail').value);
 
 
             // Set grade level and trigger change event to update sections
@@ -326,22 +332,22 @@ console.log('Parent Email:', document.getElementById('editParentEmail').value);
     <script>
         //clicable row
         document.addEventListener('DOMContentLoaded', (event) => {
-    const table = document.getElementById('studentsTable');
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const table = document.getElementById('studentsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-    for (let row of rows) {
-        row.classList.add('clickable-row');
-        row.addEventListener('click', function(event) {
-            // Check if the click is not on an action button
-            if (!event.target.closest('.action-buttons')) {
-                // Get the srcode (not the formatted name) from the data-name attribute
-                const studentSrCode = row.getAttribute('data-name');
-                // Redirect to the student details page, passing srcode as the query parameter
-                window.location.href = `student-details.php?srcode=${encodeURIComponent(studentSrCode)}`;
+            for (let row of rows) {
+                row.classList.add('clickable-row');
+                row.addEventListener('click', function(event) {
+                    // Check if the click is not on an action button
+                    if (!event.target.closest('.action-buttons')) {
+                        // Get the srcode (not the formatted name) from the data-name attribute
+                        const studentSrCode = row.getAttribute('data-name');
+                        // Redirect to the student details page, passing srcode as the query parameter
+                        window.location.href = `student-details.php?srcode=${encodeURIComponent(studentSrCode)}`;
+                    }
+                });
             }
         });
-    }
-});
 
 
 

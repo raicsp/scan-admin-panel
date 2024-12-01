@@ -84,6 +84,13 @@ $conn->close();
     <!-- SweetAlert Library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -124,24 +131,26 @@ $conn->close();
                                 </div>
                             </form>
 
-                            <table class="table table-bordered table-hover" id="absenceTable">
-                                <thead>
-                                    <tr>
-                                        <th>Sr-Code</th>
-                                        <th>Name</th>
-                                        <th>Absences</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($absentStudents as $student) : ?>
-                                        <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">
-                                            <td><?= htmlspecialchars($student['srcode']) ?></td>
-                                            <td><?= htmlspecialchars($student['student_name']) ?></td>
-                                            <td><?= htmlspecialchars($student['absent_count']) ?></td>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="absenceTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr-Code</th>
+                                            <th>Name</th>
+                                            <th>Absences</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($absentStudents as $student) : ?>
+                                            <tr data-name="<?= htmlspecialchars($student['srcode']) ?>">
+                                                <td><?= htmlspecialchars($student['srcode']) ?></td>
+                                                <td><?= htmlspecialchars($student['student_name']) ?></td>
+                                                <td><?= htmlspecialchars($student['absent_count']) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -135,6 +135,12 @@ $conn->close();
     <!-- SweetAlert Library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
 </head>
 
 <body>
@@ -186,6 +192,7 @@ $conn->close();
                                 </div>
                             </div>
                             <!-- Table for displaying the students with the most absences -->
+                             <div class = "table-responsive">
                             <table class="table table-bordered table-hover" id="absenceTable">
                                 <thead>
                                     <tr>
@@ -207,6 +214,7 @@ $conn->close();
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
+                            </table>
                             </table>
                         </div>
                     </div>

@@ -28,63 +28,76 @@ include 'database/db-profile-settings.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         .profile-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    }
 
+    .profile-card {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 900px; /* Limit maximum width for larger screens */
+        display: flex;
+        flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    }
+
+    .profile-left,
+    .profile-right {
+        flex: 1;
+        padding: 15px;
+    }
+
+    .profile-left {
+        text-align: center;
+        border-right: 1px solid #ddd;
+    }
+
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+    }
+
+    .upload-btn {
+        display: inline-block;
+        background-color: #f44336;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .save-pic-btn {
+                display: none;
+                margin-top: 10px;
+            }
+
+    .profile-right h3 {
+        margin-bottom: 20px;
+    }
+
+    input.form-control {
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
         .profile-card {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            display: flex;
-        }
-
-        .profile-left {
-            flex: 1;
+            flex-direction: column;
             text-align: center;
-            border-right: 1px solid #ddd;
-            padding-right: 30px;
         }
-
-        .profile-pic {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 20px;
+        .profile-left {
+            border-right: none;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
         }
-
-        .upload-btn {
-            display: inline-block;
-            background-color: #f44336;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .save-pic-btn {
-            display: none;
-            margin-top: 10px;
-        }
-
-        .profile-right {
-            flex: 2;
-            padding-left: 30px;
-        }
-
-        .profile-right h3 {
-            margin-bottom: 20px;
-        }
-
-        .back-btn {
-            margin-bottom: 20px;
-        }
+    }
+        
     </style>
 </head>
 
@@ -271,8 +284,7 @@ document.getElementById('confirm-update-profile').addEventListener('click', func
                 icon: 'success',
                 title: 'Profile Information Updated!',
                 text: 'Your profile information has been successfully updated.',
-                confirmButtonText: 'OK',
-
+                confirmButtonText: 'OK'
             });
         }
     });

@@ -39,4 +39,5 @@ $id = isset($_SESSION['user_id'])
 
 // Add a role variable if available in the session
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+
 ?>

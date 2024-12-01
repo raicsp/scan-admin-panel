@@ -141,6 +141,13 @@ $conn->close();
     <!-- SweetAlert Library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -193,6 +200,7 @@ $conn->close();
                             </div>
 
                             <!-- Table for displaying the students with perfect attendance -->
+                            <div class="table-responsive">
                             <table class="table table-bordered table-hover" id="attendanceTable">
                                 <thead>
                                     <tr>
@@ -219,6 +227,7 @@ $conn->close();
                                     <?php endif; ?>
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </div>
                 </div>

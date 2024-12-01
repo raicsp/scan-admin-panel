@@ -37,6 +37,10 @@ include 'database/db-student-list.php';
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
   <style>
+        .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     .clickable-row {
       cursor: pointer;
     }
@@ -82,9 +86,6 @@ include 'database/db-student-list.php';
             <div class="card-body">
 
               <h5 class="card-title">Manage Student Details and Records</h5>
-
-
-
               <!-- Filter by Grade Level and Section -->
               <div class="row mb-3">
                 <div class="col-md-6">
@@ -122,6 +123,7 @@ include 'database/db-student-list.php';
  -->
 
               <!-- Table with Data -->
+              <div class="table-responsive">
               <table id="studentsTable" class="table">
                 <thead>
                   <tr>
@@ -202,6 +204,7 @@ include 'database/db-student-list.php';
                 </tbody>
               </table>
               <!-- End Table -->
+                </div>
 
             </div>
           </div>

@@ -49,6 +49,13 @@ include 'database/db-administrator.php';
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
+  <style>
+        .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -91,6 +98,7 @@ include 'database/db-administrator.php';
 
 
               <!-- Table with Data -->
+              <div class="table-responsive">
               <table id="accountsTable" class="table table-striped display">
                 <thead>
                   <tr>
@@ -120,7 +128,7 @@ include 'database/db-administrator.php';
                 </tbody>
               </table>
               <!-- End Table with stripped rows -->
-
+              </div>
             </div>
           </div>
 

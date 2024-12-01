@@ -352,7 +352,7 @@ $activePage = 'attendance-report';
           // Close loading spinner after delay
           setTimeout(() => {
             Swal.close();
-          }, 3000); // Simulated delay for generation
+          }, 8000); // Simulated delay for generation
         }
       });
     });
