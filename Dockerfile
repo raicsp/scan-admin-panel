@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    && apt-get install -y \
+    libxpm-dev \
+    libicu-dev \
+    libxml2-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include \
     && docker-php-ext-install pdo_mysql mbstring zip gd mysqli \
     && docker-php-ext-enable gd
