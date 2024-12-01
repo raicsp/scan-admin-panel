@@ -9,10 +9,6 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    && apt-get install -y \
-    libxpm-dev \
-    libicu-dev \
-    libxml2-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include \
     && docker-php-ext-install pdo_mysql mbstring zip gd mysqli \
     && docker-php-ext-enable gd
@@ -24,7 +20,7 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 
 # Copy all project files into the container’s /var/www/html directory
-COPY . .
+COPY . ./
 
 # Install Composer (dependency manager for PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
