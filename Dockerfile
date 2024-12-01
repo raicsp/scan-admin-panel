@@ -9,9 +9,22 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include \
-    && docker-php-ext-install pdo_mysql mbstring zip gd mysqli \
-    && docker-php-ext-enable gd
+    libxpm-dev \
+    libicu-dev \
+    libxml2-dev \
+    && apt-get clean
+
+# Debug: Verify if the libraries are installed
+RUN ls -l /usr/include/freetype2 /usr/include/jpeg /usr/include/png
+
+# Configure GD extension with FreeType and JPEG support
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/freetype2 --with-jpeg-dir=/usr/include/jpeg
+
+# Install required PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring zip gd mysqli
+
+# Enable the GD extension
+RUN docker-php-ext-enable gd
 
 # Enable mod_rewrite for Apache (for URL routing if needed)
 RUN a2enmod rewrite
