@@ -7,8 +7,10 @@ if (!isset($_SESSION['firstname'], $_SESSION['lastname'], $_SESSION['email'], $_
     exit;
 }
 
-// Get the admin ID from the session
-$admin_id = $_SESSION['user_id'];
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+} 
+
 
 // Fetch user data from session
 $firstname = htmlspecialchars($_SESSION['firstname']);
