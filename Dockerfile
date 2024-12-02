@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip gd mysqli
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pdo_mysql mbstring zip mysqli
 
 # Enable mod_rewrite for Apache (for URL routing if needed)
 RUN a2enmod rewrite
