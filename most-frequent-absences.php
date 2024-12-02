@@ -81,7 +81,7 @@ WHERE a.status = 'Absent'
 $gradeCondition
 $dateCondition
 $gradeSectionCondition
-GROUP BY s.srcode, s.studentID, c.grade_level, c.section
+GROUP BY s.srcode, s.studentID, s.name, c.grade_level, c.section
 ORDER BY absence_count DESC
 ";
 
