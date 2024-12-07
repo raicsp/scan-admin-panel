@@ -31,6 +31,9 @@ RUN composer install --no-dev --optimize-autoloader
 # Set the DirectoryIndex to login.php to handle root requests
 RUN echo 'DirectoryIndex login.php index.php index.html' >> /etc/apache2/apache2.conf
 
+# Set appropriate file permissions (optional but recommended)
+RUN chown -R www-data:www-data /var/www/html
+
 # Expose the container’s port 80 (Apache default port)
 EXPOSE 80
 
