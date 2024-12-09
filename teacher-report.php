@@ -310,7 +310,7 @@ $activePage = 'attendance-report';
             // Close loading spinner after delay
             setTimeout(() => {
               Swal.close();
-            }, 8000); // Simulated delay for generation
+            }, 4000); // Simulated delay for generation
           }
         });
       }
@@ -352,7 +352,7 @@ $activePage = 'attendance-report';
           // Close loading spinner after delay
           setTimeout(() => {
             Swal.close();
-          }, 8000); // Simulated delay for generation
+          }, 4000); // Simulated delay for generation
         }
       });
     });
