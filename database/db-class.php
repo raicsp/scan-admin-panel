@@ -8,6 +8,15 @@ $alertType = '';
 // Check the logged-in user's position
 $userPosition = trim($_SESSION['position'] ?? '');
 
+if ($userPosition === '') {
+    // Display error message with image
+    echo '<div style="text-align: center;">';
+    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+    echo '<p><strong>ACCESS DENIED</strong></p>';
+    echo '</div>';
+    exit; // Terminate the script after displaying the error
+}
+
 
 // Define grade conditions based on user position
 $gradeCondition = '';

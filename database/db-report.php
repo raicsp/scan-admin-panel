@@ -5,6 +5,15 @@ session_start();
 $userPosition = trim($_SESSION['position'] ?? '');
 $classID = $_SESSION['class_id'] ?? null; // Check if class_id is set in session
 
+if ($userPosition === '') {
+    // Display error message with image
+    echo '<div style="text-align: center;">';
+    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+    echo '<p><strong>ACCESS DENIED</strong></p>';
+    echo '</div>';
+    exit; // Terminate the script after displaying the error
+}
+
 $availableGrades = [];
 $gradeCondition = '';
 // Ensure studentsDaily and studentsMonthly are populated correctly with query results.

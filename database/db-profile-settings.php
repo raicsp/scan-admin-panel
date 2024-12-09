@@ -7,11 +7,14 @@ if (!isset($_SESSION['firstname'], $_SESSION['lastname'], $_SESSION['email'], $_
     exit;
 }
 
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-} 
-
-
+// Get the admin ID from the session based on position
+if ($_SESSION['position'] === 'Teacher') {
+    // If position is "Teacher", use the 'id' session variable
+    $admin_id = $_SESSION['id'];
+} else {
+    // If position is not "Teacher", use 'user_id'
+    $admin_id = $_SESSION['user_id'];
+}
 // Fetch user data from session
 $firstname = htmlspecialchars($_SESSION['firstname']);
 $lastname = htmlspecialchars($_SESSION['lastname']);
@@ -211,65 +214,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['previous_password']))
     $stmt_fetch_admin->bind_param("i", $admin_id);
     $stmt_fetch_admin->execute();
     $result_admin = $stmt_fetch_admin->get_result();
-    $admin = $result_admin->fetch_assoc();
 
-    // Verify previous password for admin
-    if (!empty($previous_password) && password_verify($previous_password, $admin['password'])) {
-        if (!empty($new_password) && $new_password === $retype_password) {
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+    // Check if admin data exists
+    if ($result_admin->num_rows > 0) {
+        $admin = $result_admin->fetch_assoc();
 
-            // Update password in admin table
-            $sql_update_password = "UPDATE admin SET password = ? WHERE id = ?";
-            $stmt_update_password = $conn->prepare($sql_update_password);
-            $stmt_update_password->bind_param("si", $hashed_password, $admin_id);
-            if ($stmt_update_password->execute()) {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Password Updated!',
-                        text: 'Your password has been updated successfully.',
-                        confirmButtonText: 'OK'
-                    });
-                </script>";
-            } else {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Update Failed!',
-                        text: 'Failed to update password. Please try again.',
-                        confirmButtonText: 'OK'
-                    });
-                </script>";
-            }
-        } else {
-            echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Password Mismatch!',
-                    text: 'The new passwords do not match. Please try again.',
-                    confirmButtonText: 'OK'
-                });
-            </script>";
-        }
-    } else {
-        // If admin password is incorrect, try user table
-        $sql_fetch_user = "SELECT password FROM users WHERE email = ?";
-        $stmt_fetch_user = $conn->prepare($sql_fetch_user);
-        $stmt_fetch_user->bind_param("s", $email);
-        $stmt_fetch_user->execute();
-        $result_user = $stmt_fetch_user->get_result();
-        $user = $result_user->fetch_assoc();
-
-        // Verify previous password for user
-        if (!empty($previous_password) && password_verify($previous_password, $user['password'])) {
+        // Verify previous password for admin
+        if (!empty($previous_password) && password_verify($previous_password, $admin['password'])) {
             if (!empty($new_password) && $new_password === $retype_password) {
                 $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-                // Update password in users table
-                $sql_update_password_user = "UPDATE users SET password = ? WHERE email = ?";
-                $stmt_update_password_user = $conn->prepare($sql_update_password_user);
-                $stmt_update_password_user->bind_param("ss", $hashed_password, $email);
-                if ($stmt_update_password_user->execute()) {
+                // Update password in admin table
+                $sql_update_password = "UPDATE admin SET password = ? WHERE id = ?";
+                $stmt_update_password = $conn->prepare($sql_update_password);
+                $stmt_update_password->bind_param("si", $hashed_password, $admin_id);
+                if ($stmt_update_password->execute()) {
                     echo "<script>
                         Swal.fire({
                             icon: 'success',
@@ -304,6 +263,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['previous_password']))
                     icon: 'error',
                     title: 'Incorrect Password!',
                     text: 'The previous password is incorrect. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+        }
+    } else {
+        // If no admin data found, try user table
+        $sql_fetch_user = "SELECT password FROM users WHERE email = ?";
+        $stmt_fetch_user = $conn->prepare($sql_fetch_user);
+        $stmt_fetch_user->bind_param("s", $email);
+        $stmt_fetch_user->execute();
+        $result_user = $stmt_fetch_user->get_result();
+
+        // Check if user data exists
+        if ($result_user->num_rows > 0) {
+            $user = $result_user->fetch_assoc();
+
+            // Verify previous password for user
+            if (!empty($previous_password) && password_verify($previous_password, $user['password'])) {
+                if (!empty($new_password) && $new_password === $retype_password) {
+                    $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+                    // Update password in users table
+                    $sql_update_password_user = "UPDATE users SET password = ? WHERE email = ?";
+                    $stmt_update_password_user = $conn->prepare($sql_update_password_user);
+                    $stmt_update_password_user->bind_param("ss", $hashed_password, $email);
+                    if ($stmt_update_password_user->execute()) {
+                        echo "<script>
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Password Updated!',
+                                text: 'Your password has been updated successfully.',
+                                confirmButtonText: 'OK'
+                            });
+                        </script>";
+                    } else {
+                        echo "<script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed!',
+                                text: 'Failed to update password. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        </script>";
+                    }
+                } else {
+                    echo "<script>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Password Mismatch!',
+                            text: 'The new passwords do not match. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    </script>";
+                }
+            } else {
+                echo "<script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Incorrect Password!',
+                        text: 'The previous password is incorrect. Please try again.',
+                        confirmButtonText: 'OK'
+                    });
+                </script>";
+            }
+        } else {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No User Found!',
+                    text: 'No user found with the provided details.',
                     confirmButtonText: 'OK'
                 });
             </script>";

@@ -279,7 +279,7 @@ if (isset($_SESSION['position'])) {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Redirect to logout
-                        window.location.href = "login.php";
+                        window.location.href = "logout.php";
                     }
                 });
             }

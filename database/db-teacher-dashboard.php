@@ -5,10 +5,20 @@ session_start();
 $class_id = $_SESSION['class_id'] ?? 0;
 
 if ($class_id === 0) {
+   // Display error message with image
+   echo '<div style="text-align: center;">';
+   echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+   echo '<p><strong>ACCESS DENIED</strong></p>';
+   echo '</div>';
+   exit; // Terminate the script after displaying the error
+}
+$userPosition = trim($_SESSION['position'] ?? '');
+
+if ($userPosition === '') {
     // Display error message with image
     echo '<div style="text-align: center;">';
-    echo '<img src="./adminimages/error-image.png" alt="Error" style="width: 200px; height: auto;"/>';
-    echo '<p><strong>Error:</strong> Class ID is required to display data.</p>';
+    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+    echo '<p><strong>ACCESS DENIED</strong></p>';
     echo '</div>';
     exit; // Terminate the script after displaying the error
 }

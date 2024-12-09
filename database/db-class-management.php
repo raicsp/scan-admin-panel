@@ -10,7 +10,16 @@ if (isset($_SESSION['alertMessage'])) {
     unset($_SESSION['alertMessage']);
     unset($_SESSION['alertType']);
 }
+$userPosition = trim($_SESSION['position'] ?? '');
 
+if ($userPosition === '') {
+    // Display error message with image
+    echo '<div style="text-align: center;">';
+    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+    echo '<p><strong>ACCESS DENIED</strong></p>';
+    echo '</div>';
+    exit; // Terminate the script after displaying the error
+}
 // Handle form submission for adding and updating classes
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['class_id'])) {

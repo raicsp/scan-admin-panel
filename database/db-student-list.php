@@ -6,6 +6,15 @@ if (session_status() === PHP_SESSION_NONE) {
 $userPosition = trim($_SESSION['position'] ?? '');
 echo "<script>console.log('User Position: " . addslashes($userPosition) . "');</script>";
 
+if ($userPosition === '') {
+    // Display error message with image
+    echo '<div style="text-align: center;">';
+    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
+    echo '<p><strong>ACCESS DENIED</strong></p>';
+    echo '</div>';
+    exit; // Terminate the script after displaying the error
+}
+
 // Define grade conditions based on user position
 $gradeCondition = '';
 if ($userPosition === 'Elementary Chairperson') {
