@@ -137,56 +137,41 @@ while ($row = $gender_result->fetch_assoc()) {
     }
 }
 
-// Count each Attendance Status Pie Chart
-if (isset($_GET['date'])) {
-    $date = $_GET['date']; // Get the selected date from the query string
-    // Format the date as needed
-    $formatted_date = date('Y-m-d', strtotime($date));
+// Count each Attendance Status
+$status_query = "
+    SELECT a.status, COUNT(*) as count
+    FROM attendance a
+    INNER JOIN student s ON a.studentID = s.studentID
+    WHERE s.class_id = '$class_id' AND a.date = CURDATE()
+    GROUP BY a.status
+";
 
-    // Modify the query to filter by the selected date
-    $status_query = "
-        SELECT a.status, COUNT(*) as count
-        FROM attendance a
-        INNER JOIN student s ON a.studentID = s.studentID
-        WHERE s.class_id = '$class_id' AND a.date = '$formatted_date'
-        GROUP BY a.status
-    ";
+$status_result = $conn->query($status_query);
 
-    $status_result = $conn->query($status_query);
+// Initialize counters
+$present_count = 0;
+$absent_count = 0;
+$late_count = 0;
 
-    $present_count = 0;
-    $absent_count = 0;
-    $late_count = 0;
-
-    while ($row = $status_result->fetch_assoc()) {
-        if ($row['status'] == 'Present') {
-            $present_count = $row['count'];
-        } elseif ($row['status'] == 'Absent') {
-            $absent_count = $row['count'];
-        } elseif ($row['status'] == 'Late') {
-            $late_count = $row['count'];
-        }
+while ($row = $status_result->fetch_assoc()) {
+    if ($row['status'] == 'Present') {
+        $present_count = $row['count'];
+    } elseif ($row['status'] == 'Absent') {
+        $absent_count = $row['count'];
+    } elseif ($row['status'] == 'Late') {
+        $late_count = $row['count'];
     }
-
-    // Return the data as JSON for use in the front-end
-    echo json_encode([
-        'presentCount' => $present_count,
-        'absentCount' => $absent_count,
-        'lateCount' => $late_count
-    ]);
-    exit;
 }
-
 
 
 // Monthly Attendance Query
 $monthlyDataQuery = "
-SELECT DATE_FORMAT(date, '%b') AS month, COUNT(*) AS presentCount
-FROM attendance
-JOIN student ON attendance.studentID = student.studentID
-WHERE status = 'Present' AND YEAR(date) = YEAR(CURDATE()) AND student.class_id = $class_id
-GROUP BY DATE_FORMAT(date, '%b'), MONTH(date)
-ORDER BY MONTH(date);
+    SELECT DATE_FORMAT(date, '%b') AS month, COUNT(*) AS presentCount
+    FROM attendance
+    JOIN student ON attendance.studentID = student.studentID
+    WHERE status = 'Present' AND YEAR(date) = YEAR(CURDATE()) AND student.class_id = $class_id
+    GROUP BY MONTH(date)
+    ORDER BY MONTH(date);
 ";
 $monthlyDataResult = $conn->query($monthlyDataQuery);
 
@@ -200,13 +185,11 @@ while ($row = $monthlyDataResult->fetch_assoc()) {
 
 // Daily Attendance Query 
 $dailyDataQuery = " 
-SELECT DATE_FORMAT(date, '%a') AS day, COUNT(*) AS presentCount
-FROM attendance
-JOIN student ON attendance.studentID = student.studentID
-WHERE status = 'Present' AND WEEK(date) = WEEK(CURDATE()) AND student.class_id = $class_id
-GROUP BY DATE_FORMAT(date, '%a'), DAYOFWEEK(date)
-ORDER BY DAYOFWEEK(date);
-
+   SELECT DATE_FORMAT(date, '%a') AS day, COUNT(*) AS presentCount
+   FROM attendance
+   JOIN student ON attendance.studentID = student.studentID
+   WHERE status = 'Present' AND WEEK(date) = WEEK(CURDATE()) AND student.class_id = $class_id
+   GROUP BY day;
 ";
 
 $dailyDataResult = $conn->query($dailyDataQuery);  // Correct variable name here
