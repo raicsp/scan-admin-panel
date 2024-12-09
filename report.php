@@ -345,7 +345,7 @@ $activePage = 'attendance-report';
                         // Close the loading alert after a short delay (to give the download time to start)
                         setTimeout(() => {
                             Swal.close();
-                        }, 8000);
+                        }, 4000);
                     }
                 });
             }
@@ -411,7 +411,7 @@ $activePage = 'attendance-report';
                         // Close the loading alert after a short delay (to give the download time to start)
                         setTimeout(() => {
                             Swal.close();
-                        }, 8000);
+                        }, 4000);
                     }
                 });
             }
