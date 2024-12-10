@@ -7,14 +7,19 @@ if (!isset($_SESSION['firstname'], $_SESSION['lastname'], $_SESSION['email'], $_
     exit;
 }
 
-// Get the admin ID from the session based on position
+// Get the user ID and table to update based on the position
 if ($_SESSION['position'] === 'Teacher') {
-    // If position is "Teacher", use the 'id' session variable
-    $admin_id = $_SESSION['id'];
+    // If position is "Teacher", use the 'id' session variable for users table
+    $user_id = $_SESSION['id'];
+     $admin_id = $_SESSION['id'];
+    $table = 'users';
 } else {
-    // If position is not "Teacher", use 'user_id'
-    $admin_id = $_SESSION['user_id'];
+    // If position is not "Teacher", use 'user_id' for admin table
+    $user_id = $_SESSION['user_id'];
+     $admin_id = $_SESSION['id'];
+    $table = 'admin';
 }
+
 
 
 
