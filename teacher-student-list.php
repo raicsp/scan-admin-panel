@@ -87,7 +87,7 @@ include 'database/db-teacher-student-list.php';
 
                             <!-- Table with Data -->
                              <div class= "table-responsive">
-                            <table id="studentsTable" class="table">
+                            <table id="studentsTable" class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Sr-Code</th>
