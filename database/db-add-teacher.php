@@ -20,21 +20,21 @@ $alertType = "";
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate first name
-    if (empty(trim($_POST["first_name"]))) {
+    if (!isset($_POST["first_name"]) || empty(trim($_POST["first_name"]))) {
         $firstNameErr = "Please enter a first name.";
     } else {
         $firstName = trim($_POST["first_name"]);
     }
 
     // Validate last name
-    if (empty(trim($_POST["last_name"]))) {
+    if (!isset($_POST["last_name"]) || empty(trim($_POST["last_name"]))) {
         $lastNameErr = "Please enter a last name.";
     } else {
         $lastName = trim($_POST["last_name"]);
     }
 
     // Validate email
-    if (empty(trim($_POST["email"]))) {
+    if (!isset($_POST["email"]) || empty(trim($_POST["email"]))) {
         $emailErr = "Please enter an email.";
     } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
         $emailErr = "Please enter a valid email.";
@@ -42,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = trim($_POST["email"]);
     }
 }
+
 
 // Check connection
 if ($conn->connect_error) {
