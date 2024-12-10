@@ -212,13 +212,13 @@ include 'database/db-dashboard.php';
                     ?>
                   </select>
                 </li>
-                <li>
+<!--                 <li>
                   <select id="timeFilter" class="form-select">
                     <option value="today" <?= ($filter == 'today') ? 'selected' : '' ?>>Today</option>
                     <option value="week" <?= ($filter == 'week') ? 'selected' : '' ?>>This Week</option>
                     <option value="month" <?= ($filter == 'month') ? 'selected' : '' ?>>This Month</option>
                   </select>
-                </li>
+                </li> -->
 
               </ul>
             </div>
