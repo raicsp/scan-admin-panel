@@ -96,7 +96,7 @@ include 'database/db-add-teacher.php';
 
               <!-- Table with Data -->
               <div class="table-responsive">
-              <table id="accountsTable" class="table table-striped display">
+              <table id="accountsTable" class="table table-hover">
                 <thead>
                   <tr>
 
