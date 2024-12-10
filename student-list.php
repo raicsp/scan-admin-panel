@@ -452,7 +452,7 @@ include 'database/db-student-list.php';
           } // Disable ordering on the Actions column
         ],
         language: {
-          search: "Search by Name:",
+          search: "Search:",
           lengthMenu: "Show _MENU_ entries per page",
           info: "Showing _START_ to _END_ of _TOTAL_ entries",
           infoEmpty: "No matching entries found",
