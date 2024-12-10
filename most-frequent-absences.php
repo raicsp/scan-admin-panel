@@ -74,7 +74,6 @@ ROUND(
          AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'), 0)) * 100, 
     2
 ) AS percentage
-
 FROM attendance a
 JOIN student s ON a.studentID = s.studentID
 JOIN classes c ON s.class_id = c.class_id
@@ -83,7 +82,8 @@ $gradeCondition
 $dateCondition
 $gradeSectionCondition
 GROUP BY s.srcode, s.studentID, s.name, c.grade_level, c.section
-ORDER BY absence_count DESC
+ORDER BY absence_count DESC;
+
 ";
 
 $result = $conn->query($absences_sql);
