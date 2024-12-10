@@ -16,18 +16,7 @@ if ($_SESSION['position'] === 'Teacher') {
     $admin_id = $_SESSION['user_id'];
 }
 
-// Check if 'user_id' is set for admin
-if (empty($user_id)) {
-    echo "<script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Admin ID Missing!',
-            text: 'The admin ID is not available in the session. Please log in again.',
-            confirmButtonText: 'OK'
-        });
-    </script>";
-    exit;
-}
+
 
 // Fetch user data from session
 $firstname = htmlspecialchars($_SESSION['firstname']);
