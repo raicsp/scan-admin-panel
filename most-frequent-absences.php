@@ -67,13 +67,14 @@ SELECT
     c.grade_level, 
     c.section, 
     COUNT(a.status) AS absence_count, 
-    ROUND(
-        (COUNT(a.status) / NULLIF(
-            (SELECT COUNT(*) FROM attendance 
-             WHERE studentID = s.studentID 
-             AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'), 0)) * 100, 
-        2
-    ) AS percentage
+ROUND(
+    (COUNT(a.status) / NULLIF(
+        (SELECT COUNT(*) FROM attendance 
+         WHERE studentID = s.studentID 
+         AND a.date BETWEEN '$startOfMonth' AND '$endOfMonth'), 0)) * 100, 
+    2
+) AS percentage
+
 FROM attendance a
 JOIN student s ON a.studentID = s.studentID
 JOIN classes c ON s.class_id = c.class_id
