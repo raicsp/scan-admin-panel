@@ -15,6 +15,20 @@ if ($_SESSION['position'] === 'Teacher') {
     // If position is not "Teacher", use 'user_id'
     $admin_id = $_SESSION['user_id'];
 }
+
+// Check if 'user_id' is set for admin
+if (empty($user_id)) {
+    echo "<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Admin ID Missing!',
+            text: 'The admin ID is not available in the session. Please log in again.',
+            confirmButtonText: 'OK'
+        });
+    </script>";
+    exit;
+}
+
 // Fetch user data from session
 $firstname = htmlspecialchars($_SESSION['firstname']);
 $lastname = htmlspecialchars($_SESSION['lastname']);
@@ -46,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
             exit;
         }
 
-        // Resize the image
+        // Resize the image (same as your current logic)
         list($width, $height) = getimagesize($profile_pic_tmp);
         $new_width = 200; // Set desired width
         $new_height = 200; // Set desired height
@@ -101,103 +115,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['firstname'])) {
         $profile_pic_data = null;
     }
 
-    // Check if email exists in the admin table
-    $sql_check_admin = "SELECT id FROM admin WHERE email = ?";
-    $stmt_check_admin = $conn->prepare($sql_check_admin);
-    $stmt_check_admin->bind_param("s", $email);
-    $stmt_check_admin->execute();
-    $result_admin = $stmt_check_admin->get_result();
-
-    // If email is not found in admin, check in users table
-    if ($result_admin->num_rows == 0) {
-        $sql_check_user = "SELECT id FROM users WHERE email = ?";
-        $stmt_check_user = $conn->prepare($sql_check_user);
-        $stmt_check_user->bind_param("s", $email);
-        $stmt_check_user->execute();
-        $result_user = $stmt_check_user->get_result();
-
-        // If email is found in users, update the user
-        if ($result_user->num_rows > 0) {
-            $sql_update_user = "UPDATE users SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE email = ?";
-            $stmt_update_user = $conn->prepare($sql_update_user);
-            $stmt_update_user->bind_param("sssss", $firstname, $lastname, $email, $profile_pic_data, $email);
-
-            if ($stmt_update_user->execute()) {
-                if ($stmt_update_user->execute()) {
-                    // Update session variables
-                    $_SESSION['firstname'] = $firstname;
-                    $_SESSION['lastname'] = $lastname;
-                    $_SESSION['email'] = $email;
-                
-                    // If profile picture was updated
-                    if ($profile_pic_data !== null) {
-                        $_SESSION['profile_pic'] = 'data:image/' . explode('/', $profile_pic_mime)[1] . ';base64,' . base64_encode($profile_pic_data);
-                    }
-                
-                    echo "<script>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Profile Updated!',
-                            text: 'Your profile information has been updated successfully.',
-                            confirmButtonText: 'OK'
-                        });
-                    </script>";
-                }
-                
-            } else {
-                echo "<script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Update Failed!',
-                        text: 'Failed to update profile. Please try again.',
-                        confirmButtonText: 'OK'
-                    });
-                </script>";
-            }
+    // Prepare SQL update query based on the table (admin or users)
+    if ($profile_pic_data !== null) {
+        // If profile picture data exists, include it in the update query
+        if ($table === 'admin') {
+            $sql_update = "UPDATE admin SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bind_param("ssssi", $firstname, $lastname, $email, $profile_pic_data, $user_id);
         } else {
-            // Email not found in users, show error
-            echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Email Not Found!',
-                    text: 'The email address is not found in both admin and users.',
-                    confirmButtonText: 'OK'
-                });
-            </script>";
+            // Update for teacher (users table)
+            $sql_update = "UPDATE users SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bind_param("ssssi", $firstname, $lastname, $email, $profile_pic_data, $user_id);
         }
     } else {
-        // Update profile in admin table
-        $sql_update_admin = "UPDATE admin SET firstname = ?, lastname = ?, email = ?, profile_pic = ? WHERE id = ?";
-        $stmt_update_admin = $conn->prepare($sql_update_admin);
-        $stmt_update_admin->bind_param("ssssi", $firstname, $lastname, $email, $profile_pic_data, $admin_id);
-
-        if ($stmt_update_admin->execute()) {
-            $_SESSION['firstname'] = $firstname;
-            $_SESSION['lastname'] = $lastname;
-            $_SESSION['email'] = $email;
-
-            if ($profile_pic_data !== null) {
-                $_SESSION['profile_pic'] = 'data:image/' . explode('/', $profile_pic_mime)[1] . ';base64,' . base64_encode($profile_pic_data);
-            }
-
-            echo "<script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Profile Updated!',
-                    text: 'Your profile information has been updated successfully.',
-                    confirmButtonText: 'OK'
-                });
-            </script>";
+        // If no profile picture, exclude it from the update query
+        if ($table === 'admin') {
+            $sql_update = "UPDATE admin SET firstname = ?, lastname = ?, email = ? WHERE id = ?";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bind_param("sssi", $firstname, $lastname, $email, $user_id);
         } else {
-            echo "<script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Update Failed!',
-                    text: 'Failed to update profile. Please try again.',
-                    confirmButtonText: 'OK'
-                });
-            </script>";
+            // Update for teacher (users table)
+            $sql_update = "UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE id = ?";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bind_param("sssi", $firstname, $lastname, $email, $user_id);
         }
+    }
+
+    // Execute the update query and handle possible errors
+    if ($stmt_update->execute()) {
+        $_SESSION['firstname'] = $firstname;
+        $_SESSION['lastname'] = $lastname;
+        $_SESSION['email'] = $email;
+
+        if ($profile_pic_data !== null) {
+            $_SESSION['profile_pic'] = 'data:image/' . explode('/', $profile_pic_mime)[1] . ';base64,' . base64_encode($profile_pic_data);
+        }
+
+        echo "<script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated!',
+                text: 'Your profile information has been updated successfully.',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+    } else {
+        // Add error details to help debug
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed!',
+                text: 'Failed to update profile. SQL Error: " . $stmt_update->error . "',
+                confirmButtonText: 'OK'
+            });
+        </script>";
     }
 }
 
