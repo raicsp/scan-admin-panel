@@ -16,7 +16,7 @@ if ($_SESSION['position'] === 'Teacher') {
 } else {
     // If position is not "Teacher", use 'user_id' for admin table
     $user_id = $_SESSION['user_id'];
-     $admin_id = $_SESSION['id'];
+     $admin_id = $_SESSION['user_id'];
     $table = 'admin';
 }
 
