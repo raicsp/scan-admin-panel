@@ -224,7 +224,7 @@ include 'database/db-dashboard.php';
             </div>
             <div class="card-body">
               <h5 class="card-title">
-                Attendance Distribution<span> | <?= ucfirst($filter) ?> <?= $grade ? "$grade" : "" ?></span>
+                Attendance Distribution<span> | <?= $grade ? "$grade" : "" ?></span>
               </h5>
               <div id="attendanceSummaryChart"></div>
             </div>
