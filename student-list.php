@@ -124,7 +124,8 @@ include 'database/db-student-list.php';
 
               <!-- Table with Data -->
               <div class="table-responsive">
-              <table id="studentsTable" class="table">
+              <table id="studentsTable" class="table table-hover">
+                
                 <thead>
                   <tr>
                     <th>SrCode</th>
