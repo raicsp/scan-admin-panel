@@ -70,7 +70,7 @@ if ($selectedGradeSection) {
 // Query to get students with most absences within the date range
 $absences_sql = "
   SELECT s.srcode, s.studentID, CONCAT(s.name) AS student_name, 
-           c.grade_level, c.section, COUNT(a.status) AS absent_count, 
+           c.grade_level, c.section, COUNT(a.status) AS absence_count, 
            ROUND((COUNT(a.status) / (SELECT COUNT(*) FROM attendance WHERE studentID = s.studentID AND date BETWEEN '$startOfMonth' AND '$endOfMonth')) * 100, 2) AS percentage
     FROM attendance a
     JOIN student s ON a.studentID = s.studentID
@@ -80,7 +80,7 @@ $absences_sql = "
     $dateCondition
     $gradeSectionCondition
     GROUP BY s.studentID
-    ORDER BY absent_count DESC
+    ORDER BY absence_count DESC
 ";
 
 $result = $conn->query($absences_sql);
