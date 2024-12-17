@@ -1,7 +1,8 @@
 <?php
 include 'database/db_connect.php';
-include 'database/db-manage-years.php';
 session_start();
+include 'database/db-manage-years.php';
+
 $activePage = 'manage-years';
 
 $archivedData = getArchivedYears($conn);
