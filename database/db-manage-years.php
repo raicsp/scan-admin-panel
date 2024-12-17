@@ -1,240 +1,107 @@
 <?php
-
-include 'database/db-manage-years.php';
-
-$activePage = 'manage-years';
-
-$archivedData = getArchivedYears($conn);
-
-// Check if the Archive button was clicked
-$message = "";
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
-  // Call the archive function
-  $archiveResult = archiveStudentData($conn);
-  if ($archiveResult === "success") {
-    $message = "Data successfully archived!";
-  } else {
-    $message = $archiveResult; // Display any error messages
-  }
-}
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Administrator | Laboratory School | Batangas State University TNEU</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
-
-  <!-- Favicons -->
-  <link href="assets/img/bsu.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
-  <!-- Template Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
-
-  <!-- jQuery Library -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- SweetAlert Library -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-</head>
-
-<body>
-
-  <!-- Header -->
-  <?php include 'header.php'; ?>
-  <!-- Sidebar -->
-  <?php include 'sidebar.php'; ?>
-
-  <main id="main" class="main">
-    <div class="pagetitle">
-      <h1>Manage Academic Years</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-          <li class="breadcrumb-item active">Manage Academic Years</li>
-        </ol>
-      </nav>
-    </div>
-
-    <section class="section">
-      <div class="row">
-        <div class="col-lg-12">
-
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Manage Academic Years<br> <span> <?= date("F j, Y") ?></span> </h5>
-
-              <!-- Archive Data Section -->
-              <h6><b>Archive Current Year Data</b></h6>
+include 'database/db_connect.php';
+$userPosition = trim($_SESSION['position'] ?? '');
 
 
-              <!-- Form to submit archive action -->
-              <form id="archiveForm" method="POST" action="">
-                <button type="button" id="archiveButton" class="btn btn-warning mb-3">Archive Record</button>
-              </form>
+// Function to fetch archived academic years
+function getArchivedYears($conn)
+{
+    $sql = "SELECT academic_year, date_archived FROM archived_years ORDER BY date_archived DESC";
+    $result = $conn->query($sql);
 
-
-              <!-- <p class="text-muted">This action will transfer current student and attendance data to previous tables.</p> -->
-
-              <!-- View Archived Data Section -->
-              <h6><b>View Archived Data</b></h6>
-              <table class="table table-bordered " id="archiveTable">
-                <thead>
-                  <tr>
-                    <th>Academic Year</th>
-                    <th>Date Archived</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php foreach ($archivedData as $data) : ?>
-                    <tr>
-                      <td><?= htmlspecialchars($data['academic_year']) ?></td>
-                      <td><?= htmlspecialchars($data['date_archived']) ?></td>
-                      <td>
-                        <!-- View and Delete Buttons Side by Side -->
-                        <form method="POST" action="" style="display: inline-block;">
-                          <input type="hidden" name="academic_year" value="<?= htmlspecialchars($data['academic_year']) ?>">
-
-                          <!-- View Button -->
-                          <a href="archived-report.php?academic_year=<?= urlencode($data['academic_year']) ?>" class="btn btn-primary">View</a>
-
-                          <form method="POST" action="" style="display: inline-block;" id="deleteForm">
-                            <input type="hidden" name="academic_year" value="">
-                            <button type="button" class="btn btn-danger deleteButton" data-year="<?= htmlspecialchars($data['academic_year']) ?>">Delete</button>
-                          </form>
-
-                        </form>
-                      </td>
-                    </tr>
-                  <?php endforeach; ?>
-                </tbody>
-
-              </table>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Back to Top Button -->
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-
-  <!-- SweetAlert Script -->
-  <script>
-    $(document).ready(function() {
-      // Archive Button Click Handler
-      $('#archiveButton').on('click', function(e) {
-        e.preventDefault(); // Prevent default button action
-
-        // Show SweetAlert confirmation dialog
-        Swal.fire({
-          title: 'Are you sure?',
-          text: 'Do you really want to archive the current year data? This action cannot be undone.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, archive it!',
-          cancelButtonText: 'Cancel'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // If confirmed, submit the form
-            $('#archiveForm').submit();
-          }
-        });
-      });
-    });
-
-    $(document).ready(function() {
-      // Archive Button Click Handler
-
-
-      // Delete Button Click Handler
-      $('.deleteButton').on('click', function(e) {
-        e.preventDefault(); // Prevent default form submission
-
-        const academicYear = $(this).data('year'); // Get the academic year from data attribute
-
-        // Show SweetAlert confirmation dialog for deletion
-        Swal.fire({
-          title: 'Are you sure?',
-          text: `Do you really want to delete the archived data for ${academicYear}? This action cannot be undone.`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'Cancel'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // If confirmed, set the academic year in the form and submit it
-            $('#deleteForm input[name="academic_year"]').val(academicYear);
-            $('#deleteForm').submit();
-          }
-        });
-      });
-
-      // Display archive or delete message from the server
-      <?php if (!empty($message)) : ?>
-        Swal.fire({
-          title: 'Message',
-          text: '<?= htmlspecialchars($message) ?>',
-          icon: '<?= strpos($message, "successfully") !== false ? "success" : "error" ?>',
-          confirmButtonText: 'OK'
-        });
-      <?php endif; ?>
-    });
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const dataTable = new simpleDatatables.DataTable("#archiveTable", {
-        searchable: false,
-        paging: true,
-        fixedHeight: true,
-        perPage: 10, // Set the number of rows per page
-        labels: {
-          placeholder: "Search...",
-          perPage: "entries per page",
-          noRows: "No results found",
-          info: "Showing {start} to {end} of {rows} results"
+    $archivedData = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $archivedData[] = $row;
         }
-      });
-    });
-  </script>
-</body>
+    }
+    return $archivedData;
+}
 
-</html>
+// Function to archive data from student and attendance to archived tables
+function archiveStudentData($conn)
+{
+    // Fetch distinct academic years from the student table
+    $selectAcademicYearSql = "SELECT DISTINCT school_year FROM student";
+    $result = $conn->query($selectAcademicYearSql);
+
+    // Insert into archived_years table with the current date for each academic year
+    $currentDate = date('Y-m-d'); // Get current date in Y-m-d format
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $academicYear = $row['school_year'];
+            $insertArchivedYearSql = "INSERT INTO archived_years (academic_year, date_archived) VALUES ('$academicYear', '$currentDate')";
+            if ($conn->query($insertArchivedYearSql) !== TRUE) {
+                return "Error inserting into archived_years: " . $conn->error;
+            }
+        }
+    }
+
+    // Archive student data with teacher_name, class_section, and class_grade
+    $archiveStudentSql = "
+        INSERT INTO archived_student (studentID, srcode, name, gender, profile_pic, teacher_Id, teacher_name, gmail, class_id, class_grade, class_section, p_name, parent_contact, school_year, notif)
+        SELECT 
+            s.studentID, 
+            s.srcode,
+            s.name, 
+            s.gender, 
+            s.profile_pic, 
+            s.teacher_Id, 
+            CONCAT(u.firstname, ' ', u.lastname) AS teacher_name,
+            s.gmail, 
+            s.class_id, 
+            c.grade_level AS class_grade, 
+            c.section AS class_section, 
+            s.p_name, 
+            s.parent_contact, 
+            s.school_year, 
+            s.notif
+        FROM 
+            student s
+        LEFT JOIN 
+            users u ON s.teacher_Id = u.id
+        LEFT JOIN 
+            classes c ON s.class_id = c.class_id
+    ";
+
+    if ($conn->query($archiveStudentSql) === TRUE) {
+        // Delete data from the original student table after archiving
+        $deleteStudentSql = "DELETE FROM student";
+        if ($conn->query($deleteStudentSql) !== TRUE) {
+            return "Error deleting student data: " . $conn->error;
+        }
+    } else {
+        return "Error archiving student data: " . $conn->error;
+    }
+
+    // Archive attendance data
+    $archiveAttendanceSql = "INSERT INTO archived_attendance (SELECT * FROM attendance)";
+    if ($conn->query($archiveAttendanceSql) === TRUE) {
+        // Delete data from the original attendance table after archiving
+        $deleteAttendanceSql = "DELETE FROM attendance";
+        if ($conn->query($deleteAttendanceSql) !== TRUE) {
+            return "Error deleting attendance data: " . $conn->error;
+        }
+    } else {
+        return "Error archiving attendance data: " . $conn->error;
+    }
+
+    return "success"; // Return success if all operations are completed successfully
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_academic_year'])) {
+    $academicYearToDelete = $_POST['academic_year'];
+
+    // Delete the specific archived year
+    $deleteSql = "DELETE FROM archived_years WHERE academic_year = ?";
+    $stmt = $conn->prepare($deleteSql);
+    $stmt->bind_param("s", $academicYearToDelete);
+
+    if ($stmt->execute()) {
+        $message = "Academic year $academicYearToDelete deleted successfully!";
+    } else {
+        $message = "Error deleting academic year: " . $conn->error;
+    }
+
+    // Refresh the archived data
+    $archivedData = getArchivedYears($conn);
+}
