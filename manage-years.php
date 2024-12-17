@@ -85,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
 
 
               <!-- Form to submit archive action -->
-              <form method="POST" action="">
-                <!-- <button type="submit" name="archive_data" class="btn btn-warning mb-3">Archive Record</button> -->
-                <button class="btn btn-warning mb-3">Archive Record</button>
+              <form id="archiveForm" method="POST" action="">
+                <button type="button" id="archiveButton" class="btn btn-warning mb-3">Archive Record</button>
               </form>
+
 
               <!-- <p class="text-muted">This action will transfer current student and attendance data to previous tables.</p> -->
 
@@ -113,11 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
                           <input type="hidden" name="academic_year" value="<?= htmlspecialchars($data['academic_year']) ?>">
 
                           <!-- View Button -->
-                          <a href="view-archive.php?academic_year=<?= urlencode($data['academic_year']) ?>" class="btn btn-primary">View</a>
+                          <a href="archived-report.php?academic_year=<?= urlencode($data['academic_year']) ?>" class="btn btn-primary">View</a>
 
+                          <form method="POST" action="" style="display: inline-block;" id="deleteForm">
+                            <input type="hidden" name="academic_year" value="">
+                            <button type="button" class="btn btn-danger deleteButton" data-year="<?= htmlspecialchars($data['academic_year']) ?>">Delete</button>
+                          </form>
 
-                          <!-- Delete Button -->
-                          <button type="submit" name="delete_academic_year" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this academic year?');">Delete</button>
                         </form>
                       </td>
                     </tr>
@@ -156,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
     $(document).ready(function() {
       // Archive Button Click Handler
       $('#archiveButton').on('click', function(e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault(); // Prevent default button action
 
         // Show SweetAlert confirmation dialog
         Swal.fire({
@@ -175,6 +177,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
           }
         });
       });
+    });
+
+    $(document).ready(function() {
+      // Archive Button Click Handler
+
 
       // Delete Button Click Handler
       $('.deleteButton').on('click', function(e) {
