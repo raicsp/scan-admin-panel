@@ -3,7 +3,9 @@
 include 'database/db-manage-years.php';
 
 $activePage = 'manage-years';
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $archivedData = getArchivedYears($conn);
 
 // Check if the Archive button was clicked
