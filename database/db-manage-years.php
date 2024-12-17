@@ -2,14 +2,6 @@
 include 'database/db_connect.php';
 $userPosition = trim($_SESSION['position'] ?? '');
 
-if ($userPosition === '') {
-    // Display error message with image
-    echo '<div style="text-align: center;">';
-    echo '<img src="./adminimages/denied.png" alt="Error" style="width: 500px; height: auto;"/>';
-    echo '<p><strong>ACCESS DENIED</strong></p>';
-    echo '</div>';
-    exit; // Terminate the script after displaying the error
-}
 
 // Function to fetch archived academic years
 function getArchivedYears($conn)
@@ -47,9 +39,10 @@ function archiveStudentData($conn)
 
     // Archive student data with teacher_name, class_section, and class_grade
     $archiveStudentSql = "
-        INSERT INTO archived_student (studentID, name, gender, profile_pic, teacher_Id, teacher_name, gmail, class_id, class_grade, class_section, p_name, parent_contact, school_year, notif)
+        INSERT INTO archived_student (studentID, srcode, name, gender, profile_pic, teacher_Id, teacher_name, gmail, class_id, class_grade, class_section, p_name, parent_contact, school_year, notif)
         SELECT 
             s.studentID, 
+            s.srcode,
             s.name, 
             s.gender, 
             s.profile_pic, 
