@@ -8,8 +8,7 @@ $showAccounts = !in_array($userPosition, ['Elementary Chairperson', 'High School
 // Function to determine whether to show the Classes section
 $showClasses = !in_array($userPosition, ['Teacher']);
 
-// Academic Years section is hidden for all roles, so no need for a function
-$showAcademicYears = false;  // Set to false to hide it
+
 ?>
 
 <aside id="sidebar" class="sidebar">
