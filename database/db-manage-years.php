@@ -105,3 +105,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_academic_year'
     // Refresh the archived data
     $archivedData = getArchivedYears($conn);
 }
+
+
