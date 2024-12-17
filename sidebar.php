@@ -89,8 +89,8 @@ $showAcademicYears = false;  // Set to false to hide it
 
 
 
-      <!-- Academic Years Nav (hidden for all roles) -->
-      <?php if ($showAcademicYears): ?>
+        <!-- Academic Years Nav (hidden for Teacher role) -->
+      <?php if ($userPosition != 'Teacher'): ?>
     <li class="nav-item">
       <a class="nav-link <?php echo $activePage === 'manage-years' ? '' : 'collapsed'; ?>" href="<?php echo $userPosition == 'Teacher' ? 'teacher-manage-years.php' : 'manage-years.php'; ?>">
         <i class="bi bi-calendar"></i><span>Academic Years</span>
