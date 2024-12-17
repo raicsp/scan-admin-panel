@@ -81,7 +81,7 @@ $showClasses = !in_array($userPosition, ['Teacher']);
     <!-- Reports Nav -->
     <li class="nav-item">
       <a class="nav-link <?php echo $activePage === 'attendance-report' ? '' : 'collapsed'; ?>" href="<?php echo $userPosition == 'Teacher' ? 'teacher-report.php' : 'report.php'; ?>">
-        <i class="bi bi-grid"></i>
+        <i class="bi bi-file-earmark-text"></i>
         <span>Reports</span>
       </a>
       <!-- End Reports Nav -->
