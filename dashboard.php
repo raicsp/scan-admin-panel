@@ -386,7 +386,7 @@ include 'database/db-dashboard.php';
                         <th scope="col">Student Name</th>
                         <th scope="col">Grade</th>
                         <th scope="col">Section</th>
-                        <th scope="col">Lates</th>
+                        <th scope="col">Late</th>
 
                       </tr>
                     </thead>
