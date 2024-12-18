@@ -161,11 +161,11 @@ $conn->close();
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Most Frequent Late Arrivals</h1>
+            <h1>Most Frequent Tardiness</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Most Frequent Late Arrivals</li>
+                    <li class="breadcrumb-item active">Most Frequent Tardiness</li>
                 </ol>
             </nav>
         </div>
@@ -175,7 +175,7 @@ $conn->close();
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Students with Most Frequent Late Arrivals<br>
+                            <h5 class="card-title">Students with Most Frequent Tardiness<br>
 
                             </h5>
                             <div class="row mb-3">
