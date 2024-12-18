@@ -378,7 +378,7 @@ include 'database/db-dashboard.php';
                   </ul>
                 </div>
                 <div class="card-body pb-0">
-                  <h5 class="card-title">Students with Most Frequent Late Arrivals </h5>
+                  <h5 class="card-title">Students with Most Frequent Tardiness </h5>
                   <table class="table table-hover" id="lateTable">
                     <thead>
                       <tr>
