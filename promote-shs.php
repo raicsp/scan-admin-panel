@@ -243,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $('#promoteButton').click(function() {
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'You are about to promote the students and delete students with class_id 1 and 7.',
+                    text: 'You are about to promote students. This action cannot be undone.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
