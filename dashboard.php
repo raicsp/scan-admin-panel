@@ -282,7 +282,7 @@ include 'database/db-dashboard.php';
                     </ul>
                   </div>
 
-                  <h5 id="cardTitle" class="card-title mt-3" style=" text-align: left; padding: 30px; padding-top: 5px;">Attendance Overview By Grade</h5>
+                  <h5 id="cardTitle" class="card-title mt-3" style=" text-align: left; padding: 30px; padding-top: 5px;">Attendance Overview By Grade Level</h5>
                   <div id="byGradeChart"></div>
                 </div>
               </div>

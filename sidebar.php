@@ -63,7 +63,7 @@ $showClasses = !in_array($userPosition, ['Teacher']);
         <a class="nav-link <?php echo in_array($activePage, ['class', 'class-management']) ? '' : 'collapsed'; ?>" data-bs-target="#classes-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-building"></i><span>Classes</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="classes-nav" class="nav-content collapse <?php echo in_array($activePage, ['class', 'class-management']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
+        <ul id="classes-nav" class="nav-content collapse <?php echo in_array($activePage, ['class', 'class-management','class-promotion']) ? 'show' : ''; ?>" data-bs-parent="#sidebar-nav">
           <li>
             <a href="<?php echo $userPosition == 'Teacher' ? 'teacher-class.php' : 'class.php'; ?>" class="<?php echo $activePage === 'class' ? 'active' : ''; ?>">
               <i class="bi bi-circle"></i><span>Class Allocation</span>
@@ -74,6 +74,15 @@ $showClasses = !in_array($userPosition, ['Teacher']);
               <i class="bi bi-circle"></i><span>Class Management</span>
             </a>
           </li>
+          <!-- Class Promotion Nav (hidden for Teacher and Chairperson roles) -->
+          <?php if ($userPosition != 'Teacher' && $userPosition != 'Elementary Chairperson' && $userPosition != 'High School Chairperson'): ?>
+            <li>
+              <a href="promote.php" class="<?php echo $activePage === 'class-promotion' ? 'active' : ''; ?>">
+                <i class="bi bi-circle"></i><span>Class Promotion</span>
+              </a>
+            </li>
+          <?php endif; ?>
+
         </ul>
       </li><!-- End Classes Nav -->
     <?php endif; ?>
@@ -88,7 +97,7 @@ $showClasses = !in_array($userPosition, ['Teacher']);
 
 
 
-        <!-- Academic Years Nav (hidden for Teacher role) -->
+      <!-- Academic Years Nav (hidden for Teacher role) -->
       <?php if ($userPosition != 'Teacher'): ?>
     <li class="nav-item">
       <a class="nav-link <?php echo $activePage === 'manage-years' ? '' : 'collapsed'; ?>" href="<?php echo $userPosition == 'Teacher' ? 'teacher-manage-years.php' : 'manage-years.php'; ?>">

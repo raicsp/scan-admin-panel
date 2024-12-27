@@ -123,6 +123,34 @@ if ($studentResult->num_rows > 0) {
     }
 }
 
+// Query to fetch principal's name and insert it into the Excel file
+$principalQuery = "SELECT `firstname`, `lastname` FROM `admin` WHERE position='Principal' LIMIT 1";
+$principalResult = $conn->query($principalQuery);
+
+if ($principalResult && $principalResult->num_rows > 0) {
+    $principalRow = $principalResult->fetch_assoc();
+    $principalName = strtoupper($principalRow['firstname'] . ' ' . $principalRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('AF105', $principalName);
+} else {
+    $sheet->setCellValue('AF105', 'PRINCIPAL NOT FOUND'); // All caps for error message
+}
+// Fetch adviser
+$adviserQuery = "
+    SELECT u.firstname, u.lastname 
+    FROM users u
+    JOIN classes c ON u.class_id = c.class_id
+    WHERE c.grade_level = '$grade' AND c.section = '$section'
+    LIMIT 1";
+$adviserResult = $conn->query($adviserQuery);
+
+if ($adviserResult && $adviserResult->num_rows > 0) {
+    $adviserRow = $adviserResult->fetch_assoc();
+    $adviserName = strtoupper($adviserRow['firstname'] . ' ' . $adviserRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('AF101', $adviserName); // Insert adviser's name in cell AF103
+} else {
+    $sheet->setCellValue('AF101', 'ADVISER NOT FOUND'); // All caps for error message
+}
+
 // Calculate Present count for each date and set it in row 75
 $totalStudents = $studentResult->num_rows;
 $presentCountTotal = 0;

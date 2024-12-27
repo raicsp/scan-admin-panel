@@ -96,6 +96,22 @@ if ($result->num_rows > 0) {
 } else {
     echo "No student data found.";
 }
+// Fetch adviser
+$adviserQuery = "
+    SELECT u.firstname, u.lastname 
+    FROM users u
+    JOIN classes c ON u.class_id = c.class_id
+    WHERE c.grade_level = '$gradeFilter' AND c.section = '$sectionFilter'
+    LIMIT 1";
+$adviserResult = $conn->query($adviserQuery);
+
+if ($adviserResult && $adviserResult->num_rows > 0) {
+    $adviserRow = $adviserResult->fetch_assoc();
+    $adviserName = strtoupper($adviserRow['firstname'] . ' ' . $adviserRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('P22', $adviserName); // Insert adviser's name in cell AF103
+} else {
+    $sheet->setCellValue('P22', 'ADVISER NOT FOUND'); // All caps for error message
+}
 
 $totalDistinctDays = 0;
 $distinctDaysSql = "SELECT COUNT(DISTINCT DATE(date)) AS distinct_day_count FROM attendance WHERE studentID IS NOT NULL";

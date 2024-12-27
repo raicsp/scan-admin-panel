@@ -371,8 +371,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     " . (!empty($schoolYear) ? "AND s.school_year = '$schoolYear' " : "") . "
     $gradeCondition  -- Include grade condition here
     GROUP BY c.grade_level
-    ORDER BY c.grade_level ASC;
+    ORDER BY 
+        CASE
+            WHEN c.grade_level = 'Kinder' THEN 0
+            WHEN c.grade_level = 'Grade-1' THEN 1
+            WHEN c.grade_level = 'Grade-2' THEN 2
+            WHEN c.grade_level = 'Grade-3' THEN 3
+            WHEN c.grade_level = 'Grade-4' THEN 4
+            WHEN c.grade_level = 'Grade-5' THEN 5
+            WHEN c.grade_level = 'Grade-6' THEN 6
+            WHEN c.grade_level = 'Grade-7' THEN 7
+            WHEN c.grade_level = 'Grade-8' THEN 8
+            WHEN c.grade_level = 'Grade-9' THEN 9
+            WHEN c.grade_level = 'Grade-10' THEN 10
+            WHEN c.grade_level = 'Grade-11' THEN 11
+            WHEN c.grade_level = 'Grade-12' THEN 12
+            ELSE 13
+        END ASC;
 ";
+
 
     $result = $conn->query($query);
 

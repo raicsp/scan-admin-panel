@@ -35,13 +35,13 @@ if (isset($_SESSION['position'])) {
 
                 <!-- Conditionally display 'Administrator' or 'Faculty' based on the session's position -->
                 <span class="d-none d-lg-block">
-                    <?php 
-                        // Check if the position is 'Teacher' and display 'Faculty', else 'Administrator'
-                        if ($_SESSION['position'] === 'Teacher') {
-                            echo 'FACULTY';
-                        } else {
-                            echo 'ADMINISTRATOR';
-                        }
+                    <?php
+                    // Check if the position is 'Teacher' and display 'Faculty', else 'Administrator'
+                    if ($_SESSION['position'] === 'Teacher') {
+                        echo 'FACULTY';
+                    } else {
+                        echo 'ADMINISTRATOR';
+                    }
                     ?>
                 </span>
             </a>
@@ -203,7 +203,7 @@ if (isset($_SESSION['position'])) {
                 </li><!-- End Messages Nav -->
                 <span id="datetime" style="color: white; opacity: 0.6; margin-right: 20px;"></span>
                 <li class="nav-item dropdown pe-3">
-                  
+
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                         <img src="<?php echo $profile_pic; ?>" alt="Profile" class="rounded-circle">
                         <!-- Use the session profile picture -->
@@ -230,6 +230,15 @@ if (isset($_SESSION['position'])) {
                             <hr class="dropdown-divider">
                         </li>
                         <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="downloadUserManual()">
+                                <i class="bi bi-download"></i>
+                                <span>Download User Manual</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
                             <a class="dropdown-item d-flex align-items-center" href="profile-settings.php">
                                 <i class="bi bi-person-gear"></i>
                                 <span>Profile Settings</span>
@@ -239,15 +248,7 @@ if (isset($_SESSION['position'])) {
                             <hr class="dropdown-divider">
                         </li>
 
-                        <!--<li>
-                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                                <i class="bi bi-question-circle"></i>
-                                <span>Need Help?</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li> -->
+
 
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" onclick="confirmLogout()">
@@ -274,8 +275,8 @@ if (isset($_SESSION['position'])) {
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, log out!',
-                    cancelButtonText: 'No, stay here'
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Redirect to logout
@@ -284,7 +285,32 @@ if (isset($_SESSION['position'])) {
                 });
             }
 
+            function downloadUserManual() {
+                Swal.fire({
+                    title: 'Download User Manual',
+                    text: 'Are you sure you want to download the User Manual?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Trigger download
+                        const link = document.createElement('a');
+                        link.href = 'user-manual.pdf'; // Replace with the actual path to your PDF
+                        link.download = 'user-manual.pdf';
+                        link.click();
 
+                        Swal.fire(
+                            'Downloaded!',
+                            'User manual has been downloaded.',
+                            'success'
+                        );
+                    }
+                });
+            }
         </script>
 
 
@@ -292,22 +318,22 @@ if (isset($_SESSION['position'])) {
 
 </body>
 <script>
-function updateDateTime() {
-    var now = new Date();
-    var formattedDate = now.getFullYear() + '-' + 
-        ('0' + (now.getMonth() + 1)).slice(-2) + '-' + 
-        ('0' + now.getDate()).slice(-2) + ' ' + 
-        ('0' + now.getHours()).slice(-2) + ':' + 
-        ('0' + now.getMinutes()).slice(-2) + ':' + 
-        ('0' + now.getSeconds()).slice(-2);
-    document.getElementById('datetime').textContent = formattedDate;
-}
+    function updateDateTime() {
+        var now = new Date();
+        var formattedDate = now.getFullYear() + '-' +
+            ('0' + (now.getMonth() + 1)).slice(-2) + '-' +
+            ('0' + now.getDate()).slice(-2) + ' ' +
+            ('0' + now.getHours()).slice(-2) + ':' +
+            ('0' + now.getMinutes()).slice(-2) + ':' +
+            ('0' + now.getSeconds()).slice(-2);
+        document.getElementById('datetime').textContent = formattedDate;
+    }
 
-// Update the time every second
-setInterval(updateDateTime, 1000);
+    // Update the time every second
+    setInterval(updateDateTime, 1000);
 
-// Initialize the datetime on page load
-updateDateTime();
+    // Initialize the datetime on page load
+    updateDateTime();
 </script>
 
 </html>

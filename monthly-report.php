@@ -39,16 +39,16 @@ if ($result->num_rows > 0) {
         // Convert the numeric month to the full month name
         $monthNum = $rowData['month_num'];
         $monthName = DateTime::createFromFormat('!m', $monthNum)->format('F'); // Convert numeric month to month name
-        
+
         // Insert the month name into row 1 (column B, C, D, etc.)
         $sheet->setCellValue(chr(64 + $column) . '1', $monthName); // Using 'B1', 'C1', etc.
-        
+
         // Query to count the number of distinct days in the current month
         $dayCountSql = "SELECT COUNT(DISTINCT DAY(date)) AS day_count 
                         FROM attendance 
                         WHERE MONTH(date) = $monthNum";
         $dayResult = $conn->query($dayCountSql);
-        
+
         // Get the count of distinct days for the current month
         if ($dayResult->num_rows > 0) {
             $dayData = $dayResult->fetch_assoc();
@@ -96,7 +96,7 @@ if ($result->num_rows > 0) {
 
             // Insert the absence count into the corresponding cell for the student and month
             $sheet->setCellValue(chr(64 + $column) . $row, $absentCount); // Set value in the cell corresponding to student and month
-            
+
             $totalAbsences += $absentCount; // Add to the total absences for this student
         }
 
@@ -109,7 +109,21 @@ if ($result->num_rows > 0) {
     echo "No student data found.";
 }
 
+// Query to fetch adviser using class_id directly
+$adviserQuery = "
+    SELECT firstname, lastname 
+    FROM users 
+    WHERE class_id = $class_id
+    LIMIT 1";
+$adviserResult = $conn->query($adviserQuery);
 
+if ($adviserResult && $adviserResult->num_rows > 0) {
+    $adviserRow = $adviserResult->fetch_assoc();
+    $adviserName = strtoupper($adviserRow['firstname'] . ' ' . $adviserRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('P22', $adviserName);
+} else {
+    $sheet->setCellValue('P22', 'ADVISER NOT FOUND'); // All caps for error message
+}
 
 // Calculate the total number of distinct days in O2 by considering all months
 $totalDistinctDays = 0;
@@ -131,7 +145,7 @@ for ($i = 4; $i <= $row - 1; $i++) {
     // Calculate O2 - M (total days - total absences for each student)
     $totalAbsencesForStudent = $sheet->getCell('M' . $i)->getValue();  // Get total absences from column M
     $totalDaysInO2 = $sheet->getCell('O2')->getValue(); // Get total days from O2
-    
+
     // Subtract absences from total days and store in column N
     $sheet->setCellValue('N' . $i, $totalDaysInO2 - $totalAbsencesForStudent); // Set value in column N
 }
@@ -148,4 +162,3 @@ header('Cache-Control: max-age=0');
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 $writer->save('php://output');
 exit;
-?>

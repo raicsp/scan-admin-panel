@@ -33,73 +33,73 @@ $activePage = 'attendance';
   <link href="assets/css/style.css" rel="stylesheet">
 
   <style>
-  .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-  .form-control,
-  .form-select {
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-  }
+    .form-control,
+    .form-select {
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+    }
 
-  /* Custom form layout for spacing */
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-  }
-
-  .form-row .col-md-3,
-  .form-row .col-md-5,
-  .form-row .col-md-2 {
-    flex-grow: 1;
-  }
-
-  /* Align buttons */
-  .btn-container {
-    display: flex;
-    justify-content: flex-start;
-    gap: 10px;
-  }
-
-  /* Styling improvements for buttons */
-  .btn-primary,
-  .btn-success {
-    padding: 0.4rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  /* Improve table styling */
-  .table {
-    margin-top: 20px;
-  }
-
-  /* Responsive form layout */
-  @media (max-width: 768px) {
+    /* Custom form layout for spacing */
     .form-row {
-      flex-direction: column;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
     }
 
     .form-row .col-md-3,
     .form-row .col-md-5,
     .form-row .col-md-2 {
-      width: 100%;
+      flex-grow: 1;
     }
 
+    /* Align buttons */
     .btn-container {
-      justify-content: center;
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
     }
-  }
 
-  /* Adjust table header and data alignment */
-  @media (max-width: 576px) {
-    .table-responsive {
+    /* Styling improvements for buttons */
+    .btn-primary,
+    .btn-success {
+      padding: 0.4rem 1rem;
       font-size: 0.9rem;
     }
-  }
-</style>
+
+    /* Improve table styling */
+    .table {
+      margin-top: 20px;
+    }
+
+    /* Responsive form layout */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+      }
+
+      .form-row .col-md-3,
+      .form-row .col-md-5,
+      .form-row .col-md-2 {
+        width: 100%;
+      }
+
+      .btn-container {
+        justify-content: center;
+      }
+    }
+
+    /* Adjust table header and data alignment */
+    @media (max-width: 576px) {
+      .table-responsive {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -176,11 +176,16 @@ $activePage = 'attendance';
                         <td><?= htmlspecialchars($student['srcode']) ?></td>
                         <td><?= htmlspecialchars($student['name']) ?></td>
                         <?php foreach ($dates as $date) : ?>
-                          <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?></td>
+                          <?php
+                          $status = isset($student['data'][$date]) ? $student['data'][$date] : 'Absent';
+                          $statusClass = ($status == 'Late' || $status == 'Absent') ? 'text-danger' : '';
+                          ?>
+                          <td class="<?= $statusClass ?>"><?= htmlspecialchars($status) ?></td>
                         <?php endforeach; ?>
                       </tr>
                     <?php endforeach; ?>
                   </tbody>
+
                 </table>
               </div>
 

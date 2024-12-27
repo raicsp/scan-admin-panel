@@ -28,8 +28,21 @@ if ($userPosition === 'Elementary Chairperson') {
     $availableGrades = ['Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
     $gradeCondition = " AND c.grade_level IN ('Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12')";
 } else {
-    $availableGrades = ['Kinder', 'Grade-1', 'Grade-2', 'Grade-3', 'Grade-4', 'Grade-5', 'Grade-6', 
-                        'Grade-7', 'Grade-8', 'Grade-9', 'Grade-10', 'Grade-11', 'Grade-12'];
+    $availableGrades = [
+        'Kinder',
+        'Grade-1',
+        'Grade-2',
+        'Grade-3',
+        'Grade-4',
+        'Grade-5',
+        'Grade-6',
+        'Grade-7',
+        'Grade-8',
+        'Grade-9',
+        'Grade-10',
+        'Grade-11',
+        'Grade-12'
+    ];
 }
 
 // Initialize filter variables
@@ -56,10 +69,28 @@ if (isset($_GET['filterMonthly'])) {
 
 // Query to fetch all sections based on available grades
 $gradesAndSectionsQuery = "
-    SELECT DISTINCT grade_level, section
-    FROM classes
-    WHERE grade_level IN ('" . implode("', '", $availableGrades) . "')
-    ORDER BY grade_level, section";
+SELECT DISTINCT grade_level, section
+FROM classes
+WHERE grade_level IN ('" . implode("', '", $availableGrades) . "')
+ORDER BY 
+    CASE 
+        WHEN grade_level = 'Kinder' THEN 0
+        WHEN grade_level = 'Grade-1' THEN 1
+        WHEN grade_level = 'Grade-2' THEN 2
+        WHEN grade_level = 'Grade-3' THEN 3
+        WHEN grade_level = 'Grade-4' THEN 4
+        WHEN grade_level = 'Grade-5' THEN 5
+        WHEN grade_level = 'Grade-6' THEN 6
+        WHEN grade_level = 'Grade-7' THEN 7
+        WHEN grade_level = 'Grade-8' THEN 8
+        WHEN grade_level = 'Grade-9' THEN 9
+        WHEN grade_level = 'Grade-10' THEN 10
+        WHEN grade_level = 'Grade-11' THEN 11
+        WHEN grade_level = 'Grade-12' THEN 12
+        ELSE 13 -- In case there are unanticipated grade levels
+    END,
+    section;
+";
 $gradesAndSectionsResult = $conn->query($gradesAndSectionsQuery);
 
 $allGrades = [];
@@ -126,11 +157,11 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
     $filename = 'attendance_report.csv';
     header('Content-Type: text/csv');
     header("Content-Disposition: attachment; filename=\"$filename\"");
-    
+
     $output = fopen('php://output', 'w');
     $header = array_merge(['Name', 'Grade', 'Section', 'Date', 'Status']);
     fputcsv($output, $header);
-    
+
     $exportData = array_merge($studentsDaily, $studentsMonthly);
     foreach ($exportData as $student) {
         foreach ($student['data'] as $date => $status) {
@@ -140,4 +171,3 @@ if (isset($_GET['export']) && $_GET['export'] == 'csv') {
     fclose($output);
     exit();
 }
-?>

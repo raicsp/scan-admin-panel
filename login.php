@@ -62,7 +62,7 @@ include 'database/db-login.php';
                             <div class="d-flex justify-content-center ">
 
 
-                                <img src="assets/img/header.png" alt="header" style="max-width: 100%; height: 100%; margin-bottom: 0;">
+                                <img src="adminimages/scan-header.png" alt="header" style="max-width: 100%; height: 100%; margin-bottom: 0;">
 
 
 

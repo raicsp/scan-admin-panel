@@ -10,8 +10,8 @@ $activePage = 'attendance';
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Administrator | Laboratory School | Batangas State University TNEU</title>
- <!-- Favicons -->
- <link href="assets/img/bsu.png" rel="icon">
+  <!-- Favicons -->
+  <link href="assets/img/bsu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -158,7 +158,7 @@ $activePage = 'attendance';
                 <div class="row mb-3">
                   <div class="btn-container">
                     <button type="submit" class="btn btn-primary">Filter</button>
-                    
+
                   </div>
                 </div>
               </form>
@@ -177,14 +177,19 @@ $activePage = 'attendance';
                   <tbody>
                     <?php foreach ($students as $student) : ?>
                       <tr>
-                      <td><?= htmlspecialchars($student['srcode']) ?></td>
+                        <td><?= htmlspecialchars($student['srcode']) ?></td>
                         <td><?= htmlspecialchars($student['name']) ?></td>
                         <?php foreach ($dates as $date) : ?>
-                          <td><?= isset($student['data'][$date]) ? htmlspecialchars($student['data'][$date]) : 'Absent' ?></td>
+                          <?php
+                          $status = isset($student['data'][$date]) ? $student['data'][$date] : 'Absent';
+                          $statusClass = ($status == 'Late' || $status == 'Absent') ? 'text-danger' : '';
+                          ?>
+                          <td class="<?= $statusClass ?>"><?= htmlspecialchars($status) ?></td>
                         <?php endforeach; ?>
                       </tr>
                     <?php endforeach; ?>
                   </tbody>
+
                 </table>
               </div>
 
@@ -225,7 +230,7 @@ $activePage = 'attendance';
       }
     }
   </script>
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       const dataTable = new simpleDatatables.DataTable("#studentsTable", {
         searchable: false,
@@ -240,7 +245,7 @@ $activePage = 'attendance';
         }
       });
     });
-</script>
+  </script>
 </body>
 
 </html>

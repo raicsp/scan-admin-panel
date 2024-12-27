@@ -71,7 +71,25 @@ if ($result->num_rows > 0) {
 usort($teachers, function ($a, $b) {
     return strcmp($a['fullname'], $b['fullname']);
 });
+//reset
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'reset_classes') {
+    try {
+        $resetClasses = $conn->prepare("UPDATE classes SET assigned_teacher_id = NULL");
+        $resetClasses->execute();
 
+        $resetUsers = $conn->prepare("UPDATE users SET class_id = NULL");
+        $resetUsers->execute();
+
+        $resetStudents = $conn->prepare("UPDATE student SET teacher_Id = NULL");
+        $resetStudents->execute();
+
+        echo 'success';
+    } catch (PDOException $e) {
+        error_log("Reset Error: " . $e->getMessage());
+        echo 'error';
+    }
+    exit; // Ensure no further output
+}
 
 // Handle Teacher Assignment Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -125,4 +143,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo 'Invalid class_id or teacher_id';
     }
 }
-?>

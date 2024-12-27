@@ -154,6 +154,33 @@ foreach ($dateColumnMap as $date => $column) {
     $presentCountTotal += $presentCount;
 }
 
+// Query to fetch principal's name and insert it into the Excel file
+$principalQuery = "SELECT `firstname`, `lastname` FROM `admin` WHERE position='Principal' LIMIT 1";
+$principalResult = $conn->query($principalQuery);
+
+if ($principalResult && $principalResult->num_rows > 0) {
+    $principalRow = $principalResult->fetch_assoc();
+    $principalName = strtoupper($principalRow['firstname'] . ' ' . $principalRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('AF105', $principalName);
+} else {
+    $sheet->setCellValue('AF105', 'PRINCIPAL NOT FOUND'); // All caps for error message
+}
+
+// Query to fetch adviser using class_id directly
+$adviserQuery = "
+    SELECT firstname, lastname 
+    FROM users 
+    WHERE class_id = $class_id
+    LIMIT 1";
+$adviserResult = $conn->query($adviserQuery);
+
+if ($adviserResult && $adviserResult->num_rows > 0) {
+    $adviserRow = $adviserResult->fetch_assoc();
+    $adviserName = strtoupper($adviserRow['firstname'] . ' ' . $adviserRow['lastname']); // Convert to uppercase
+    $sheet->setCellValue('AF101', $adviserName);
+} else {
+    $sheet->setCellValue('AF101', 'ADVISER NOT FOUND'); // All caps for error message
+}
 
 // Set the total present count in AK75
 $sheet->setCellValue('AK75', $presentCountTotal);

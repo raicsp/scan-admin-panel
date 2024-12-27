@@ -2,6 +2,7 @@
 $activePage = 'class';
 include 'database/db_connect.php';
 include 'database/db-class.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -31,8 +32,8 @@ include 'database/db-class.php';
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
 
- <!-- jQuery -->
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <!-- DataTables JS -->
@@ -72,7 +73,7 @@ include 'database/db-class.php';
 
               <!-- Filters -->
               <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-5">
                   <select id="gradeFilter" class="form-select">
                     <option value="">Select Grade</option>
                     <?php foreach ($grades as $grade) : ?>
@@ -80,12 +81,16 @@ include 'database/db-class.php';
                     <?php endforeach; ?>
                   </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-5">
                   <select id="sectionFilter" class="form-select">
                     <option value="">Select Section</option>
                     <!-- Section options will be populated dynamically -->
                   </select>
                 </div>
+                <div class="col-md-2">
+                  <button id="resetButton" class="btn btn-danger w-100">Reset</button>
+                </div>
+
               </div>
 
               <!-- DataTable -->
@@ -105,16 +110,28 @@ include 'database/db-class.php';
                       <td>
                         <select class="form-select" data-class-id="<?php echo htmlspecialchars($class['class_id']); ?>" onchange="updateTeacher(this)">
                           <option value="">Assign Teacher</option>
+
                           <?php foreach ($teachers as $teacher) : ?>
-                            <option value="<?php echo htmlspecialchars($teacher['id']); ?>" <?php echo ($class['assigned_teacher_id'] == $teacher['id']) ? 'selected' : ''; ?>>
-                              <?php echo htmlspecialchars($teacher['fullname']); ?>
-                            </option>
+                            <?php
+                            // Safely check if 'assigned_teacher_id' exists and handle accordingly
+                            $isAssigned = !empty($class['assigned_teacher_id']) && $class['assigned_teacher_id'] == $teacher['id'];
+                            ?>
+                            <?php if (!$isAssigned && !in_array($teacher['id'], array_column($classes, 'assigned_teacher_id', 'class_id'))) : ?>
+                              <option value="<?php echo htmlspecialchars($teacher['id']); ?>">
+                                <?php echo htmlspecialchars($teacher['fullname']); ?>
+                              </option>
+                            <?php elseif ($isAssigned) : ?>
+                              <option value="<?php echo htmlspecialchars($teacher['id']); ?>" selected>
+                                <?php echo htmlspecialchars($teacher['fullname']); ?>
+                              </option>
+                            <?php endif; ?>
                           <?php endforeach; ?>
                         </select>
                       </td>
                     </tr>
                   <?php endforeach; ?>
                 </tbody>
+
               </table>
 
             </div>
@@ -139,145 +156,207 @@ include 'database/db-class.php';
 
   <!-- Main JS -->
   <script>
-  $(document).ready(function () {
-    // Custom sorting function for numeric values in "Grade Level"
-    jQuery.fn.dataTable.ext.type.order['grade-level-pre'] = function (data) {
-      const match = data.match(/\d+/); // Extract the numeric value from the grade level
-      return match ? parseInt(match[0], 10) : 0; // Return the numeric value for sorting
-    };
+    $(document).ready(function() {
+      // Custom sorting function for numeric values in "Grade Level"
+      jQuery.fn.dataTable.ext.type.order['grade-level-pre'] = function(data) {
+        const match = data.match(/\d+/); // Extract the numeric value from the grade level
+        return match ? parseInt(match[0], 10) : 0; // Return the numeric value for sorting
+      };
 
-    // Initialize DataTable
-    const table = $('#classTable').DataTable({
-      paging: true,
-      searching: true,
-      ordering: true,
-      pageLength: 10,
-      order: [[0, 'asc']], // Default sorting on the Grade Level column (index 0)
-      columnDefs: [
-        { type: 'grade-level', targets: 0 }, // Apply custom sorting to Grade Level column
-      ],
-      dom: 't<"bottom"ip>',
-      stripeClasses: [],
-      language: {
-        search: "Search:",
-        zeroRecords: "No Classes Available",
-        lengthMenu: "Show _MENU_ entries per page",
-        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-        infoEmpty: "No matching entries",
-        paginate: {
-          previous: "Previous",
-          next: "Next"
+      // Initialize DataTable
+      const table = $('#classTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        pageLength: 10,
+        order: [
+          [0, 'asc']
+        ], // Default sorting on the Grade Level column (index 0)
+        columnDefs: [{
+            type: 'grade-level',
+            targets: 0
+          }, // Apply custom sorting to Grade Level column
+        ],
+        dom: 't<"bottom"ip>',
+        stripeClasses: [],
+        language: {
+          search: "Search:",
+          zeroRecords: "No Classes Available",
+          lengthMenu: "Show _MENU_ entries per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+          infoEmpty: "No matching entries",
+          paginate: {
+            previous: "Previous",
+            next: "Next"
+          }
+        },
+      });
+
+      // Section Data from PHP
+      const sectionsByGrade = <?php echo json_encode($sectionsByGrade); ?>;
+
+      // Populate Sections Based on Grade Selection
+      $('#gradeFilter').on('change', function() {
+        const selectedGrade = $(this).val();
+        const sectionFilter = $('#sectionFilter');
+
+        // Clear existing options
+        sectionFilter.empty().append('<option value="">Select Section</option>');
+
+        // Populate new options if a grade is selected
+        if (selectedGrade && sectionsByGrade[selectedGrade]) {
+          sectionsByGrade[selectedGrade].forEach(section => {
+            sectionFilter.append(new Option(section, section));
+          });
         }
-      },
+
+        // Trigger filtering
+        $('#sectionFilter').trigger('change');
+      });
+
+      // Custom Filters
+      $('#gradeFilter, #sectionFilter').on('change', function() {
+        const grade = $('#gradeFilter').val();
+        const section = $('#sectionFilter').val();
+
+        // Apply exact match search using regex
+        table
+          .columns(0).search(grade ? `^${grade}$` : '', true, false) // Grade Level column (index 0)
+          .columns(1).search(section ? `^${section}$` : '', true, false) // Section column (index 1)
+          .draw();
+      });
     });
 
-    // Section Data from PHP
-    const sectionsByGrade = <?php echo json_encode($sectionsByGrade); ?>;
+    // Update teacher functionality
+    function updateTeacher(selectElement) {
+      const classId = selectElement.getAttribute('data-class-id'); // Class ID
+      const teacherId = selectElement.value; // Currently selected teacher ID
+      const teacherName = selectElement.options[selectElement.selectedIndex].text; // Name of the selected teacher
+      const previousValue = selectElement.dataset.previousValue || ''; // Store the previous value (default to empty)
+      const previousText = selectElement.dataset.previousText || 'Assign Teacher'; // Store the previous text (default to 'Assign Teacher')
+      const row = $(selectElement).closest('tr'); // Get the table row
 
-    // Populate Sections Based on Grade Selection
-    $('#gradeFilter').on('change', function () {
-      const selectedGrade = $(this).val();
-      const sectionFilter = $('#sectionFilter');
+      // Revert dropdown to the previous value until confirmed
+      selectElement.value = previousValue;
 
-      // Clear existing options
-      sectionFilter.empty().append('<option value="">Select Section</option>');
-
-      // Populate new options if a grade is selected
-      if (selectedGrade && sectionsByGrade[selectedGrade]) {
-        sectionsByGrade[selectedGrade].forEach(section => {
-          sectionFilter.append(new Option(section, section));
-        });
-      }
-
-      // Trigger filtering
-      $('#sectionFilter').trigger('change');
-    });
-
-    // Custom Filters
-    $('#gradeFilter, #sectionFilter').on('change', function () {
-      const grade = $('#gradeFilter').val();
-      const section = $('#sectionFilter').val();
-
-      // Apply exact match search using regex
-      table
-        .columns(0).search(grade ? `^${grade}$` : '', true, false) // Grade Level column (index 0)
-        .columns(1).search(section ? `^${section}$` : '', true, false) // Section column (index 1)
-        .draw();
-    });
-  });
-
-  // Update teacher functionality
-  function updateTeacher(selectElement) {
-    const classId = selectElement.getAttribute('data-class-id'); // Class ID
-    const teacherId = selectElement.value; // Currently selected teacher ID
-    const teacherName = selectElement.options[selectElement.selectedIndex].text; // Name of the selected teacher
-    const previousValue = selectElement.dataset.previousValue || ''; // Store the previous value (default to empty)
-    const previousText = selectElement.dataset.previousText || 'Assign Teacher'; // Store the previous text (default to 'Assign Teacher')
-    const row = $(selectElement).closest('tr'); // Get the table row
-
-    // Revert dropdown to the previous value until confirmed
-    selectElement.value = previousValue;
-
-    Swal.fire({
-        title: 'Are you sure?',
+      Swal.fire({
+        // title: 'Are you sure?',
         text: `Do you want to assign ${teacherName} to this class?`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, assign it!',
+        confirmButtonText: 'Yes',
         cancelButtonText: 'Cancel',
-    }).then((result) => {
+      }).then((result) => {
         if (result.isConfirmed) {
-            // AJAX request to assign teacher
-            $.post('database/db-class.php', {
-                class_id: classId,
-                teacher_id: teacherId,
-            }, function (response) {
-                if (response.trim() === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Assigned!',
-                        text: 'The teacher has been successfully assigned.',
-                        timer: 1500,
-                        showConfirmButton: false,
-                    });
+          // AJAX request to assign teacher
+          $.post('database/db-class.php', {
+            class_id: classId,
+            teacher_id: teacherId,
+          }, function(response) {
+            if (response.trim() === 'success') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Assigned!',
+                text: 'The teacher has been successfully assigned to the class.',
+                timer: 1500,
+                showConfirmButton: false,
+              }).then(() => {
+                // Set a 2-second delay before reloading the page
+                setTimeout(() => {
+                  location.reload();
+                });
+              });
+              // Update the dropdown to reflect the confirmed assignment
+              selectElement.dataset.previousValue = teacherId;
+              selectElement.dataset.previousText = teacherName;
+              selectElement.value = teacherId;
 
-                    // Update the dropdown to reflect the confirmed assignment
-                    selectElement.dataset.previousValue = teacherId;
-                    selectElement.dataset.previousText = teacherName;
-                    selectElement.value = teacherId;
+              // Re-populate the dropdown with the updated list of teachers
+              $.get('database/db-class.php', {
+                class_id: classId
+              }, function(updatedTeachers) {
+                // Filter out the already assigned teacher from the list
+                const teachers = updatedTeachers.filter(teacher => teacher.id !== teacherId);
 
-                    // Update the DataTable dynamically
-                    const table = $('#classTable').DataTable();
-                    const rowIndex = table.row(row).index();
-                    table.cell(rowIndex, 2).data(`
-                        <select class="form-select" data-class-id="${classId}" onchange="updateTeacher(this)" data-previous-value="${teacherId}" data-previous-text="${teacherName}">
-                            <option value="">Assign Teacher</option>
-                            <?php foreach ($teachers as $teacher) : ?>
-                                <option value="<?php echo htmlspecialchars($teacher['id']); ?>" 
-                                ${teacherId == <?php echo $teacher['id']; ?> ? 'selected' : ''}>
-                                <?php echo htmlspecialchars($teacher['fullname']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    `).draw(false); // Update the Action column and redraw the table without reloading
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'There was an error assigning the teacher.',
-                    });
+                // Update the dropdown options
+                $(selectElement).empty();
+                $(selectElement).append('<option value="">Assign Teacher</option>'); // Add the "Assign Teacher" option
 
-                    // Revert to the previous value on error
-                    selectElement.value = previousValue;
-                }
-            });
+                teachers.forEach(teacher => {
+                  $(selectElement).append(`<option value="${teacher.id}">${teacher.fullname}</option>`);
+                });
+              });
+
+              // Update the DataTable dynamically (optional, if you want to refresh the table without reloading)
+              const table = $('#classTable').DataTable();
+              const rowIndex = table.row(row).index();
+              table.cell(rowIndex, 2).data(`
+            <select class="form-select" data-class-id="${classId}" onchange="updateTeacher(this)" data-previous-value="${teacherId}" data-previous-text="${teacherName}">
+              <option value="">Assign Teacher</option>
+              ${teachers.map(teacher => `<option value="${teacher.id}" ${teacher.id === teacherId ? 'selected' : ''}>${teacher.fullname}</option>`).join('')}
+            </select>
+          `).draw(false); // Update the Action column and redraw the table without reloading
+
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'There was an error assigning the teacher.',
+              });
+
+              // Revert to the previous value on error
+              selectElement.value = previousValue;
+            }
+          });
         } else {
-            // Revert dropdown to the previous value if cancelled
-            selectElement.value = previousValue;
+          // Revert dropdown to the previous value if cancelled
+          selectElement.value = previousValue;
         }
-    });
-}
+      });
+    }
+    $(document).ready(function() {
+      $('#resetButton').on('click', function() {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "This will reset all class assignments.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'Cancel',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // AJAX call to execute the reset SQL queries
+            $.post('database/db-class.php', {
+              action: 'reset_classes'
+            }, function(response) {
+              console.log('Server Response:', response); // Log the response
+              if (response.trim() === 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Reset!',
+                  text: 'All classes have been reset successfully.',
+                  timer: 1500,
+                  showConfirmButton: false,
+                }).then(() => {
+                  // Set a 2-second delay before reloading the page
+                  setTimeout(() => {
+                    location.reload();
+                  });
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error!',
+                  text: 'An error occurred while resetting classes. Please try again.',
+                });
+              }
+            });
 
+
+          }
+        });
+      });
+    });
   </script>
 
 
