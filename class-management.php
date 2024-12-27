@@ -323,12 +323,12 @@ include 'database/db-class-management.php';
     function submitUpdateClassForm() {
       Swal.fire({
         title: 'Save Changes?',
-        text: 'Are you sure you want to update this class?',
+        text: 'You are about to update this class.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, save it!'
+        confirmButtonText: 'Yes'
       }).then((result) => {
         if (result.isConfirmed) {
           document.getElementById('updateClassForm').submit();
@@ -345,7 +345,7 @@ include 'database/db-class-management.php';
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Yes'
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = '?delete_id=' + classId;

@@ -273,10 +273,10 @@ $activePage = 'attendance-report';
       } else {
         Swal.fire({
           title: "Generate Daily Report?",
-          text: "Are you sure you want to generate the daily report for the selected month?",
+          text: "You are about to generate the daily report for the selected month?",
           icon: "question",
           showCancelButton: true,
-          confirmButtonText: "Yes, Generate",
+          confirmButtonText: "Generate",
           cancelButtonText: "Cancel",
         }).then((result) => {
           if (result.isConfirmed) {
@@ -322,10 +322,10 @@ $activePage = 'attendance-report';
 
       Swal.fire({
         title: "Generate Monthly Report?",
-        text: "Are you sure you want to generate the monthly report?",
+        text: "You are about to generate the monthly report.",
         icon: "question",
         showCancelButton: true,
-        confirmButtonText: "Yes, Generate",
+        confirmButtonText: "Generate",
         cancelButtonText: "Cancel",
       }).then((result) => {
         if (result.isConfirmed) {

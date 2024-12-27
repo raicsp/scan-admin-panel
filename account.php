@@ -311,7 +311,7 @@ include 'database/db-add-teacher.php';
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Yes'
       }).then((result) => {
         if (result.isConfirmed) {
           isSubmitting = true; // Set the flag to prevent further submissions

@@ -322,7 +322,7 @@ include 'database/db-administrator.php';
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Yes'
       }).then((result) => {
         if (result.isConfirmed) {
           document.getElementById('deleteTeacherId').value = id; // Set the id in hidden input
@@ -339,7 +339,7 @@ include 'database/db-administrator.php';
         text: "Please confirm your action.",
         icon: 'info',
         showCancelButton: true,
-        confirmButtonText: 'Yes, proceed!',
+        confirmButtonText: 'Yes',
         cancelButtonText: 'Cancel'
       }).then((result) => {
         if (result.isConfirmed) {

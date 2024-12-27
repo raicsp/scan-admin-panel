@@ -230,11 +230,11 @@ document.getElementById('save-pic-btn').addEventListener('click', function(event
 
     Swal.fire({
         title: 'Are you sure?',
-        text: "Do you want to save this profile picture?",
+        text: "You are about to save this profile picture.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, save it!',
-        cancelButtonText: 'No, cancel!'
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('profile-settings-form').submit();
@@ -270,11 +270,11 @@ document.getElementById('confirm-update-profile').addEventListener('click', func
 
     Swal.fire({
         title: 'Are you sure?',
-        text: "Do you want to update your profile information?",
+        text: "You are about to update your profile information.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, update it!',
-        cancelButtonText: 'No, cancel!'
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('profile-settings-form').submit();
@@ -320,11 +320,11 @@ document.getElementById('confirm-change-password').addEventListener('click', fun
 
     Swal.fire({
         title: 'Are you sure?',
-        text: "Do you want to change your password?",
+        text: "You are about to change your password.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, change it!',
-        cancelButtonText: 'No, cancel!'
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('password-change-form').submit();

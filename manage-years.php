@@ -194,12 +194,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_data'])) {
         // Show SweetAlert confirmation dialog for deletion
         Swal.fire({
           title: 'Are you sure?',
-          text: `Do you really want to delete the archived data for ${academicYear}? This action cannot be undone.`,
+          text: `You are about to delete the archived data for ${academicYear}. This action cannot be undone.`,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#d33',
           cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!',
+          confirmButtonText: 'Yes',
           cancelButtonText: 'Cancel'
         }).then((result) => {
           if (result.isConfirmed) {
